@@ -1,0 +1,11 @@
+# Binaries
+bin/*
+*.o
+*.exe
+
+# Project files
+vs*/
+
+# Swap files
+*.swp
+bin/bootstrap
