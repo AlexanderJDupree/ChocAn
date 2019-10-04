@@ -46,7 +46,7 @@ project "ChocAn"
     kind "StaticLib"
     language "C++"
     targetdir "lib/%{cfg.buildcfg}/"
-    targetname "libChocAn"
+    targetname "ChocAn"
 
     local include = "include/"
     local source  = "src/"
