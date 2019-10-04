@@ -22,8 +22,8 @@ ifeq ($(config),debug)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -Wall -Wextra -Werror -std=c++11
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -Wall -Wextra -Werror -std=c++11
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/debug/liblibChocAn.a
-  LDDEPS += ../lib/debug/liblibChocAn.a
+  LIBS += ../lib/debug/libChocAn.a
+  LDDEPS += ../lib/debug/libChocAn.a
   ALL_LDFLAGS += $(LDFLAGS)
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
@@ -49,8 +49,8 @@ ifeq ($(config),release)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++11
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++11
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/release/liblibChocAn.a
-  LDDEPS += ../lib/release/liblibChocAn.a
+  LIBS += ../lib/release/libChocAn.a
+  LDDEPS += ../lib/release/libChocAn.a
   ALL_LDFLAGS += $(LDFLAGS) -s
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS

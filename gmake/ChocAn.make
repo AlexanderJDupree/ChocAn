@@ -13,7 +13,7 @@ endif
 ifeq ($(config),debug)
   RESCOMP = windres
   TARGETDIR = ../lib/debug
-  TARGET = $(TARGETDIR)/liblibChocAn.a
+  TARGET = $(TARGETDIR)/libChocAn.a
   OBJDIR = obj/debug/ChocAn
   DEFINES += -DDEBUG -DMOCKING_ENABLED
   INCLUDES += -I../include
@@ -40,7 +40,7 @@ endif
 ifeq ($(config),release)
   RESCOMP = windres
   TARGETDIR = ../lib/release
-  TARGET = $(TARGETDIR)/liblibChocAn.a
+  TARGET = $(TARGETDIR)/libChocAn.a
   OBJDIR = obj/release/ChocAn
   DEFINES += -DNDEBUG
   INCLUDES += -I../include
