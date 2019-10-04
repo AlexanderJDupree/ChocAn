@@ -79,12 +79,14 @@ build() {
 tests() {
   if [[ -d bin/tests/ ]]; then
 
-    hl::subtle "Running Debug Configuration Tests"
+    h2 "Running Tests"
+
+    hl::subtle "Debug Configuration Tests"
 
     run::set-next show-output-on
     run "echo && bin/tests/debug_tests"
 
-    hl::subtle "Running Release Configuration Tests"
+    hl::subtle "Release Configuration Tests"
 
     run::set-next show-output-on
     run "echo && bin/tests/release_tests"
