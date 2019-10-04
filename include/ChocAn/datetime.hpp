@@ -10,7 +10,7 @@ Authors: Daniel Mendez
          Arman Alauizadeh 
          Alexander DuPree
 
-https://github.com/AlexanderJDupree/
+https://github.com/AlexanderJDupree/ChocAn
  
 */
 
@@ -21,36 +21,16 @@ https://github.com/AlexanderJDupree/
 #include <chrono>
 #include <exception>
 
-struct invalid_datetime : std::exception
-{
-    typedef std::tuple<unsigned, unsigned, unsigned> Info;
-
-    Info values;
-    const char* error;
-
-    invalid_datetime(Info values, const char* error)
-        : values(values), error(error) {};
-
-    const char* what() const throw()
-    {
-        return error;
-    }
-
-    Info get_info() const throw()
-    {
-        return values;
-    }
-};
 
 class datetime_unit
 {
 public:
 
-    datetime_unit(unsigned val = 1) : _val(val) {};
+    explicit datetime_unit(unsigned val = 1) : _val(val) {};
     
     virtual bool ok() const = 0;
 
-    virtual operator unsigned() const { return _val; }
+    explicit operator unsigned() const { return _val; }
 
 protected:
 
@@ -62,7 +42,7 @@ class Day : public datetime_unit
 {
 public:
 
-    Day(unsigned day = 1) : datetime_unit(day) {};
+    explicit Day(unsigned day = 1) : datetime_unit(day) {};
 
     bool ok() const override;
 
@@ -77,7 +57,7 @@ class Month : public datetime_unit
 {
 public:
 
-    Month(unsigned month = 1) : datetime_unit(month) {};
+    explicit Month(unsigned month = 1) : datetime_unit(month) {};
 
     bool ok() const override;
 
@@ -92,7 +72,7 @@ class Year : public datetime_unit
 {
 public:
 
-    Year(unsigned year = 2019) : datetime_unit(year) {};
+    explicit Year(unsigned year = 2019) : datetime_unit(year) {};
 
     bool ok() const override;
     bool is_leap_year() const;
@@ -130,4 +110,26 @@ private:
 
 };
 
+// Custom Exception
+struct invalid_datetime : std::exception
+{
+    typedef std::tuple<Day, Month, Year> Info;
+
+    Info values;
+    const char* error;
+
+    invalid_datetime(Info values, const char* error)
+        : values(values), error(error) {};
+
+    const char* what() const throw()
+    {
+        return error;
+    }
+
+    Info get_info() const throw()
+    {
+        return values;
+    }
+};
 #endif // DATETIME_HPP
+
