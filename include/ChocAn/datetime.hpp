@@ -108,7 +108,7 @@ class DateTime
 {
 public:
 
-    DateTime(unsigned day = 4, unsigned month = 7, unsigned year = 1776);
+    DateTime(Day day, Month month, Year year);
 
     bool ok() const;
 

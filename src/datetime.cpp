@@ -18,7 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 /** DATETIME CLASS **/
 
-DateTime::DateTime(unsigned day, unsigned month, unsigned year)
+DateTime::DateTime(Day day, Month month, Year year)
     : _day(day), _month(month), _year(year)
 {
     if (!ok())
