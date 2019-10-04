@@ -1,5 +1,7 @@
 # Binaries
-bin/*
+bin/
+obj/
+lib/
 *.o
 *.exe
 
