@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <catch.hpp>
 #include <ChocAn/datetime.hpp>
 
-TEST_CASE("Constructors for DateTime classes", "[constructors]")
+TEST_CASE("Constructors for DateTime classes", "[constructors], [datetime]")
 {
 
     SECTION("Construct valid Day object")
@@ -67,7 +67,7 @@ TEST_CASE("Constructors for DateTime classes", "[constructors]")
     }
 }
 
-TEST_CASE("Detecting Leap Years", "[leap_year]")
+TEST_CASE("Detecting Leap Years", "[leap_year], [datetime]")
 {
     SECTION("Non-leap year")
     {
@@ -87,7 +87,17 @@ TEST_CASE("Detecting Leap Years", "[leap_year]")
     }
 }
 
-TEST_CASE("DateTime comparison operators")
+TEST_CASE("Getting current DateTime from system clock", "[current_time], [datetime]")
+{
+    DateTime epoch(Day(1), Month(1), Year(1970));
+
+    SECTION("0 seconds since epoch")
+    {
+        REQUIRE(DateTime::get_current_datetime() == epoch);
+    }
+}
+
+TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
 {
 // DateTime utilizes Day, Month, Year comparison operatos, as such we need only
 // Test the DateTime class operators
