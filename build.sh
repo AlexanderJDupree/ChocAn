@@ -66,12 +66,12 @@ build() {
   run "cd gmake"
 
   run::set-next show-output-on
-  run "echo && make -j 12 config=debug"
+  run "echo && make -j 12 config=debug verbose=true"
 
   h2 "Building Release Configuration"
 
   run::set-next show-output-on
-  run "echo && make -j 12 config=release"
+  run "echo && make -j 12 config=release verbose=true"
 
   run "cd ${ProjectRoot}"
 }
