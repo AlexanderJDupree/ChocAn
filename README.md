@@ -1,5 +1,6 @@
 # ChocAn - Group Software Project
 [![CircleCI](https://circleci.com/gh/AlexanderJDupree/ChocAn.svg?style=svg)](https://circleci.com/gh/AlexanderJDupree/ChocAn)
+[![codecov](https://codecov.io/gh/AlexanderJDupree/ChocAn/branch/master/graph/badge.svg)](https://codecov.io/gh/AlexanderJDupree/ChocAn)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/af9edf02e21b4343b34b8b64ff534b10)](https://www.codacy.com/manual/AlexanderJDupree/ChocAn?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AlexanderJDupree/ChocAn&amp;utm_campaign=Badge_Grade)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/AlexanderJDupree/ChocAn/blob/master/LICENSE)
 
