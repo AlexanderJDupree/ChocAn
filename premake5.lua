@@ -37,7 +37,7 @@ workspace "CS300 Term Project"
 
     filter "toolset:gcc"
         buildoptions { 
-            "-Wall", "-Wextra", "-Werror"
+            "-Wall", "-Wextra", "-Werror", "-std=c++11"
         }
 
     filter {} -- close filter
@@ -83,9 +83,6 @@ project "Tests"
     includedirs { test_inc, include }
 
     --postbuildcommands ".././bin/tests/%{cfg.buildcfg}_tests"
-
-    filter { "action:gmake or action:gmake2" }
-        buildoptions "-std=c++11"
 
     filter {} -- close filter
 
