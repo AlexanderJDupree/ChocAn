@@ -18,7 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 /** DATETIME CLASS **/
 
-DateTime::DateTime(unsigned day, unsigned month, unsigned year)
+DateTime::DateTime(Day day, Month month, Year year)
     : _day(day), _month(month), _year(year)
 {
     if (!ok())
@@ -44,6 +44,19 @@ bool DateTime::ok() const
         && _day <= calendar[static_cast<unsigned>(_month) - 1];
 }
 
+const Day&   DateTime::day() const 
+{ 
+    return _day; 
+}
+const Month& DateTime::month() const 
+{ 
+    return _month; 
+}
+const Year&  DateTime::year() const
+{
+    return _year;
+}
+
 bool DateTime::operator <  (const DateTime& rhs) const
 {
     return _year < rhs._year || _month < rhs._month || _day < rhs._day;
@@ -63,6 +76,17 @@ bool DateTime::operator <= (const DateTime& rhs) const
 bool DateTime::operator == (const DateTime& rhs) const
 {
     return _year == rhs._year && _month == rhs._month && _day == rhs._day;
+}
+
+/** SYSTEM CLOCK INTERFACE **/
+
+tm system_clock::get_utc_time()
+{
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    time_t time = std::chrono::system_clock::to_time_t(now);
+    
+    return *gmtime(&time);
 }
 
 /** DAY CLASS **/

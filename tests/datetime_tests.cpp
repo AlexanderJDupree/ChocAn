@@ -13,11 +13,21 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
+#include <iostream>
 #include <catch.hpp>
 #include <ChocAn/datetime.hpp>
 
-TEST_CASE("Constructors for DateTime classes", "[constructors]")
+std::ostream& operator<<(std::ostream& os, const DateTime& date)
 {
+    os << static_cast<unsigned>(date.day()) << "-" 
+       << static_cast<unsigned>(date.month()) << "-" 
+       << static_cast<unsigned>(date.year());
+    return os;
+}
+
+TEST_CASE("Constructors for DateTime classes", "[constructors], [datetime]")
+{
+
     SECTION("Construct valid Day object")
     {
         REQUIRE(Day(4).ok());
@@ -32,7 +42,7 @@ TEST_CASE("Constructors for DateTime classes", "[constructors]")
     }
     SECTION("Construct valid DateTime object")
     {
-        REQUIRE(DateTime(4, 7, 1776).ok());
+        REQUIRE(DateTime(Day(4), Month(7), Year(1776)).ok());
     }
     SECTION("Days outside range [1-31] will set ok status to false")
     {
@@ -46,11 +56,11 @@ TEST_CASE("Constructors for DateTime classes", "[constructors]")
     }
     SECTION("Leap years account for 29 days in February")
     {
-        REQUIRE(DateTime(29, 2, 2020).ok());
+        REQUIRE(DateTime(Day(29), Month(2), Year(2020)).ok());
     }
     SECTION("Februrary has 28 days on non leap years")
     {
-        REQUIRE(DateTime(28, 2, 2019).ok());
+        REQUIRE(DateTime(Day(28), Month(2), Year(2019)).ok());
     }
     SECTION("Invalid date will throw invalid_datetime exception")
     {  
@@ -58,12 +68,15 @@ TEST_CASE("Constructors for DateTime classes", "[constructors]")
         Month invalid_month(13);
         // TODO Establish year parameters and add to test
 
-        REQUIRE_THROWS_AS(DateTime(22, invalid_month, 1991), invalid_datetime);
-        REQUIRE_THROWS_AS(DateTime(invalid_day, 9, 1991), invalid_datetime);
+        REQUIRE_THROWS_AS(DateTime(Day(22), invalid_month, Year(1991))
+                         , invalid_datetime);
+
+        REQUIRE_THROWS_AS(DateTime(invalid_day, Month(9), Year(1991))
+                         , invalid_datetime);
     }
 }
 
-TEST_CASE("Detecting Leap Years", "[leap_year]")
+TEST_CASE("Detecting Leap Years", "[leap_year], [datetime]")
 {
     SECTION("Non-leap year")
     {
@@ -83,26 +96,71 @@ TEST_CASE("Detecting Leap Years", "[leap_year]")
     }
 }
 
-TEST_CASE("DateTime comparison operators")
+struct mock_clock
+{
+    typedef std::chrono::system_clock clock;
+    typedef clock::time_point time_point;
+
+    static time_point time;
+
+    static void duration_since_epoch(clock::duration d)
+    {
+        time = time_point(d);
+    }
+    static tm get_utc_time()
+    {
+        time_t tt = clock::to_time_t(time);
+
+        return *gmtime(&tt);
+    }
+};
+
+// Initialized out of line because time point is not const
+mock_clock::time_point mock_clock::time = mock_clock::time_point();
+
+TEST_CASE("Getting DateTime from system clock", "[clock], [datetime]")
+{
+    DateTime epoch(Day(1), Month(1), Year(1970));
+    DateTime expected_date(Day(5), Month(10), Year(2019));
+
+    SECTION("0 seconds since epoch")
+    {
+        mock_clock::duration_since_epoch(std::chrono::seconds(0));
+
+        REQUIRE(DateTime::get_current_datetime<mock_clock>() == epoch);
+    }
+    SECTION("October 5th 2019, day I wrote this test")
+    {
+        mock_clock::duration_since_epoch(std::chrono::seconds(1570250129));
+
+        REQUIRE(DateTime::get_current_datetime<mock_clock>() == expected_date);
+    }
+}
+
+TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
 {
 // DateTime utilizes Day, Month, Year comparison operatos, as such we need only
 // Test the DateTime class operators
 
     SECTION("DateTime objects with equal values are equal")
     {
-        REQUIRE(DateTime(1, 1, 2020) == DateTime(1, 1, 2020));
+        REQUIRE(DateTime(Day(1), Month(1), Year(2020)) 
+             == DateTime(Day(1), Month(1), Year(2020)));
     }
     SECTION("DateTime objects with differing year values")
     {
-        REQUIRE(DateTime(1, 1, 2019) < DateTime(1, 1, 2020));
+        REQUIRE(DateTime(Day(1), Month(1), Year(2019)) 
+              < DateTime(Day(1), Month(1), Year(2020)));
     }
     SECTION("DateTime objects with differing month values")
     {
-        REQUIRE(DateTime(10, 10, 2020) < DateTime(10, 11, 2020));
+        REQUIRE(DateTime(Day(10), Month(10), Year(2020)) 
+              < DateTime(Day(10), Month(11), Year(2020)));
     }
     SECTION("DateTime objects with differing day values")
     {
-        REQUIRE(DateTime(10, 10, 2020) < DateTime(11, 10, 2020));
+        REQUIRE(DateTime(Day(10), Month(10), Year(2020)) 
+              < DateTime(Day(11), Month(10), Year(2020)));
     }
 }
 
