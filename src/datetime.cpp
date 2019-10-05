@@ -28,6 +28,26 @@ DateTime::DateTime(Day day, Month month, Year year)
     }
 }
 
+DateTime DateTime::get_current_datetime()
+{
+    tm utc_time = get_utc_time();
+
+    return DateTime( Day(utc_time.tm_mday)
+                   , Month(utc_time.tm_mon + 1)
+                   , Year(utc_time.tm_year + 1900));
+}
+
+tm DateTime::get_utc_time()
+{
+    using namespace std::chrono;
+
+    system_clock::time_point now = system_clock::now();
+
+    time_t time = system_clock::to_time_t(now);
+    
+    return *gmtime(&time);
+}
+
 bool DateTime::ok() const
 {
     const Day calendar[] = 
@@ -42,6 +62,19 @@ bool DateTime::ok() const
         && _month.ok() 
         && _day.ok() 
         && _day <= calendar[static_cast<unsigned>(_month) - 1];
+}
+
+const Day&   DateTime::day() const 
+{ 
+    return _day; 
+}
+const Month& DateTime::month() const 
+{ 
+    return _month; 
+}
+const Year&  DateTime::year() const
+{
+    return _year;
 }
 
 bool DateTime::operator <  (const DateTime& rhs) const

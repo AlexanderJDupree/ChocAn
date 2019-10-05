@@ -18,7 +18,9 @@ https://github.com/AlexanderJDupree/ChocAn
 #define DATETIME_HPP
 
 #include <tuple>
+#include <ctime>
 #include <chrono>
+#include <iostream>
 #include <exception>
 
 
@@ -89,6 +91,7 @@ class DateTime
 public:
 
     DateTime(Day day, Month month, Year year);
+    static DateTime get_current_datetime();
 
     bool ok() const;
 
@@ -102,7 +105,9 @@ public:
     bool operator <= (const DateTime& rhs) const;
     bool operator == (const DateTime& rhs) const;
 
-private:
+protected:
+
+    static tm get_utc_time();
 
     Day   _day;
     Month _month;

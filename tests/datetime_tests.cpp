@@ -13,8 +13,17 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
+#include <iostream>
 #include <catch.hpp>
 #include <ChocAn/datetime.hpp>
+
+std::ostream& operator<<(std::ostream& os, const DateTime& date)
+{
+    os << static_cast<unsigned>(date.day()) << "-" 
+       << static_cast<unsigned>(date.month()) << "-" 
+       << static_cast<unsigned>(date.year());
+    return os;
+}
 
 TEST_CASE("Constructors for DateTime classes", "[constructors], [datetime]")
 {
@@ -87,15 +96,22 @@ TEST_CASE("Detecting Leap Years", "[leap_year], [datetime]")
     }
 }
 
+/*
+TODO Figure out how to mock system clock to run tests against
 TEST_CASE("Getting current DateTime from system clock", "[current_time], [datetime]")
 {
     DateTime epoch(Day(1), Month(1), Year(1970));
 
     SECTION("0 seconds since epoch")
     {
+        test.set_utc_time.tm_mday = 1;
+        test.set_utc_time.tm_mon  = 0;
+        test.set_utc_time.tm_year = 70;
+
         REQUIRE(DateTime::get_current_datetime() == epoch);
     }
 }
+*/
 
 TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
 {
