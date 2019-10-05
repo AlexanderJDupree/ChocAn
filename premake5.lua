@@ -28,7 +28,9 @@ workspace "CS300 Term Project"
     warnings "Extra"
 
     filter "configurations:debug*"   
-        defines { "DEBUG", "MOCKING_ENABLED" } 
+        buildoptions { "-fprofile-arcs", "-ftest-coverage" }
+        defines { "DEBUG" }
+        links "gcov"
         symbols "On"
 
     filter "configurations:release*" 

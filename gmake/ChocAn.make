@@ -15,14 +15,14 @@ ifeq ($(config),debug)
   TARGETDIR = ../lib/debug
   TARGET = $(TARGETDIR)/libChocAn.a
   OBJDIR = obj/debug/ChocAn
-  DEFINES += -DDEBUG -DMOCKING_ENABLED
+  DEFINES += -DDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -Wall -Wextra -Werror -std=c++11
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -Wall -Wextra -Werror -std=c++11
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++11
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++11
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS +=
+  LIBS += -lgcov
   LDDEPS +=
   ALL_LDFLAGS += $(LDFLAGS)
   LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
