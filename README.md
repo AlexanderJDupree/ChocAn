@@ -3,8 +3,6 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/af9edf02e21b4343b34b8b64ff534b10)](https://www.codacy.com/manual/AlexanderJDupree/ChocAn?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AlexanderJDupree/ChocAn&amp;utm_campaign=Badge_Grade)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/AlexanderJDupree/ChocAn/blob/master/LICENSE)
 
-TODO Update and connect badges
-
 ## Introduction
 
 ChocAn is a group software project for CS300 at Portland State University
