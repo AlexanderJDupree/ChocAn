@@ -21,28 +21,30 @@ Address::Address(std::string street, std::string city, std::string state, unsign
 
         if(!ok()){
 
-            throw address_error(report_issues());
+            std::stack<std::string> fields;
+
+            fields.push(street);
+            fields.push(city);
+            fields.push(state);
+            fields.push(std::to_string(zip));
+
+            throw address_error(fields);
         }
 
     }
-}
 
 bool Address::ok() const{
 
-    if(street.length() > 25 || street.empty()) return false;
+    if(street.length() > 25 || street.empty() || street == " ") return false;
 
-    //TODO add checks for other fields
+    if(city.length() > 14 || city.empty() || city == " ") return false;
+
+    if(state.length() > 2 || state.empty() || state == " ") return false;
+
+    if(!zip) return false;
+
+    return true;
 }
 
-std::string Address::report_issues(){
-
-    std::string issue_brief("ERROR(S): ");
-
-    if(street.length() > 25) issue_brief += " street name too long\n";
-
-    if(street.empty()) issue_brief += " street name empty\n";
-
-    //TODO add briefs for other fields
-}
 
 

@@ -17,17 +17,23 @@ https://github.com/AlexanderJDupree/
 #define ADDRESS_HPP
 
 #include <string>
+#include <stack>
 #include <exception>
 
-struct address_error{
+struct address_error : std::exception{
 
-    std::string error;
+    std::stack<std::string> error_log;
 
-    address_error(std::string error) : error(error) {};
+    address_error(std::stack<std::string> errors) : error_log(errors) {};
 
-    std::string what() const throw(){ 
+    const char* what() const throw(){
         
-        return error;
+        return "Error with constructing address object";
+    }
+
+    std::stack<std::string> get_info() const throw(){
+
+        return error_log;
     }
 
 };
@@ -38,9 +44,7 @@ class Address{
 
         Address(std::string street, std::string city, std::string state, unsigned zip);
 
-//--utilities
         bool ok() const;
-        std::string report_issues();
 
     private:
 
