@@ -142,7 +142,7 @@ struct invalid_datetime : std::exception
     Info values;
     const char* error;
 
-    invalid_datetime(Info values, const char* error)
+    invalid_datetime(const Info& values, const char* error)
         : values(values), error(error) {};
 
     const char* what() const throw()
