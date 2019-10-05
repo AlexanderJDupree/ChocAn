@@ -14,6 +14,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <iostream>
+#include <sstream>
 #include <catch.hpp>
 #include <ChocAn/datetime.hpp>
 
@@ -149,8 +150,8 @@ TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
     }
     SECTION("DateTime objects with differing year values")
     {
-        REQUIRE(DateTime(Day(1), Month(1), Year(2019)) 
-              < DateTime(Day(1), Month(1), Year(2020)));
+        REQUIRE(DateTime(Day(1), Month(1), Year(2020)) 
+              >= DateTime(Day(1), Month(1), Year(2019)));
     }
     SECTION("DateTime objects with differing month values")
     {
@@ -162,5 +163,14 @@ TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
         REQUIRE(DateTime(Day(10), Month(10), Year(2020)) 
               < DateTime(Day(11), Month(10), Year(2020)));
     }
+}
+
+TEST_CASE("Testing ostream operator", "[datetime]")
+{
+    std::stringstream oss;
+
+    oss << DateTime(Day(10), Month(10), Year(2020));
+
+    REQUIRE(oss.str() == "10-10-2020");
 }
 
