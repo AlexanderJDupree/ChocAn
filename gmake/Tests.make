@@ -65,6 +65,7 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
+	$(OBJDIR)/address_tests.o \
 	$(OBJDIR)/datetime_tests.o \
 	$(OBJDIR)/test_config_main.o \
 
@@ -125,6 +126,9 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
+$(OBJDIR)/address_tests.o: ../tests/address_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/datetime_tests.o: ../tests/datetime_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
