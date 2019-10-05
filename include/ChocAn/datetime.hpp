@@ -3,7 +3,8 @@
 File: datetime.hpp
 
 Brief: DateTime class standardizes the date time formats throughout ChocAn data
-       processing services and provides methods for validation and reporting.
+       processing services and provides methods for validation and receiving 
+       the current date and time
 
 Authors: Daniel Mendez 
          Alexander Salazar
@@ -20,9 +21,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <tuple>
 #include <ctime>
 #include <chrono>
-#include <iostream>
 #include <exception>
-
 
 class datetime_unit
 {
@@ -86,11 +85,21 @@ public:
     bool operator == (const Year& rhs) const;
 };
 
+
+// Wraps std::chrono methods to return a tm (time) object
+struct system_clock
+{
+    static tm get_utc_time();
+};
+
 class DateTime
 {
 public:
 
     DateTime(Day day, Month month, Year year);
+
+    // remove system clock dependency by templating clock type
+    template <typename clock_t = system_clock>
     static DateTime get_current_datetime();
 
     bool ok() const;
@@ -107,13 +116,23 @@ public:
 
 protected:
 
-    static tm get_utc_time();
-
     Day   _day;
     Month _month;
     Year  _year;
 
 };
+
+
+template <typename clock_t>
+DateTime DateTime::get_current_datetime()
+{
+    tm utc_time = clock_t::get_utc_time();
+
+    // TODO 1 and 1900  are magic numbers
+    return DateTime( Day(utc_time.tm_mday)
+                   , Month(utc_time.tm_mon + 1)
+                   , Year(utc_time.tm_year + 1900));
+}
 
 // Custom Exception
 struct invalid_datetime : std::exception

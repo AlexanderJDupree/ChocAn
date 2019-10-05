@@ -96,22 +96,46 @@ TEST_CASE("Detecting Leap Years", "[leap_year], [datetime]")
     }
 }
 
-/*
-TODO Figure out how to mock system clock to run tests against
-TEST_CASE("Getting current DateTime from system clock", "[current_time], [datetime]")
+struct mock_clock
+{
+    typedef std::chrono::system_clock clock;
+    typedef clock::time_point time_point;
+
+    static time_point time;
+
+    static void duration_since_epoch(clock::duration d)
+    {
+        time = time_point(d);
+    }
+    static tm get_utc_time()
+    {
+        time_t tt = clock::to_time_t(time);
+
+        return *gmtime(&tt);
+    }
+};
+
+// Initialized out of line because time point is not const
+mock_clock::time_point mock_clock::time = mock_clock::time_point();
+
+TEST_CASE("Getting DateTime from system clock", "[clock], [datetime]")
 {
     DateTime epoch(Day(1), Month(1), Year(1970));
+    DateTime expected_date(Day(5), Month(10), Year(2019));
 
     SECTION("0 seconds since epoch")
     {
-        test.set_utc_time.tm_mday = 1;
-        test.set_utc_time.tm_mon  = 0;
-        test.set_utc_time.tm_year = 70;
+        mock_clock::duration_since_epoch(std::chrono::seconds(0));
 
-        REQUIRE(DateTime::get_current_datetime() == epoch);
+        REQUIRE(DateTime::get_current_datetime<mock_clock>() == epoch);
+    }
+    SECTION("October 5th 2019, day I wrote this test")
+    {
+        mock_clock::duration_since_epoch(std::chrono::seconds(1570250129));
+
+        REQUIRE(DateTime::get_current_datetime<mock_clock>() == expected_date);
     }
 }
-*/
 
 TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
 {
