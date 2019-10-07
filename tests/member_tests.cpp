@@ -26,7 +26,6 @@ TEST_CASE("Constructors for member class", "[constructors], [member]"){
         REQUIRE(Member(address,"first name", "last name",123456789).ok());
 
     }
-
 }    
 
 
