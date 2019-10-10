@@ -1,8 +1,8 @@
 /* 
  
-File: member.hpp
+File: account.hpp
 
-Brief: Member class packages all the personal information about a member.
+Brief: account class packages all the personal information about a member.
 
 Authors: Daniel Mendez 
          Alexander Salazar
@@ -13,4 +13,6 @@ https://github.com/AlexanderJDupree/
  
 */
 
-#ifndef
+#ifndef ACCOUNT_HPP
+
+

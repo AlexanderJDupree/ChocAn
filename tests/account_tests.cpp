@@ -1,6 +1,6 @@
 /* 
 
-File: member_tests.cpp
+File: account_tests.cpp
 
 Brief: Unit tests for address class and associated utility classes.
 
@@ -14,16 +14,16 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <catch.hpp>
-#include <ChocAn/member.hpp>
+#include <ChocAn/account.hpp>
 #include <ChocAn/address.hpp>
 
-TEST_CASE("Constructors for member class", "[constructors], [member]"){
+TEST_CASE("Constructors for account class", "[constructors], [account]"){
 
-    SECTION("Construct valid member object"){
+    SECTION("Construct valid account object"){
 
         Address address("street", "city", "OR", 97080);
 
-        REQUIRE(Member(address,"first name", "last name",123456789).ok());
+        REQUIRE(account(address,"first name", "last name",123456789).ok());
 
     }
 }    
