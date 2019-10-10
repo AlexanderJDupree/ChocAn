@@ -188,7 +188,7 @@ TEST_CASE("Testing invalid_datetime exception")
             Month invalid_month = std::get<1>(err.get_info());
             Year invalid_year   = std::get<2>(err.get_info());
 
-            CHECK(err.what() == "Invalid Date Time Values");
+            CHECK(err.what() == std::string("Invalid Date Time Values"));
             CHECK(invalid_day == Day(40));
             CHECK(invalid_month == Month(13));
             CHECK(invalid_year == Year(2040));
