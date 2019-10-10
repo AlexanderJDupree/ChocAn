@@ -19,11 +19,20 @@ https://github.com/AlexanderJDupree/ChocAn
 
 TEST_CASE("Constructors for account class", "[constructors], [account]"){
 
+    std::string first = "first";
+    std::string last = "last";
+    unsigned acct_num = 123456789;
+
     SECTION("Construct valid account object"){
+    
+        std::string street = "street";
+        std::string city = "city";
+        std::string state = "OR";
+        unsigned zip = 97080;
 
-        Address address("street", "city", "OR", 97080);
+        Address address(street, city, state, zip);
 
-        REQUIRE(Account(address,"first name", "last name",123456789).ok());
+        REQUIRE(Account(address,first,last,acct_num).ok());
 
     }
 }    

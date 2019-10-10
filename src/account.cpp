@@ -32,7 +32,7 @@ Account::Account(Address& address, std::string& f_name, std::string& l_name, uns
 
     }
 
-bool account::ok() const{
+bool Account::ok() const{
 
     int name_length = first_name.length() + last_name.length();
 
