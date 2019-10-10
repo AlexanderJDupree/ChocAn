@@ -24,7 +24,7 @@ struct address_error : std::exception{
 
     std::stack<std::string> error_log;
 
-    address_error(std::stack<std::string> errors) : error_log(errors) {};
+    address_error(std::stack<std::string>& errors) : error_log(errors) {};
 
     const char* what() const throw(){
         

@@ -23,7 +23,7 @@ TEST_CASE("Constructors for account class", "[constructors], [account]"){
 
         Address address("street", "city", "OR", 97080);
 
-        REQUIRE(account(address,"first name", "last name",123456789).ok());
+        REQUIRE(Account(address,"first name", "last name",123456789).ok());
 
     }
 }    
