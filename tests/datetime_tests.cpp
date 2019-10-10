@@ -160,8 +160,8 @@ TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
     }
     SECTION("DateTime objects with differing day values")
     {
-        REQUIRE(DateTime(Day(10), Month(10), Year(2020)) 
-              < DateTime(Day(11), Month(10), Year(2020)));
+        REQUIRE( DateTime(Day(10), Month(10), Year(2020)) 
+              <= DateTime(Day(11), Month(10), Year(2020)));
     }
 }
 
@@ -174,3 +174,25 @@ TEST_CASE("Testing ostream operator", "[datetime]")
     REQUIRE(oss.str() == "10-10-2020");
 }
 
+TEST_CASE("Testing invalid_datetime exception")
+{
+    SECTION("invalid_datetime error message and values")
+    {
+        try
+        {
+            DateTime(Day(40), Month(13), Year(2040));
+        }
+        catch (const invalid_datetime& err)
+        {
+            Day   invalid_day   = std::get<0>(err.get_info());
+            Month invalid_month = std::get<1>(err.get_info());
+            Year invalid_year   = std::get<2>(err.get_info());
+
+            CHECK(err.what() == "Invalid Date Time Values");
+            CHECK(invalid_day == Day(40));
+            CHECK(invalid_month == Month(13));
+            CHECK(invalid_year == Year(2040));
+        }
+    }
+    
+}
