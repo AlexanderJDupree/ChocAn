@@ -16,6 +16,8 @@ https://github.com/AlexanderJDupree/
 #ifndef ACCOUNT_HPP
 #define ACCOUNT_HPP
 
+#include <ChocAn/address>
+
 struct account_error : std::exception{
 
     std::stack<std::string> error_log;
@@ -36,6 +38,17 @@ struct account_error : std::exception{
 
 
 class Account{
+
+        Account(Address&,std::string&,std::string&,unsigned);
+
+        bool ok() const;
+
+    private:
+
+        Address address;
+        std::string first_name;
+        std::string last_name;
+        unsigned account_number;
 
 };
 

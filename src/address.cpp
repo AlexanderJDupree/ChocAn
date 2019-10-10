@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/address.hpp>
 
-Address::Address(std::string street, std::string city, std::string state, unsigned zip)
+Address::Address(std::string& street, std::string& city, std::string& state, unsigned zip)
     : street(street), city(city), state(state), zip(zip){
 
         if(!ok()){

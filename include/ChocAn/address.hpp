@@ -42,7 +42,7 @@ class Address{
 
     public:
 
-        Address(std::string street, std::string city, std::string state, unsigned zip);
+        Address(std::string& street, std::string& city, std::string& state, unsigned zip);
 
         bool ok() const;
 
