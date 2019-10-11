@@ -104,6 +104,7 @@ main() {
   build
   tests
   h::green "Build Complete!"
+  echo " "
 }
 
 (( $_s_ )) || main
