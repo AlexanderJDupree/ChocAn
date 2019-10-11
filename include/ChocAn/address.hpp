@@ -17,21 +17,21 @@ https://github.com/AlexanderJDupree/
 #define ADDRESS_HPP
 
 #include <string>
-#include <stack>
+#include <vector>
 #include <exception>
 
 struct address_error : std::exception{
 
-    std::stack<std::string> error_log;
+    std::vector<std::string> error_log;
 
-    address_error(std::stack<std::string>& errors) : error_log(errors) {};
+    explicit address_error(std::vector<std::string>& errors) : error_log(errors) {};
 
     const char* what() const throw(){
         
         return "Error with constructing address object";
     }
 
-    std::stack<std::string> get_info() const throw(){
+    std::vector<std::string> get_info() const throw(){
 
         return error_log;
     }

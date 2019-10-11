@@ -21,12 +21,7 @@ Address::Address(std::string& street, std::string& city, std::string& state, uns
 
         if(!ok()){
 
-            std::stack<std::string> fields;
-
-            fields.push(street);
-            fields.push(city);
-            fields.push(state);
-            fields.push(std::to_string(zip));
+            std::vector<std::string> fields = {street,city,state,std::to_string(zip)};
 
             throw address_error(fields);
         }

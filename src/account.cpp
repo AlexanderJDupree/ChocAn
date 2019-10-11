@@ -21,11 +21,7 @@ Account::Account(Address& address, std::string& f_name, std::string& l_name, uns
 
         if(!ok()){
 
-            std::stack<std::string> fields;
-
-            fields.push(f_name);
-            fields.push(l_name);
-            fields.push(std::to_string(num));
+            std::vector<std::string> fields = {f_name, l_name,std::to_string(num)};
 
             throw account_error(fields);
         }

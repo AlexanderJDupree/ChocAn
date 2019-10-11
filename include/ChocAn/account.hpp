@@ -20,16 +20,16 @@ https://github.com/AlexanderJDupree/
 
 struct account_error : std::exception{
 
-    std::stack<std::string> error_log;
+    std::vector<std::string> error_log;
 
-    account_error(std::stack<std::string>& errors) : error_log(errors) {};
+    explicit account_error(std::vector<std::string>& errors) : error_log(errors) {};
 
     const char* what() const throw() {
 
         return "Error with constructing account object";
     }
 
-    std::stack<std::string> get_info() const throw(){
+    std::vector<std::string> get_info() const throw(){
 
         return error_log;
     }
@@ -41,7 +41,7 @@ class Account{
 
     public:
 
-        Account(Address&,std::string&,std::string&,unsigned);
+        Account(Address& address,std::string& f_name,std::string& l_name,unsigned acct_num);
 
         bool ok() const;
 
