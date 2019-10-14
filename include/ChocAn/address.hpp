@@ -16,33 +16,33 @@ https://github.com/AlexanderJDupree/
 #ifndef ADDRESS_HPP
 #define ADDRESS_HPP
 
-#include <string>
-#include <vector>
-#include <exception>
+#include <ChocAn/exception.hpp>
 
-struct address_error : std::exception{
+struct invalid_address : public chocan_user_exception
+{
 
-    std::vector<std::string> error_log;
+    info exception_info;
 
-    explicit address_error(std::vector<std::string>& errors) : error_log(errors) {};
+    explicit invalid_address(info exception_info) 
+        : exception_info(std::move(exception_info)) {};
 
     const char* what() const throw(){
-        
         return "Error with constructing address object";
     }
 
-    std::vector<std::string> get_info() const throw(){
-
-        return error_log;
+    const info& get_info() const
+    {
+        return exception_info;
     }
 
 };
 
-class Address{
-
+class Address
+{
     public:
 
-        Address(std::string& street, std::string& city, std::string& state, unsigned zip);
+        Address(std::string& street, std::string& city, 
+                std::string& state, unsigned zip);
 
         bool ok() const;
 

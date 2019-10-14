@@ -18,10 +18,9 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef DATETIME_HPP
 #define DATETIME_HPP
 
-#include <tuple>
 #include <ctime>
 #include <chrono>
-#include <exception>
+#include <ChocAn/exception.hpp>
 
 class datetime_unit
 {
@@ -30,6 +29,8 @@ public:
     explicit datetime_unit(unsigned val = 1) : _val(val) {};
     
     virtual bool ok() const = 0;
+    
+    unsigned to_int() const { return _val; }
 
     explicit operator unsigned() const { return _val; }
 
@@ -134,26 +135,28 @@ DateTime DateTime::get_current_datetime()
                    , Year(utc_time.tm_year + 1900));
 }
 
+
 // Custom Exception
-struct invalid_datetime : std::exception
+class invalid_datetime : public chocan_user_exception
 {
-    typedef std::tuple<Day, Month, Year> Info;
+public:
 
-    Info values;
     const char* error;
+    info exception_info;
 
-    invalid_datetime(const Info& values, const char* error)
-        : values(values), error(error) {};
+    invalid_datetime(const char* error, info exception_info)
+        : error(error), exception_info(std::move(exception_info)) {};
 
     const char* what() const throw()
     {
         return error;
     }
 
-    Info get_info() const throw()
+    const info& get_info() const
     {
-        return values;
+        return exception_info;
     }
+
 };
 #endif // DATETIME_HPP
 
