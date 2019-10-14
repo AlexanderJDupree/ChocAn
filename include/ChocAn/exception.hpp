@@ -9,13 +9,15 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#ifndef CHOCAN_EXCEPTIONS
-#define CHOCAN_EXCEPTIONS
+#ifndef CHOCAN_EXCEPTION_HPP
+#define CHOCAN_EXCEPTION_HPP
 
 #include <vector>
 #include <string>
@@ -38,4 +40,5 @@ public:
     virtual const info& get_info() const = 0;
 };
 
-#endif // CHOCAN_EXCEPTIONS
+#endif // CHOCAN_EXCEPTION_HPP
+

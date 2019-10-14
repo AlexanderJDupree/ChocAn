@@ -8,13 +8,15 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
-https://github.com/AlexanderJDupree/
+https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#ifndef ADDRESS_HPP
-#define ADDRESS_HPP
+#ifndef CHOCAN_ADDRESS_HPP
+#define CHOCAN_ADDRESS_HPP
 
 #include <ChocAn/exception.hpp>
 
@@ -26,7 +28,8 @@ struct invalid_address : public chocan_user_exception
     explicit invalid_address(info exception_info) 
         : exception_info(std::move(exception_info)) {};
 
-    const char* what() const throw(){
+    const char* what() const throw()
+    {
         return "Error with constructing address object";
     }
 
@@ -54,4 +57,5 @@ class Address
         unsigned zip;
 };
 
-#endif
+#endif // CHOCAN_ADDRESS_HPP
+

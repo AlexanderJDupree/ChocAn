@@ -8,13 +8,15 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
-https://github.com/AlexanderJDupree/
+https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#ifndef ACCOUNT_HPP
-#define ACCOUNT_HPP
+#ifndef CHOCAN_ACCOUNT_HPP
+#define CHOCAN_ACCOUNT_HPP
 
 #include <ChocAn/address.hpp>
 #include <ChocAn/exception.hpp>
@@ -62,5 +64,5 @@ class Account{
 
 };
 
-#endif
+#endif // CHOCAN_ACCOUNT_HPP
 

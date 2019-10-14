@@ -9,6 +9,8 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
  

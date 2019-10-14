@@ -10,13 +10,15 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#ifndef DATETIME_HPP
-#define DATETIME_HPP
+#ifndef CHOCAN_DATETIME_HPP
+#define CHOCAN_DATETIME_HPP
 
 #include <ctime>
 #include <chrono>
@@ -158,5 +160,5 @@ public:
     }
 
 };
-#endif // DATETIME_HPP
+#endif // CHOCAN_DATETIME_HPP
 

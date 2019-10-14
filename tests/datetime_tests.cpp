@@ -8,6 +8,8 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
  
@@ -199,5 +201,4 @@ TEST_CASE("Testing invalid_datetime exception", "[exception]")
         }
         REQUIRE(i == 3);
     }
-    
 }
