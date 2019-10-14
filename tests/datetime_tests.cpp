@@ -8,6 +8,8 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
  
@@ -160,8 +162,8 @@ TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
     }
     SECTION("DateTime objects with differing day values")
     {
-        REQUIRE(DateTime(Day(10), Month(10), Year(2020)) 
-              < DateTime(Day(11), Month(10), Year(2020)));
+        REQUIRE( DateTime(Day(10), Month(10), Year(2020)) 
+              <= DateTime(Day(11), Month(10), Year(2020)));
     }
 }
 
@@ -174,3 +176,29 @@ TEST_CASE("Testing ostream operator", "[datetime]")
     REQUIRE(oss.str() == "10-10-2020");
 }
 
+TEST_CASE("Testing invalid_datetime exception", "[exception]")
+{
+    SECTION("invalid_datetime error message and values")
+    {
+        int i = 0;
+        try
+        {
+            DateTime(Day(40), Month(13), Year(2040));
+        }
+        catch (const chocan_user_exception& err)
+        {
+
+            chocan_user_exception::info expected_values { 
+                                      "Day should be between 1 - 31"
+                                    , "Months should be between 1 - 12"
+                                    , "Years should be greater than 1970"
+                                };
+
+            for (const auto& info : err.get_info())
+            {
+                REQUIRE(info == expected_values[i++]);
+            }
+        }
+        REQUIRE(i == 3);
+    }
+}

@@ -8,30 +8,36 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
-https://github.com/AlexanderJDupree/
+https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#ifndef ACCOUNT_HPP
-#define ACCOUNT_HPP
+#ifndef CHOCAN_ACCOUNT_HPP
+#define CHOCAN_ACCOUNT_HPP
 
 #include <ChocAn/address.hpp>
+#include <ChocAn/exception.hpp>
 
-struct account_error : std::exception{
+class invalid_account : public chocan_user_exception
+{
+public:
 
-    std::vector<std::string> error_log;
+    info exception_info;
 
-    explicit account_error(std::vector<std::string>& errors) : error_log(errors) {};
+    explicit invalid_account(info exception_info) 
+        : exception_info(std::move(exception_info)) {};
 
-    const char* what() const throw() {
-
-        return "Error with constructing account object";
+    const char* what() const throw() 
+    {
+        return "Can't create account, invalid values";
     }
 
-    std::vector<std::string> get_info() const throw(){
-
-        return error_log;
+    const info& get_info() const
+    {
+        return exception_info;
     }
 
 };
@@ -41,7 +47,11 @@ class Account{
 
     public:
 
-        Account(Address& address,std::string& f_name,std::string& l_name,unsigned acct_num);
+        Account( Address& address
+               , std::string& f_name
+               , std::string& l_name
+               , unsigned ID
+               );
 
         bool ok() const;
 
@@ -50,11 +60,9 @@ class Account{
         Address address;
         std::string first_name;
         std::string last_name;
-        unsigned account_number;
+        unsigned ID;
 
 };
 
-
-#endif
-
+#endif // CHOCAN_ACCOUNT_HPP
 

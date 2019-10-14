@@ -9,6 +9,8 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
  
@@ -16,17 +18,15 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/account.hpp>
 
-Account::Account(Address& address, std::string& f_name, std::string& l_name, unsigned num)
-    : address(address), first_name(f_name), last_name(l_name), account_number(num){
-
-        if(!ok()){
-
-            std::vector<std::string> fields = {f_name, l_name,std::to_string(num)};
-
-            throw account_error(fields);
+Account::Account( Address& address, std::string& f_name, 
+                 std::string& l_name, unsigned ID )
+    : address(address), first_name(f_name), last_name(l_name), ID(ID)
+{
+        if(!ok())
+        {
+            throw invalid_account( { "Name must be less than 25 characters" });
         }
-
-    }
+}
 
 bool Account::ok() const{
 
@@ -34,10 +34,9 @@ bool Account::ok() const{
 
     if(name_length > 25 || name_length < 2) return false;
 
-    if(!account_number) return false;
+    // TODO For now we don't know how we want to validate the account ID
+    //if(!account_number) return false;
 
     return true;
 }
-
-
 

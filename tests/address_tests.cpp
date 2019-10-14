@@ -8,6 +8,8 @@ Authors: Daniel Mendez
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
  
@@ -23,12 +25,13 @@ TEST_CASE("Constructors for address classes", "[constructors], [address]"){
     std::string state = "OR";
     unsigned zip = 97080;
 
-    SECTION("Construct valid address object"){
-
+    SECTION("Construct valid address object")
+    {
         REQUIRE(Address(line_one,city,state,zip).ok());
     }
 
-    SECTION("Ensures usuable information has been entered into each field"){
+    SECTION("Ensures usuable information has been entered into each field")
+    {
 
         std::string temp = " ";
         REQUIRE_THROWS(Address(temp,city,state,zip));
@@ -36,17 +39,16 @@ TEST_CASE("Constructors for address classes", "[constructors], [address]"){
         REQUIRE_THROWS(Address(line_one,city,temp,zip));
         REQUIRE_THROWS(Address(line_one,city,state,0));
     }
-    SECTION("Checks that exception is thrown for invalid entries"){  
+    SECTION("Checks that exception is thrown for invalid entries")
+    {  
 
         std::string temp = "extra long test string test";
         std::string nully("");
 
-        REQUIRE_THROWS_AS(Address(temp,city,state,0),address_error);
+        REQUIRE_THROWS_AS(Address(temp,city,state,0), invalid_address);
 
 
-        REQUIRE_THROWS_AS(Address(nully,nully,nully,0),address_error);
+        REQUIRE_THROWS_AS(Address(nully,nully,nully,0), invalid_address);
     }
 }
-
-
 

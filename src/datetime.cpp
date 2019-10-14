@@ -1,14 +1,15 @@
 /* 
  
-File: datetime.hpp
+File: datetime.cpp
 
-Brief: DateTime class standardizes the date time formats throughout ChocAn data
-       processing services and provides methods for validation and reporting.
+Brief: Implementation file for DateTime and associated utility classes
 
 Authors: Daniel Mendez 
          Alexander Salazar
          Arman Alauizadeh 
          Alexander DuPree
+         Kyle Zalewski
+         Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
  
@@ -23,8 +24,11 @@ DateTime::DateTime(Day day, Month month, Year year)
 {
     if (!ok())
     {
-        throw invalid_datetime( std::make_tuple(day, month, year)
-                              , "Invalid Date Time Values"      );
+        throw invalid_datetime( "Invalid datetime values",
+                              { "Day should be between 1 - 31"
+                              , "Months should be between 1 - 12"
+                              , "Years should be greater than 1970"
+                              } );
     }
 }
 
@@ -41,7 +45,7 @@ bool DateTime::ok() const
     return _year.ok() 
         && _month.ok() 
         && _day.ok() 
-        && _day <= calendar[static_cast<unsigned>(_month) - 1];
+        && _day <= calendar[_month.to_int() - 1];
 }
 
 const Day&   DateTime::day() const 
