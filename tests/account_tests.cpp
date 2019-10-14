@@ -2,7 +2,7 @@
 
 File: account_tests.cpp
 
-Brief: Unit tests for address class and associated utility classes.
+Brief: Unit tests for account class
 
 Authors: Daniel Mendez 
          Alexander Salazar
@@ -32,26 +32,18 @@ TEST_CASE("Constructors for account class", "[constructors], [account]"){
 
     Address address(street, city, state, zip);
    
-    SECTION("Construct valid account object"){
+    SECTION("Construct valid account object")
+    {
     
-
-        REQUIRE(Account(address,first,last,acct_num).ok());
-
+        REQUIRE(Account(address, first,last, acct_num).ok());
     }
 
-    SECTION("Ensure attempts to construct invalid objects are handled"){
+    SECTION("Ensure attempts to construct invalid objects are handled")
+    {
 
-        REQUIRE_THROWS_AS(Account(address,string_too_long,last,acct_num),account_error);
-        REQUIRE_THROWS_AS(Account(address,first,last,0),account_error);
-
+        REQUIRE_THROWS_AS( Account(address, string_too_long, last,acct_num)
+                         , invalid_account );
     }
 }    
-
-
-
-
-
-
-
 
 
