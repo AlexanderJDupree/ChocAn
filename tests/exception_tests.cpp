@@ -2,7 +2,7 @@
 
 File: exception_tests.cpp
 
-Brief: Unit tests for DateTime class and associated utility classes.
+Brief: Unit tests for chocAn exception interfaces
 
 Authors: Daniel Mendez 
          Alexander Salazar
@@ -19,7 +19,7 @@ https://github.com/AlexanderJDupree/ChocAn
 class test_exception : public chocan_user_exception
 {
 public:
-    test_exception(const char* error, Info exception_info)
+    test_exception(const char* error, info exception_info)
         : error(error), exception_info(exception_info) {}
 
     const char* what() const throw()
@@ -27,13 +27,13 @@ public:
         return error;
     }
 
-    const Info& get_info() const
+    const info& get_info() const
     {
         return exception_info;
     }
 
     const char* error;
-    Info exception_info;
+    info exception_info;
 };
 
 void throw_test_exception(test_exception err)
@@ -41,28 +41,29 @@ void throw_test_exception(test_exception err)
     throw err;
 }
 
-// TODO Refactor, this test is ugly
 TEST_CASE("chocan_user_exception", "[exception]")
 {
-    chocan_user_exception::Info exception_info;
 
-    exception_info["user input"] = "expected value";
-    exception_info["bad field"] = "how to fix bad field";
+    chocan_user_exception::info expected_values { "x should be y", "a should be b" };
 
-    test_exception test("error msg", exception_info);
+    test_exception test("error msg", expected_values);
+    
+    SECTION("Exceptions are can be caught when thrown")
+    {
+        REQUIRE_THROWS_AS(throw_test_exception(test), test_exception);
+    }
 
     SECTION("Accessing exception error message")
     {
-
         try
         {
             throw_test_exception(test);
         }
-        catch (const chocan_user_exception& err)
+        catch (const test_exception& err)
         {
             REQUIRE(err.what() == std::string("error msg"));
-            REQUIRE(err.get_info() == exception_info);
+            REQUIRE(err.get_info() == expected_values);
         }
     }
-
 }
+
