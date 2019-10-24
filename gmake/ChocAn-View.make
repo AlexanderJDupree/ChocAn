@@ -12,20 +12,20 @@ endif
 
 ifeq ($(config),debug)
   RESCOMP = windres
-  TARGETDIR = ../bin/tests
-  TARGET = $(TARGETDIR)/debug_tests
-  OBJDIR = obj/debug/Tests
+  TARGETDIR = ../lib/debug
+  TARGET = $(TARGETDIR)/libChocAn-View.a
+  OBJDIR = obj/debug/ChocAn-View
   DEFINES += -DDEBUG
-  INCLUDES += -I../third_party -I../include
+  INCLUDES += -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/debug/libChocAn-Core.a ../lib/debug/libChocAn-Data.a ../lib/debug/libChocAn-App.a ../lib/debug/libChocAn-View.a -lgcov
-  LDDEPS += ../lib/debug/libChocAn-Core.a ../lib/debug/libChocAn-Data.a ../lib/debug/libChocAn-App.a ../lib/debug/libChocAn-View.a
+  LIBS += ../lib/debug/libChocAn-Core.a ../lib/debug/libChocAn-App.a -lgcov
+  LDDEPS += ../lib/debug/libChocAn-Core.a ../lib/debug/libChocAn-App.a
   ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
+  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -39,20 +39,20 @@ endif
 
 ifeq ($(config),release)
   RESCOMP = windres
-  TARGETDIR = ../bin/tests
-  TARGET = $(TARGETDIR)/release_tests
-  OBJDIR = obj/release/Tests
+  TARGETDIR = ../lib/release
+  TARGET = $(TARGETDIR)/libChocAn-View.a
+  OBJDIR = obj/release/ChocAn-View
   DEFINES += -DNDEBUG
-  INCLUDES += -I../third_party -I../include
+  INCLUDES += -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/release/libChocAn-Core.a ../lib/release/libChocAn-Data.a ../lib/release/libChocAn-App.a ../lib/release/libChocAn-View.a
-  LDDEPS += ../lib/release/libChocAn-Core.a ../lib/release/libChocAn-Data.a ../lib/release/libChocAn-App.a ../lib/release/libChocAn-View.a
+  LIBS += ../lib/release/libChocAn-Core.a ../lib/release/libChocAn-App.a
+  LDDEPS += ../lib/release/libChocAn-Core.a ../lib/release/libChocAn-App.a
   ALL_LDFLAGS += $(LDFLAGS) -s
-  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
+  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -65,12 +65,7 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/state_machine_tests.o \
-	$(OBJDIR)/account_tests.o \
-	$(OBJDIR)/address_tests.o \
-	$(OBJDIR)/datetime_tests.o \
-	$(OBJDIR)/exception_tests.o \
-	$(OBJDIR)/test_config_main.o \
+	$(OBJDIR)/terminal_state_viewer.o \
 
 RESOURCES := \
 
@@ -82,7 +77,7 @@ ifeq (.exe,$(findstring .exe,$(ComSpec)))
 endif
 
 $(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR)
-	@echo Linking Tests
+	@echo Linking ChocAn-View
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -105,7 +100,7 @@ else
 endif
 
 clean:
-	@echo Cleaning Tests
+	@echo Cleaning ChocAn-View
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -129,22 +124,7 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/state_machine_tests.o: ../tests/app/state_machine_tests.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/account_tests.o: ../tests/core/account_tests.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/address_tests.o: ../tests/core/address_tests.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/datetime_tests.o: ../tests/core/datetime_tests.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/exception_tests.o: ../tests/core/exception_tests.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/test_config_main.o: ../tests/test_config_main.cpp
+$(OBJDIR)/terminal_state_viewer.o: ../src/view/terminal_state_viewer.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

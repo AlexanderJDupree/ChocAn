@@ -82,12 +82,27 @@ project "ChocAn-App"
     files (source .. "*.cpp")
     includedirs (include)
 
+project "ChocAn-View"
+    kind "StaticLib"
+    links "ChocAn-Core"
+    links "ChocAn-App"
+    language "C++"
+    targetdir "lib/%{cfg.buildcfg}/"
+    targetname "ChocAn-View"
+
+    local include = "include/"
+    local source  = "src/view/"
+
+    files (source .. "*.cpp")
+    includedirs (include)
+
 project "ChocAn-Exe"
     kind "ConsoleApp"
     language "C++"
     links "ChocAn-Core"
     links "ChocAn-Data"
     links "ChocAn-App"
+    links "ChocAn-View"
     targetdir "bin/%{cfg.buildcfg}/"
     targetname  "ChocAn_%{cfg.buildcfg}"
 
@@ -103,6 +118,7 @@ project "Tests"
     links "ChocAn-Core"
     links "ChocAn-Data"
     links "ChocAn-App"
+    links "ChocAn-View"
     targetdir "bin/tests/"
     targetname "%{cfg.buildcfg}_tests"
 

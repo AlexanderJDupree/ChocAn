@@ -80,6 +80,6 @@ TEST_CASE("State controller transitions state", "[transition], [state_controller
     {
         controller.transition("1");
 
-        REQUIRE(controller.accept_state());
+        REQUIRE(controller.end_state());
     }
 }
