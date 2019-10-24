@@ -14,6 +14,7 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
+#include <limits>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -51,8 +52,8 @@ void Terminal_State_Viewer::reset_input_stream() const
     // reset failed state
     std::cin.clear();
 
-    // discard ARBITRARY 256 characters OR to newline
-    std::cin.ignore(256, '\n');
+    // discard characters up to the limit of the stream OR to newline
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     return;
 }
 
