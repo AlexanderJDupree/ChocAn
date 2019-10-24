@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <catch.hpp>
-#include <ChocAn/exception.hpp>
+#include <ChocAn/core/exception.hpp>
 
 class test_exception : public chocan_user_exception
 {

@@ -16,10 +16,10 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <catch.hpp>
-#include <ChocAn/address.hpp>
+#include <ChocAn/core/address.hpp>
 
-TEST_CASE("Constructors for address classes", "[constructors], [address]"){
-
+TEST_CASE("Constructors for address classes", "[constructors], [address]")
+{
     std::string line_one = "line_one";
     std::string city = "city";
     std::string state = "OR";

@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#include <ChocAn/address.hpp>
+#include <ChocAn/core/address.hpp>
 
 Address::Address(std::string& street, std::string& city, 
                  std::string& state, unsigned zip)

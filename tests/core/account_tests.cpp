@@ -16,8 +16,8 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <catch.hpp>
-#include <ChocAn/account.hpp>
-#include <ChocAn/address.hpp>
+#include <ChocAn/core/account.hpp>
+#include <ChocAn/core/address.hpp>
 
 TEST_CASE("Constructors for account class", "[constructors], [account]"){
 

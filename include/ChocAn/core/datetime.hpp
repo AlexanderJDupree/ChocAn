@@ -22,7 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ctime>
 #include <chrono>
-#include <ChocAn/exception.hpp>
+#include <ChocAn/core/exception.hpp>
 
 class datetime_unit
 {
@@ -160,5 +160,6 @@ public:
     }
 
 };
+
 #endif // CHOCAN_DATETIME_HPP
 

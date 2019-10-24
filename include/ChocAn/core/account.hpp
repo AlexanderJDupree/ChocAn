@@ -18,8 +18,8 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_ACCOUNT_HPP
 #define CHOCAN_ACCOUNT_HPP
 
-#include <ChocAn/address.hpp>
-#include <ChocAn/exception.hpp>
+#include <ChocAn/core/address.hpp>
+#include <ChocAn/core/exception.hpp>
 
 class invalid_account : public chocan_user_exception
 {
