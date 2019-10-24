@@ -51,7 +51,7 @@ public:
         return *state;
     }
 
-    bool accept_state() const
+    bool end_state() const
     {
         State& current = *state;
 
