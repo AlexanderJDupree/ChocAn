@@ -1,0 +1,17 @@
+=============== PROVIDER MENU ===============
+
+0) Return to Login Screen
+
+1) View Your Provider Profile
+
+2) Update Your Provider Profile
+
+3) Update Member Profile
+
+4) View Member Record
+
+5) Add Service Transaction
+
+( Entering 'exit' will close the application )
+
+> 

@@ -1,0 +1,9 @@
+=============== CHOCAN LOGIN SERVICE ===============
+
+Welcome, 
+
+Please enter your ChocAn Provider or Manager ID. 
+
+( Entering 'exit' will close the application )
+
+> 

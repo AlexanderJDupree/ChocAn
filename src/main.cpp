@@ -25,7 +25,7 @@ int main () {
 
     while(!controller.end_state())
     {
-        viewer.display_state(controller.current_state());
+        viewer.render_state(controller.current_state());
 
         controller.transition(viewer.interact());
     }

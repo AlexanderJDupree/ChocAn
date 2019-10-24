@@ -28,7 +28,7 @@ public:
 
     virtual std::string interact() const = 0;
 
-    virtual void display_state(const State& state) const = 0;
+    virtual void render_state(const State& state) const = 0;
 
 };
 
