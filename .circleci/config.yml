@@ -13,8 +13,8 @@ jobs:
           name: Installing gcc
           command: 'apt-get update && apt-get install -y gcc g++'
       - run:
-          name: Installing wget, curl
-          command: 'apt-get update && apt-get install -y wget curl'
+          name: Installing wget
+          command: 'apt-get update && apt-get install -y wget'
       - run:
           name: Download Premake5
           command: 'wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz'
@@ -25,8 +25,17 @@ jobs:
           name: Creating Build Files
           command: './premake5 gmake'
       - run:
-          name: Build and run
-          command: './build.sh'
+          name: Build Debug
+          command: 'make -C gmake -j 12 config=debug verbose=true'
+      - run:
+          name: Build Release
+          command: 'make -C gmake -j 12 config=release verbose=true'
+      - run:
+          name: Run Debug Tests
+          command: './bin/tests/debug_tests'
+      - run:
+          name: Run Release Tests
+          command: './bin/tests/release_tests'
       - run:
           name: Upload code coverage
           command: 'bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect reports" '
