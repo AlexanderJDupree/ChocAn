@@ -2,28 +2,10 @@ version: 2
 
 jobs:
   build:
-    docker:
-      - image: "debian:stretch"
+    machine: 
+      image: ubuntu-1604:201903-01
     steps:
       - checkout
-      - run:
-          name: Installing sudo
-          command: 'apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*'
-      - run:
-          name: Install Software properties common
-          command: 'apt-get update && apt-get install -y software-properties-common'
-      - run:
-          name: Update repo tool chain
-          command: 'add-apt-repository ppa:ubuntu-toolchain-r/test && apt update'
-      - run:
-          name: Installing gcc
-          command: 'apt-get update && apt-get install -y gcc-7 g++-7'
-      - run:
-          name: Installing make
-          command: 'apt-get update && apt-get install -y make'
-      - run:
-          name: Installing wget
-          command: 'apt-get update && apt-get install -y wget'
       - run:
           name: Download Premake5
           command: 'wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz'
@@ -34,17 +16,9 @@ jobs:
           name: Creating Build Files
           command: './premake5 gmake'
       - run:
-          name: Build Debug
-          command: 'make -C gmake -j 12 config=debug verbose=true'
-      - run:
-          name: Build Release
-          command: 'make -C gmake -j 12 config=release verbose=true'
-      - run:
-          name: Run Debug Tests
-          command: './bin/tests/debug_tests'
-      - run:
-          name: Run Release Tests
-          command: './bin/tests/release_tests'
+          name: Build and run
+          command: './build.sh'
       - run:
           name: Upload code coverage
           command: 'bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect reports" '
+
