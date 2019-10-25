@@ -16,12 +16,8 @@ jobs:
           name: Install GCC-7
           command: 'sudo apt update && sudo apt install g++-7 -y'
       - run:
-          name: Link GCC-7
-          command: 'sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
-                                             --slave /usr/bin/g++ g++ /usr/bin/g++-7'
-      - run:
-          name: Update alternatives
-          command: 'sudo update-alternatives --config gcc'
+          name: Update Alternatives
+          command: 'sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60'
       - run:
           name: Download Premake5
           command: 'wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz'
