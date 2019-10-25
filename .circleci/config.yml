@@ -10,6 +10,9 @@ jobs:
           name: Installing sudo
           command: 'apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*'
       - run:
+          name: Update package toolchain
+          command: 'apt-get install -y software-properties-common && add-apt-repository ppa:ubuntu-toolchain-r/test'
+      - run:
           name: Installing gcc
           command: 'apt-get update && apt-get install -y gcc-7 g++-7'
       - run:
