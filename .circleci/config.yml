@@ -19,6 +19,8 @@ jobs:
           name: Link GCC-7
           command: 'sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
                                              --slave /usr/bin/g++ g++ /usr/bin/g++-7'
+      - run:
+          name: Update alternatives
           command: 'sudo update-alternatives --config gcc'
       - run:
           name: Download Premake5
