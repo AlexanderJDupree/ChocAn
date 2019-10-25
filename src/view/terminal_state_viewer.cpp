@@ -28,8 +28,8 @@ https://github.com/AlexanderJDupree/ChocAn
 
 const Terminal_State_Viewer::View_Table Terminal_State_Viewer::view_table 
 {
-    { Login_State().id(), "login.txt" },
-    { Exit_State().id(), "exit.txt" },
+    { Login_State().id(),         "login.txt" },
+    { Exit_State().id(),          "exit.txt" },
     { Provider_Menu_State().id(), "provider_menu.txt" }
 };
 
@@ -59,6 +59,7 @@ void Terminal_State_Viewer::reset_input_stream() const
 
 void Terminal_State_Viewer::render_state(const State& state) const
 {
+    render_state_info(state.info());
     try
     {
         render(view_table.at(state.id()));
@@ -67,7 +68,13 @@ void Terminal_State_Viewer::render_state(const State& state) const
     {
         render(view_not_implemented);
     }
-    
+    return;
+}
+
+void Terminal_State_Viewer::render_state_info(const State_Info& info) const
+{
+    std::cout << '\n' << info.msg.value_or("") << std::endl;
+
     return;
 }
 
@@ -85,5 +92,3 @@ void Terminal_State_Viewer::render(const std::string& view_name) const
         std::cerr << "Error: Unable to open view: " << view << std::endl;
     }
 }
-
-

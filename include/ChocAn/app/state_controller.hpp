@@ -45,7 +45,7 @@ public:
         return *this;
     }
 
-    // Use optional??
+    // Use optional?? Is there any scenario where state is null?
     const State& current_state() const
     {
         return *state;

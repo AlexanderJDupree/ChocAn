@@ -25,3 +25,8 @@ State::State_Ptr Exit_State::evaluate(const std::string& input)
     }
     return std::make_unique<Exit_State>();
 }
+
+State_Info Exit_State::info() const
+{
+    return State_Info();
+}

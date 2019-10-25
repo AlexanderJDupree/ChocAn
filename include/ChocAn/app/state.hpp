@@ -22,6 +22,16 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <memory>
 #include <typeinfo>
+#include <optional>
+
+// TODO evaluate prototype
+class State_Info
+{
+public:
+
+    std::optional<std::string> msg;
+
+};
 
 class State
 {
@@ -33,7 +43,9 @@ public:
 
     virtual State_Ptr evaluate(const std::string& input) = 0;
 
-    virtual size_t id() const { return typeid(*this).hash_code(); }
+    virtual State_Info info() const = 0;
+
+    size_t id() const { return typeid(*this).hash_code(); }
 
     bool operator == (const State& rhs) const { return this->id() == rhs.id(); }
 

@@ -35,6 +35,8 @@ private:
 
     void render(const std::string& view_name) const;
 
+    void render_state_info(const State_Info& info) const;
+
     void reset_input_stream() const;
 
     static const View_Table view_table;

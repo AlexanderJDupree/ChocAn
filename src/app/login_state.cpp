@@ -29,10 +29,15 @@ State::State_Ptr Login_State::evaluate(const std::string& input)
     {
         return std::make_unique<Provider_Menu_State>();
     }
-    return std::make_unique<Login_State>();
+    return std::make_unique<Login_State>("Invalid Login");
 }
 
-bool Login_State::login(std::string input)
+State_Info Login_State::info() const
+{
+    return State_Info { login_msg };
+}
+
+bool Login_State::login(const std::string& input)
 {
     // TODO implement login logic
     if (input == "1234")

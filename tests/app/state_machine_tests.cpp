@@ -22,12 +22,16 @@ class Q1 : public State
 {
 public: 
     State_Ptr evaluate(const std::string& input);
+
+    State_Info info() const { return State_Info(); }
 };
 
 class Q2 : public State
 {
 public: 
     State::State_Ptr evaluate(const std::string& input);
+
+    State_Info info() const { return State_Info(); }
 };
 
 State::State_Ptr Q1::evaluate(const std::string& input)

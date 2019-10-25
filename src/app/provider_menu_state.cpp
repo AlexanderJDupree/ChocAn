@@ -31,3 +31,8 @@ State::State_Ptr Provider_Menu_State::evaluate(const std::string& input)
     }
     return std::make_unique<Provider_Menu_State>();
 }
+
+State_Info Provider_Menu_State::info() const
+{
+    return State_Info();
+}

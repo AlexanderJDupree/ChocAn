@@ -2,7 +2,7 @@
 
 File: exit_state.hpp
 
-Brief: exit state is a final state for the chocAn application and will perform 
+Brief: exit state is an end state for the chocAn application and will perform 
        any necessary teardown.
 
 Authors: Daniel Mendez 
@@ -24,6 +24,8 @@ https://github.com/AlexanderJDupree/ChocAn
 class Exit_State : public State
 {
     State_Ptr evaluate(const std::string& input);
+
+    State_Info info() const;
 };
 
 #endif // CHOCAN_EXIT_STATE_H

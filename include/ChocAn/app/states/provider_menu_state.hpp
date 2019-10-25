@@ -24,6 +24,8 @@ https://github.com/AlexanderJDupree/ChocAn
 class Provider_Menu_State : public State
 {
     State_Ptr evaluate(const std::string& input);
+
+    State_Info info() const;
 };
 
 #endif // CHOCAN_PROVIDER_MENU_STATE_H
