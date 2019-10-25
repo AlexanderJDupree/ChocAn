@@ -7,6 +7,20 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install software-properties-common
+          command: 'sudo apt-get install -y software-properties-common'
+      - run:
+          name: Update Repository Tool Chain
+          command: 'sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test'
+      - run:
+          name: Install GCC-7
+          command: 'sudo apt update && sudo apt install g++-7 -y'
+      - run:
+          name: Link GCC-7
+          command: 'sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
+                                             --slave /usr/bin/g++ g++ /usr/bin/g++-7'
+          command: 'sudo update-alternatives --config gcc'
+      - run:
           name: Download Premake5
           command: 'wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz'
       - run:
