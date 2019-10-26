@@ -76,9 +76,12 @@ TEST_CASE("State controller transitions state", "[transition], [state_controller
     }
     SECTION("Valid input transitions state")
     {
+        // Transition to Q2
         controller.transition("1");
+        // Transition back to Q1
+        controller.transition("0");
 
-        REQUIRE(controller.current_state() == Q2());
+        REQUIRE(controller.current_state() == Q1());
     }
     SECTION("Accept state can be transitioned into")
     {
