@@ -5,7 +5,7 @@ File: terminal_state_viewer.hpp
 Brief:  
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski

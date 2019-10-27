@@ -4,7 +4,7 @@ File: terminal_state_viewer.cpp
 Brief:  
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski
@@ -91,4 +91,5 @@ void Terminal_State_Viewer::render(const std::string& view_name) const
     {
         std::cerr << "Error: Unable to open view: " << view << std::endl;
     }
+    return file.close();
 }
