@@ -2,7 +2,8 @@
  
 File: main.cpp
 
-Brief: Provides the entry point for the ChocAn data processing application
+Brief: Provides the entry point for the ChocAn data processing application.
+       Main module utilizes a state machine model to control user interaction.
 
 Authors: Daniel Mendez 
          Alexander Salazar
@@ -15,12 +16,21 @@ https://github.com/AlexanderJDupree/LinkedListsCPP
  
 */
 
-#include <iostream>
+#include <ChocAn/app/state_controller.hpp>
+#include <ChocAn/view/terminal_state_viewer.hpp>
 
 int main () {
 
-    std::cout << "\nHello World\n" << std::endl;
+    State_Controller controller;
+    Terminal_State_Viewer viewer;
+
+    // TODO exit loop if viewer can't open view
+    while(!controller.end_state())
+    {
+        viewer.render_state(controller.current_state());
+
+        controller.transition(viewer.interact());
+    }
 
     return 0;
 }
-

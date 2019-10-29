@@ -18,7 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_ADDRESS_HPP
 #define CHOCAN_ADDRESS_HPP
 
-#include <ChocAn/exception.hpp>
+#include <ChocAn/core/exception.hpp>
 
 struct invalid_address : public chocan_user_exception
 {

@@ -13,8 +13,8 @@ endif
 ifeq ($(config),debug)
   RESCOMP = windres
   TARGETDIR = ../lib/debug
-  TARGET = $(TARGETDIR)/libChocAn-App.a
-  OBJDIR = obj/debug/ChocAn-App
+  TARGET = $(TARGETDIR)/libChocAn-Core.a
+  OBJDIR = obj/debug/ChocAn-Core
   DEFINES += -DDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
@@ -22,8 +22,8 @@ ifeq ($(config),debug)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/debug/libChocAn-Core.a -lgcov
-  LDDEPS += ../lib/debug/libChocAn-Core.a
+  LIBS += -lgcov
+  LDDEPS +=
   ALL_LDFLAGS += $(LDFLAGS)
   LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
   define PREBUILDCMDS
@@ -40,8 +40,8 @@ endif
 ifeq ($(config),release)
   RESCOMP = windres
   TARGETDIR = ../lib/release
-  TARGET = $(TARGETDIR)/libChocAn-App.a
-  OBJDIR = obj/release/ChocAn-App
+  TARGET = $(TARGETDIR)/libChocAn-Core.a
+  OBJDIR = obj/release/ChocAn-Core
   DEFINES += -DNDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
@@ -49,8 +49,8 @@ ifeq ($(config),release)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/release/libChocAn-Core.a
-  LDDEPS += ../lib/release/libChocAn-Core.a
+  LIBS +=
+  LDDEPS +=
   ALL_LDFLAGS += $(LDFLAGS) -s
   LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
   define PREBUILDCMDS
@@ -65,9 +65,9 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/exit_state.o \
-	$(OBJDIR)/login_state.o \
-	$(OBJDIR)/provider_menu_state.o \
+	$(OBJDIR)/account.o \
+	$(OBJDIR)/address.o \
+	$(OBJDIR)/datetime.o \
 
 RESOURCES := \
 
@@ -79,7 +79,7 @@ ifeq (.exe,$(findstring .exe,$(ComSpec)))
 endif
 
 $(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR)
-	@echo Linking ChocAn-App
+	@echo Linking ChocAn-Core
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -102,7 +102,7 @@ else
 endif
 
 clean:
-	@echo Cleaning ChocAn-App
+	@echo Cleaning ChocAn-Core
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -126,13 +126,13 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/exit_state.o: ../src/app/exit_state.cpp
+$(OBJDIR)/account.o: ../src/core/account.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/login_state.o: ../src/app/login_state.cpp
+$(OBJDIR)/address.o: ../src/core/address.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/provider_menu_state.o: ../src/app/provider_menu_state.cpp
+$(OBJDIR)/datetime.o: ../src/core/datetime.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

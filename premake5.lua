@@ -39,27 +39,70 @@ workspace "CS300 Term Project"
 
     filter "toolset:gcc"
         buildoptions { 
-            "-Wall", "-Wextra", "-Werror", "-std=c++11"
+            "-Wall", "-Wextra", "-Werror", "-std=c++17"
         }
 
     filter {} -- close filter
 
-project "ChocAn"
+project "ChocAn-Core"
     kind "StaticLib"
     language "C++"
     targetdir "lib/%{cfg.buildcfg}/"
-    targetname "ChocAn"
+    targetname "ChocAn-Core"
 
     local include = "include/"
-    local source  = "src/"
+    local source  = "src/core/"
+
+    files (source .. "*.cpp")
+    includedirs (include)
+
+project "ChocAn-Data"
+    kind "StaticLib"
+    links "ChocAn-Core"
+    language "C++"
+    targetdir "lib/%{cfg.buildcfg}/"
+    targetname "ChocAn-Data"
+
+    local include = "include/"
+    local source  = "src/data/"
 
     files (source .. "*.cpp")
     includedirs (include)
 
 project "ChocAn-App"
+    kind "StaticLib"
+    links "ChocAn-Core"
+    language "C++"
+    targetdir "lib/%{cfg.buildcfg}/"
+    targetname "ChocAn-App"
+
+    local include = "include/"
+    local source  = "src/app/"
+
+    files (source .. "*.cpp")
+    includedirs (include)
+
+project "ChocAn-View"
+    kind "StaticLib"
+    links "ChocAn-Core"
+    links "ChocAn-App"
+    language "C++"
+    targetdir "lib/%{cfg.buildcfg}/"
+    targetname "ChocAn-View"
+
+    local include = "include/"
+    local source  = "src/view/"
+
+    files (source .. "*.cpp")
+    includedirs (include)
+
+project "ChocAn-Exe"
     kind "ConsoleApp"
     language "C++"
-    links "ChocAn"
+    links "ChocAn-Core"
+    links "ChocAn-Data"
+    links "ChocAn-App"
+    links "ChocAn-View"
     targetdir "bin/%{cfg.buildcfg}/"
     targetname  "ChocAn_%{cfg.buildcfg}"
 
@@ -72,7 +115,10 @@ project "ChocAn-App"
 project "Tests"
     kind "ConsoleApp"
     language "C++"
-    links "ChocAn"
+    links "ChocAn-Core"
+    links "ChocAn-Data"
+    links "ChocAn-App"
+    links "ChocAn-View"
     targetdir "bin/tests/"
     targetname "%{cfg.buildcfg}_tests"
 

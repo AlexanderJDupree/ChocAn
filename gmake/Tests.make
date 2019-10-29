@@ -19,11 +19,11 @@ ifeq ($(config),debug)
   INCLUDES += -I../third_party -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++11
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++11
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/debug/libChocAn.a -lgcov
-  LDDEPS += ../lib/debug/libChocAn.a
+  LIBS += ../lib/debug/libChocAn-Core.a ../lib/debug/libChocAn-Data.a ../lib/debug/libChocAn-App.a ../lib/debug/libChocAn-View.a -lgcov
+  LDDEPS += ../lib/debug/libChocAn-Core.a ../lib/debug/libChocAn-Data.a ../lib/debug/libChocAn-App.a ../lib/debug/libChocAn-View.a
   ALL_LDFLAGS += $(LDFLAGS)
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
@@ -46,11 +46,11 @@ ifeq ($(config),release)
   INCLUDES += -I../third_party -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++11
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++11
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/release/libChocAn.a
-  LDDEPS += ../lib/release/libChocAn.a
+  LIBS += ../lib/release/libChocAn-Core.a ../lib/release/libChocAn-Data.a ../lib/release/libChocAn-App.a ../lib/release/libChocAn-View.a
+  LDDEPS += ../lib/release/libChocAn-Core.a ../lib/release/libChocAn-Data.a ../lib/release/libChocAn-App.a ../lib/release/libChocAn-View.a
   ALL_LDFLAGS += $(LDFLAGS) -s
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
@@ -65,6 +65,8 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
+	$(OBJDIR)/state_machine_tests.o \
+	$(OBJDIR)/state_tests.o \
 	$(OBJDIR)/account_tests.o \
 	$(OBJDIR)/address_tests.o \
 	$(OBJDIR)/datetime_tests.o \
@@ -128,16 +130,22 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/account_tests.o: ../tests/account_tests.cpp
+$(OBJDIR)/state_machine_tests.o: ../tests/app/state_machine_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/address_tests.o: ../tests/address_tests.cpp
+$(OBJDIR)/state_tests.o: ../tests/app/state_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/datetime_tests.o: ../tests/datetime_tests.cpp
+$(OBJDIR)/account_tests.o: ../tests/core/account_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/exception_tests.o: ../tests/exception_tests.cpp
+$(OBJDIR)/address_tests.o: ../tests/core/address_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/datetime_tests.o: ../tests/core/datetime_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/exception_tests.o: ../tests/core/exception_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/test_config_main.o: ../tests/test_config_main.cpp

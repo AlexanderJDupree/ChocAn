@@ -9,43 +9,70 @@ ifndef verbose
 endif
 
 ifeq ($(config),debug)
-  ChocAn_config = debug
+  ChocAn_Core_config = debug
+  ChocAn_Data_config = debug
   ChocAn_App_config = debug
+  ChocAn_View_config = debug
+  ChocAn_Exe_config = debug
   Tests_config = debug
 endif
 ifeq ($(config),release)
-  ChocAn_config = release
+  ChocAn_Core_config = release
+  ChocAn_Data_config = release
   ChocAn_App_config = release
+  ChocAn_View_config = release
+  ChocAn_Exe_config = release
   Tests_config = release
 endif
 
-PROJECTS := ChocAn ChocAn-App Tests
+PROJECTS := ChocAn-Core ChocAn-Data ChocAn-App ChocAn-View ChocAn-Exe Tests
 
 .PHONY: all clean help $(PROJECTS) 
 
 all: $(PROJECTS)
 
-ChocAn:
-ifneq (,$(ChocAn_config))
-	@echo "==== Building ChocAn ($(ChocAn_config)) ===="
-	@${MAKE} --no-print-directory -C . -f ChocAn.make config=$(ChocAn_config)
+ChocAn-Core:
+ifneq (,$(ChocAn_Core_config))
+	@echo "==== Building ChocAn-Core ($(ChocAn_Core_config)) ===="
+	@${MAKE} --no-print-directory -C . -f ChocAn-Core.make config=$(ChocAn_Core_config)
 endif
 
-ChocAn-App: ChocAn
+ChocAn-Data: ChocAn-Core
+ifneq (,$(ChocAn_Data_config))
+	@echo "==== Building ChocAn-Data ($(ChocAn_Data_config)) ===="
+	@${MAKE} --no-print-directory -C . -f ChocAn-Data.make config=$(ChocAn_Data_config)
+endif
+
+ChocAn-App: ChocAn-Core
 ifneq (,$(ChocAn_App_config))
 	@echo "==== Building ChocAn-App ($(ChocAn_App_config)) ===="
 	@${MAKE} --no-print-directory -C . -f ChocAn-App.make config=$(ChocAn_App_config)
 endif
 
-Tests: ChocAn
+ChocAn-View: ChocAn-Core ChocAn-App
+ifneq (,$(ChocAn_View_config))
+	@echo "==== Building ChocAn-View ($(ChocAn_View_config)) ===="
+	@${MAKE} --no-print-directory -C . -f ChocAn-View.make config=$(ChocAn_View_config)
+endif
+
+ChocAn-Exe: ChocAn-Core ChocAn-Data ChocAn-App ChocAn-View
+ifneq (,$(ChocAn_Exe_config))
+	@echo "==== Building ChocAn-Exe ($(ChocAn_Exe_config)) ===="
+	@${MAKE} --no-print-directory -C . -f ChocAn-Exe.make config=$(ChocAn_Exe_config)
+endif
+
+Tests: ChocAn-Core ChocAn-Data ChocAn-App ChocAn-View
 ifneq (,$(Tests_config))
 	@echo "==== Building Tests ($(Tests_config)) ===="
 	@${MAKE} --no-print-directory -C . -f Tests.make config=$(Tests_config)
 endif
 
 clean:
-	@${MAKE} --no-print-directory -C . -f ChocAn.make clean
+	@${MAKE} --no-print-directory -C . -f ChocAn-Core.make clean
+	@${MAKE} --no-print-directory -C . -f ChocAn-Data.make clean
 	@${MAKE} --no-print-directory -C . -f ChocAn-App.make clean
+	@${MAKE} --no-print-directory -C . -f ChocAn-View.make clean
+	@${MAKE} --no-print-directory -C . -f ChocAn-Exe.make clean
 	@${MAKE} --no-print-directory -C . -f Tests.make clean
 
 help:
@@ -58,8 +85,11 @@ help:
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
-	@echo "   ChocAn"
+	@echo "   ChocAn-Core"
+	@echo "   ChocAn-Data"
 	@echo "   ChocAn-App"
+	@echo "   ChocAn-View"
+	@echo "   ChocAn-Exe"
 	@echo "   Tests"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"

@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#include <ChocAn/account.hpp>
+#include <ChocAn/core/account.hpp>
 
 Account::Account( Address& address, std::string& f_name, 
                  std::string& l_name, unsigned ID )

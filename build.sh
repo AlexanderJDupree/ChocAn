@@ -9,6 +9,8 @@
 #
 #   $ make all
 #
+# TODO Add check to ensure GCC version is >= 7.0
+# TODO If lib-bash fails we should build manually with make -C gmake
 
 
 ( [[ -n ${ZSH_EVAL_CONTEXT} && ${ZSH_EVAL_CONTEXT} =~ :file$ ]] || \

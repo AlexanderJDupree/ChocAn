@@ -13,8 +13,8 @@ endif
 ifeq ($(config),debug)
   RESCOMP = windres
   TARGETDIR = ../lib/debug
-  TARGET = $(TARGETDIR)/libChocAn-App.a
-  OBJDIR = obj/debug/ChocAn-App
+  TARGET = $(TARGETDIR)/libChocAn-Data.a
+  OBJDIR = obj/debug/ChocAn-Data
   DEFINES += -DDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
@@ -40,8 +40,8 @@ endif
 ifeq ($(config),release)
   RESCOMP = windres
   TARGETDIR = ../lib/release
-  TARGET = $(TARGETDIR)/libChocAn-App.a
-  OBJDIR = obj/release/ChocAn-App
+  TARGET = $(TARGETDIR)/libChocAn-Data.a
+  OBJDIR = obj/release/ChocAn-Data
   DEFINES += -DNDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
@@ -65,9 +65,6 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/exit_state.o \
-	$(OBJDIR)/login_state.o \
-	$(OBJDIR)/provider_menu_state.o \
 
 RESOURCES := \
 
@@ -79,7 +76,7 @@ ifeq (.exe,$(findstring .exe,$(ComSpec)))
 endif
 
 $(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR)
-	@echo Linking ChocAn-App
+	@echo Linking ChocAn-Data
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -102,7 +99,7 @@ else
 endif
 
 clean:
-	@echo Cleaning ChocAn-App
+	@echo Cleaning ChocAn-Data
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -126,15 +123,6 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/exit_state.o: ../src/app/exit_state.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/login_state.o: ../src/app/login_state.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/provider_menu_state.o: ../src/app/provider_menu_state.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))
