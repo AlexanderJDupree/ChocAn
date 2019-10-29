@@ -19,13 +19,14 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/app/states/login_state.hpp>
 #include <ChocAn/app/states/provider_menu_state.hpp>
 
-State::State_Ptr Login_State::evaluate(const std::string& input)
+State::State_Ptr Login_State::evaluate(const Input_Vector& input)
 {
-    if(input == "exit")
+    // TODO check vector size??
+    if(input.at(0) == "exit")
     {
         return std::make_unique<Exit_State>();
     }
-    if(login(input))
+    if(login(input.at(0)))
     {
         return std::make_unique<Provider_Menu_State>();
     }
@@ -34,7 +35,7 @@ State::State_Ptr Login_State::evaluate(const std::string& input)
 
 State_Info Login_State::info() const
 {
-    return State_Info { login_msg };
+    return State_Info { login_status };
 }
 
 bool Login_State::login(const std::string& input)

@@ -21,6 +21,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_STATE_H
 
 #include <memory>
+#include <vector>
 #include <typeinfo>
 #include <optional>
 
@@ -29,7 +30,7 @@ class State_Info
 {
 public:
 
-    std::optional<std::string> msg;
+    std::optional<std::string> status_msg;
 
 };
 
@@ -37,11 +38,12 @@ class State
 {
 public:
 
-    typedef std::shared_ptr<State> State_Ptr;
+    typedef std::shared_ptr<State>      State_Ptr;
+    typedef std::vector<std::string>    Input_Vector;
 
     virtual ~State() {};
 
-    virtual State_Ptr evaluate(const std::string& input) = 0;
+    virtual State_Ptr evaluate(const Input_Vector& input) = 0;
 
     virtual State_Info info() const = 0;
 

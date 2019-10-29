@@ -34,27 +34,27 @@ TEST_CASE("State Behavior", "[state]")
 
     SECTION("States do not transition on evaluation of invalid input")
     {
-        REQUIRE(*(Login_State().evaluate("Bad Input")) == Login_State());
-        REQUIRE(*(Exit_State().evaluate("Bad_Input")) == Exit_State());
-        REQUIRE(*(Provider_Menu_State().evaluate("Bad_Input")) == Provider_Menu_State());
+        REQUIRE(*(Login_State().evaluate({ "Bad Input" })) == Login_State());
+        REQUIRE(*(Exit_State().evaluate({ "Bad_Input" })) == Exit_State());
+        REQUIRE(*(Provider_Menu_State().evaluate({ "Bad_Input" })) == Provider_Menu_State());
     }
     SECTION("All states transition to exit state on input 'exit'")
     {
         std::for_each(states.begin(), states.end(), 
         [](State* state)
         { 
-            REQUIRE(*(state->evaluate("exit")) == Exit_State());
+            REQUIRE(*(state->evaluate({ "exit" })) == Exit_State());
         });
     }
     SECTION("Provider Menu State returns to login on input '0'")
     {
-        REQUIRE(*(provider_menu_state.evaluate("0")) == Login_State());
+        REQUIRE(*(provider_menu_state.evaluate({ "0" })) == Login_State());
     }
     SECTION("Login State returns login message after a failed attempt")
     {
-        State::State_Ptr failed_login = Login_State().evaluate("bad input");
+        State::State_Ptr failed_login = Login_State().evaluate({ "bad input" });
 
-        REQUIRE(failed_login->info().msg);
+        REQUIRE(failed_login->info().status_msg);
     }
 
 }

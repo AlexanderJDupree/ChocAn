@@ -23,10 +23,10 @@ https://github.com/AlexanderJDupree/ChocAn
 class Login_State : public State
 {
 public:
-    Login_State(std::string&& login_msg = "")
-        : login_msg(std::move(login_msg)) {}
+    Login_State(std::string&& login_status = "Welcome")
+        : login_status(std::move(login_status)) {}
 
-    State_Ptr evaluate(const std::string& input);
+    State_Ptr evaluate(const Input_Vector& input);
 
     State_Info info() const;
 
@@ -34,7 +34,7 @@ public:
 
 private: 
 
-    const std::string login_msg;
+    const std::string login_status;
 
 };
 

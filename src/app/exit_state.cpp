@@ -17,9 +17,9 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/app/states/exit_state.hpp>
 
-State::State_Ptr Exit_State::evaluate(const std::string& input)
+State::State_Ptr Exit_State::evaluate(const Input_Vector& input)
 {
-    if(input == "test")
+    if(input.size() == 0)
     {
         return std::make_unique<Exit_State>();
     }

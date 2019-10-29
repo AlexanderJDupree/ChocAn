@@ -39,7 +39,7 @@ public:
                     , State_Set&& end_states  = { std::make_unique<Exit_State>() } )
         : state(std::move(initial_state)), end_states(std::move(end_states)) {}
 
-    State_Controller& transition(const std::string& input)
+    State_Controller& transition(const State::Input_Vector& input)
     {
         state = state->evaluate(input);
         return *this;

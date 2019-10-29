@@ -26,9 +26,9 @@ public:
 
     virtual ~State_Viewer() {}
 
-    virtual std::string interact() const = 0;
+    virtual const State::Input_Vector& interact() = 0;
 
-    virtual void render_state(const State& state) const = 0;
+    virtual void render_state(const State& state) = 0;
 
 };
 

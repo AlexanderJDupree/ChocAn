@@ -19,13 +19,14 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/app/states/login_state.hpp>
 #include <ChocAn/app/states/provider_menu_state.hpp>
 
-State::State_Ptr Provider_Menu_State::evaluate(const std::string& input)
+State::State_Ptr Provider_Menu_State::evaluate(const Input_Vector& input)
 {
-    if(input == "0")
+
+    if(input.at(0) == "0")
     {
         return std::make_unique<Login_State>();
     }
-    if(input == "exit")
+    if(input.at(0) == "exit")
     {
         return std::make_unique<Exit_State>();
     }

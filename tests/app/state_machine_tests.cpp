@@ -21,7 +21,7 @@ https://github.com/AlexanderJDupree/ChocAn
 class Q1 : public State
 {
 public: 
-    State_Ptr evaluate(const std::string& input);
+    State_Ptr evaluate(const Input_Vector& input);
 
     State_Info info() const { return State_Info(); }
 };
@@ -29,23 +29,23 @@ public:
 class Q2 : public State
 {
 public: 
-    State::State_Ptr evaluate(const std::string& input);
+    State::State_Ptr evaluate(const Input_Vector& input);
 
     State_Info info() const { return State_Info(); }
 };
 
-State::State_Ptr Q1::evaluate(const std::string& input)
+State::State_Ptr Q1::evaluate(const Input_Vector& input)
 {
-    if(input == "1")
+    if(input.at(0) == "1")
     {
         return std::make_unique<Q2>();
     }
     return std::make_unique<Q1>();
 }
 
-State::State_Ptr Q2::evaluate(const std::string& input)
+State::State_Ptr Q2::evaluate(const Input_Vector& input)
 {
-    if(input == "0")
+    if(input.at(0) == "0")
     {
         return std::make_unique<Q1>();
     }
@@ -70,22 +70,22 @@ TEST_CASE("State controller transitions state", "[transition], [state_controller
 
     SECTION("Invalid input does not change state")
     {
-        controller.transition("not recognized");
+        controller.transition({ "not recognized" });
 
         REQUIRE(controller.current_state() == Q1());
     }
     SECTION("Valid input transitions state")
     {
         // Transition to Q2
-        controller.transition("1");
+        controller.transition({ "1" });
         // Transition back to Q1
-        controller.transition("0");
+        controller.transition({ "0" });
 
         REQUIRE(controller.current_state() == Q1());
     }
     SECTION("Accept state can be transitioned into")
     {
-        controller.transition("1");
+        controller.transition({ "1" });
 
         REQUIRE(controller.end_state());
     }
