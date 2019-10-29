@@ -1,4 +1,4 @@
-=============== PROVIDER MENU ===============
+<header> 
 
 0) Return to Login Screen
 
@@ -10,8 +10,8 @@
 
 4) View Member Record
 
-5) Add Service Transaction
+5) Adrvice Transaction
 
-( Entering 'exit' will close the application )
+<footer>
 
-> 
+<prompt>

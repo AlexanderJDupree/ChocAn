@@ -1,9 +1,9 @@
-=============== CHOCAN LOGIN SERVICE ===============
+<header>
 
-Welcome, 
+<status_msg>, 
 
 Please enter your ChocAn Provider or Manager ID. 
 
-( Entering 'exit' will close the application )
+<footer>
 
-> 
+<prompt>
