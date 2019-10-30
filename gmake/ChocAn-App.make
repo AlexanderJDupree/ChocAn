@@ -67,6 +67,7 @@ endif
 OBJECTS := \
 	$(OBJDIR)/exit_state.o \
 	$(OBJDIR)/login_state.o \
+	$(OBJDIR)/manager_menu_state.o \
 	$(OBJDIR)/provider_menu_state.o \
 
 RESOURCES := \
@@ -130,6 +131,9 @@ $(OBJDIR)/exit_state.o: ../src/app/exit_state.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/login_state.o: ../src/app/login_state.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/manager_menu_state.o: ../src/app/manager_menu_state.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/provider_menu_state.o: ../src/app/provider_menu_state.cpp
