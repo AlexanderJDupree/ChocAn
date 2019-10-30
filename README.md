@@ -29,56 +29,74 @@ Alternatively, I also provided a build script that will build and execute the un
 ```bash
 ./build.sh
 ```
+Now you can run the applciaiton with:
 
+```bash
+./bin/release/ChocAn_release
+```
 
-### Usage 
+Also, the test binary is located in `bin/tests/` if you run `./bin/tests/debug_tests --help` you will see a list of testing options that can be performed.
 
 ## What's in this Repo?
 
 ```bash
-├── bin <-- executables will be found in here
+.
+├── bin         <-- Executable binaries stored here.
+│   ├── debug
+│   ├── release
+│   └── tests
 |
-├── build.sh <-- Fancy build script
+├── build.sh    <-- Fancy Build script
 |
-├── docs <-- finalized and in-progress documentation will be found here
+├── codecov.yml <-- config file for code coverage reports
 |
-├── gmake <-- directory holds all the GNU Makefiles and object binaries. 
-│   ├── ChocAn-App.make
-│   ├── ChocAn.make
-│   ├── Makefile
-│   └── Tests.make
+├── docs        <-- Project documentation goes here
 |
-├── include <-- Stores all public header files
-│   └── ChocAn
-│       └── datetime.hpp
+├── gmake       <-- Holds GNU Makefiles used to build the project
+|
+├── include     <-- Public header files go here
+│   └── ChocAn
+│       ├── app <-- Application layer files
+|       |   |
+│       │   ├── states  <-- Specific Application states go here
+|       |   
+│       ├── core <-- Domain layer files
+|       |
+│       ├── data <-- Data Access Layer files
+|       |
+│       └── view <-- Presentation Layer files
+|   
+├── lib          <-- Project static libraries are stored here
+│   ├── debug
+│   └── release
 |
 ├── LICENSE
+├── premake5.lua <-- Build script for premake5
+├── README.md    <-- This document\
 |
-├── premake5.lua <-- build script for premake5, generates the Make files
+├── src          <-- Source files go here, structured in the same way as include/
+│   ├── app
+│   ├── core
+│   ├── data
+│   ├── view
+│   └── main.cpp
 |
-├── README.md <- this document
+├── tests       <-- Test source files, structured in the same way as include/
+│   ├── app
+│   ├── core
+│   ├── data
+│   └── test_config_main.cpp
 |
-├── src <-- implementation files here. 
-│   ├── datetime.cpp
-│   └── main.cpp
+├── third_party <-- Third-party libraries
+│   └── catch.hpp
 |
-├── tests <-- Ensure each module contains its own test file
-│   ├── datetime_tests.cpp
-│   └── test_config_main.cpp
-|
-└── third_party <-- open source libraries will be stored here, with their licences if needed. 
-    └── catch.hpp
+└── views       <-- All UI text files go here
+
 ```
 
 ## Contributing
 
-If you're contributing to this project ensure you communicate which feature exactly you will be developing, and try to develop only that feature. It is also vital that all dvelopment is done on a feature branch. For example, if you are working on the DateTime library, then you should first run:
-
-```bash
-git checkout -b DateTime
-```
-
-Then within that branch create more branches for each module created within that feature. Also, be sure to pull from the master branch regularly so your branch is continually updated. When your feature is completed and a suite of unit tests has been added create a pull request into the master branch then we can review the changes, run the tests, and merge the feature branch. This will keep our git history clean, and prevent merge difficulties. 
+I wrote a basic contributing guide that explains the application architecture and how to code within it. Check it out [here](https://github.com/AlexanderJDupree/ChocAn/blob/master/docs/contributing.md).
 
 ## Built With
 
@@ -86,6 +104,13 @@ Then within that branch create more branches for each module created within that
 * [Premake5](https://premake.github.io/download.html) - Build system
 
 ## Authors
+
+* **Alex Salazar**  - [AlexSalazarJ](https://github.com/AlexSalazarJ)
+* **Daniel Mendez** - [dannymendez90](https://github.com/dannymendez90)
+* **Kyle Zalewski** - [kzalewski11](https://github.com/kzalewski11)
+* **Dominique Moore** - [Dom26](https://github.com/Dom26)
+* **Arman Alauizadeh** - [keyumar](https://github.com/Keyumar)
+* **Alexander DuPree** - [AlexanderJDupree](https://github.com/AlexanderJDupree)
 
 ## License
 
