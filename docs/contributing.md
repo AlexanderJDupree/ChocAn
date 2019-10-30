@@ -40,16 +40,15 @@ public:
     size_t id() const { return typeid(*this).hash_code(); }
 
     bool operator == (const State& rhs) const { return this->id() == rhs.id(); }
-
-    bool operator < (const State& rhs) const { return id() < rhs.id(); }
 };
 
 ```
 
-First, we typedef the std::shared_ptr to `State_Ptr`, and std::vector to `Input_Vector`. Typedefs help relieve us of the tedious C++ standard library typenames and allows us to reference an object type in a uniform way. The `State` class also has two pure virtual methods that derived classes must implement. The first is the *evaluate* function. *evaluate* takes in an `Input_Vector` and returns a `State_Ptr`. You can think of this as a function that maps *inputs* to *states*. How it maps these inputs is up to you, but generally invalid or unrecognizable input should map back to itself. The second virtual method is *info*, which returns a `State_Info` object that holds optional data about the state.
+First, we typedef the `std::shared_ptr` to `State_Ptr`, and `std::vector` to `Input_Vector`. Typedefs help relieve us of the tedious C++ standard library typenames and allow us to reference an object's type in a uniform way. The `State` class also has two pure virtual methods that derived classes must implement. The first is the *evaluate* function. *evaluate* takes in an `Input_Vector` and returns a `State_Ptr`. You can think of this as a function that maps *inputs* to *states*. How it maps these inputs is up to you, but generally invalid or unrecognizable input should map back to itself. The second virtual method is *info*, which returns a `State_Info` object that holds optional data about the state.
 
 The `State_Controller` just manages what the current state is and feeds input into the current state to evaluate. So in the main module we continue to loop until the `State_Controller` reaches an *end* state and with each iteration we display the states **view** and have the `State_Controller` transition state to the evaluation of the states input.
 
+(src/main.cpp)
 ```c++
 int main () {
 
@@ -155,12 +154,12 @@ TEST_CASE("State Behavior", "[state]")
 {
     Login_State login_state;
     Exit_State  exit_state;
-    Manager_Menu_State manager_menu_state; // Add this line
+    Manager_Menu_State manager_menu_state; // <-- Add this line
     Provider_Menu_State provider_menu_state;
 
     std::vector<State*> states { &login_state
                                , &exit_state
-                               , &manager_menu_state // Add this line
+                               , &manager_menu_state // <-- Add this line
                                , &provider_menu_state
                                }; 
 
@@ -195,7 +194,7 @@ SECTION("Manager Menu State returns to login on input '0'")
 
 Now that we added the tests, lets build and run the test target to make sure everything works as expected.
 
-Since we added new files to the project we need to update the Makefiles to include these files in our build targets. We can do this by manually editing the Makefiles, or use the **Premake5** build system to generate the makefiles for us. If you don't have **Premake5** you can [download the binary here](https://premake.github.io/download.html).
+Since we added new files to the project we need to update the Makefiles to include these files in our build targets. We can do this by manually editing the Makefiles, or by using the **Premake5** build system to generate the makefiles for us. If you don't have **Premake5** you can [download the binary here](https://premake.github.io/download.html).
 
 With **Premake5** installed and included in our *PATH* we can run the following command to update the Makefiles:
 
@@ -382,4 +381,4 @@ Enter State: <prompt>
 Enter Street Address: <prompt>
 ```
 
-This view would collect all user input into the `Input_Vector` and have the associated state unpack and evaluate that input. The state can also provide a status message via the `State_Info` method, which can be displayed via the `<status_msg>` viewer command. Also, we can always add more commands for the viewer to use in order to handle different types of interaction with the user. 
+This view would collect all user input into the `Input_Vector` and have the associated state unpack and evaluate that input. The state can also provide a status message via the `State_Info` object, which can be displayed via the `<status_msg>` viewer command. Also, we can always add more commands for the viewer to use in order to handle different types of interaction with the user. 
