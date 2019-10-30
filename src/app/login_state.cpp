@@ -18,6 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/app/states/exit_state.hpp>
 #include <ChocAn/app/states/login_state.hpp>
 #include <ChocAn/app/states/provider_menu_state.hpp>
+#include <ChocAn/app/states/manager_menu_state.hpp>
 
 State::State_Ptr Login_State::evaluate(const Input_Vector& input)
 {
@@ -25,6 +26,10 @@ State::State_Ptr Login_State::evaluate(const Input_Vector& input)
     if(input.at(0) == "exit")
     {
         return std::make_unique<Exit_State>();
+    }
+    if(input.at(0) == "5678")
+    {
+        return std::make_unique<Manager_Menu_State>();
     }
     if(login(input.at(0)))
     {
