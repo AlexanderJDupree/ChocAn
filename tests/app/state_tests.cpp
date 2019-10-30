@@ -64,4 +64,14 @@ TEST_CASE("State Behavior", "[state]")
 
         REQUIRE(failed_login->info().status_msg);
     }
+    SECTION("Login State returns Provider Menu State with provider login id")
+    {
+        // TODO this test will need to be updated when we create the actual login ID's
+        REQUIRE(*(login_state.evaluate({ "1234" })) == Provider_Menu_State());
+    }
+    SECTION("Login State returns Manager Menu State with manager login id")
+    {
+        // TODO this test will need to be updated when we create the actual login ID's
+        REQUIRE(*(login_state.evaluate({ "5678" })) == Manager_Menu_State());
+    }
 }
