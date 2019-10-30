@@ -355,6 +355,14 @@ And finally we can build and run the application.
 
 Note: The password to get to the Manager Menu is '5678' for right now. 
 
+If we can build the application, all tests pass, and we're satisfied with our work we should push our code up to the remote repository like this:
+
+
+```bash
+git add .
+git commit -m "Implemented Manager_Menu_State"
+git push --set-upstream origin manager_menu
+```
 
 ## Wrapping Up
 
