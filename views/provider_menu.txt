@@ -10,7 +10,7 @@
 
 4) View Member Record
 
-5) Adrvice Transaction
+5) Add Transaction
 
 <footer>
 

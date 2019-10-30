@@ -32,12 +32,13 @@ class State_Controller
 {
 public:
 
-    typedef State::State_Ptr State_Ptr;
-    typedef std::set<State_Ptr> State_Set;
+    typedef std::set<size_t> End_State_Set;
 
-    State_Controller( State_Ptr initial_state = std::make_unique<Login_State>()
-                    , State_Set&& end_states  = { std::make_unique<Exit_State>() } )
-        : state(std::move(initial_state)), end_states(std::move(end_states)) {}
+    State_Controller( State::State_Ptr initial_state = std::make_unique<Login_State>()
+                    , End_State_Set&&  end_states    = { Exit_State().id() } )
+        : state     ( std::move(initial_state) )
+        , end_states( std::move(end_states)    ) 
+        {}
 
     State_Controller& transition(const State::Input_Vector& input)
     {
@@ -53,19 +54,13 @@ public:
 
     bool end_state() const
     {
-        State& current = *state;
-
-        return end_states.end() != std::find_if(end_states.begin(), end_states.end(), 
-                                   [&current](const State_Ptr& accept)
-                                   { 
-                                       return *accept == current; 
-                                   } );
+        return end_states.find(state->id()) != end_states.end();
     }
 
 private:
 
-    State_Ptr state;
-    State_Set end_states;
+    State::State_Ptr state;
+    End_State_Set    end_states;
 };
 
 #endif // CHOCAN_STATE_CONTROLLER_H

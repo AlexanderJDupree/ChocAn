@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/app/states/exit_state.hpp>
 #include <ChocAn/app/states/login_state.hpp>
+#include <ChocAn/app/states/manager_menu_state.hpp>
 #include <ChocAn/app/states/provider_menu_state.hpp>
 
 #include <ChocAn/view/terminal_state_viewer.hpp>
@@ -29,9 +30,10 @@ https://github.com/AlexanderJDupree/ChocAn
 
 const Terminal_State_Viewer::View_Table Terminal_State_Viewer::view_table 
 {
-    { Login_State().id(),         "login" },
-    { Exit_State().id(),          "exit" },
-    { Provider_Menu_State().id(), "provider_menu" }
+    { Login_State().id(),         "login"         },
+    { Exit_State().id(),          "exit"          },
+    { Provider_Menu_State().id(), "provider_menu" },
+    { Manager_Menu_State().id(),  "manager_menu"  }
 };
 
 Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
