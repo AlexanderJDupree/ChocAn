@@ -57,7 +57,7 @@ TEST_CASE("State Controller construction", "[constructors], [state_controller]")
     SECTION("State_Controller is constructed with initial state")
     {
         State_Controller controller { std::make_unique<Q1>() , 
-                                    { std::make_unique<Q2>() } };
+                                    { Q2().id() } };
 
         REQUIRE(controller.current_state() == Q1());
     }
@@ -66,7 +66,7 @@ TEST_CASE("State controller transitions state", "[transition], [state_controller
 {
 
     State_Controller controller { std::make_unique<Q1>() , 
-                                { std::make_unique<Q2>() } };
+                                { Q2().id() } };
 
     SECTION("Invalid input does not change state")
     {

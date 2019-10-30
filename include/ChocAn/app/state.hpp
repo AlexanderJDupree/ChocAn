@@ -20,10 +20,12 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_STATE_H
 #define CHOCAN_STATE_H
 
+#include <map>
 #include <memory>
 #include <vector>
 #include <typeinfo>
 #include <optional>
+#include <functional>
 
 // TODO evaluate prototype
 class State_Info
@@ -41,6 +43,8 @@ public:
     typedef std::shared_ptr<State>      State_Ptr;
     typedef std::vector<std::string>    Input_Vector;
 
+    typedef std::map<std::string, std::function<State_Ptr()>> Transition_Table;
+
     virtual ~State() {};
 
     virtual State_Ptr evaluate(const Input_Vector& input) = 0;
@@ -50,8 +54,6 @@ public:
     size_t id() const { return typeid(*this).hash_code(); }
 
     bool operator == (const State& rhs) const { return this->id() == rhs.id(); }
-
-    bool operator < (const State& rhs) const { return id() < rhs.id(); }
 };
 
 #endif  // CHOCAN_STATE_H
