@@ -16,36 +16,43 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#include <ChocAn/core/address.hpp>
+#include <ChocAn/core/utils/address.hpp>
+#include <ChocAn/core/utils/validators.hpp>
 
-Address::Address(std::string& street, std::string& city, 
-                 std::string& state, unsigned zip)
-    : street(street), city(city), state(state), zip(zip)
+Address::Address( const std::string& street 
+                , const std::string& city 
+                , const std::string& state 
+                , const unsigned     zip   )
+            : street ( street )
+            , city   ( city   )
+            , state  ( state  )
+            , zip    ( zip    )
 {
+    chocan_user_exception::Info errors;
 
-        if(!ok())
-        {
-            throw invalid_address( { "Street address must be less than 25 characters" 
-                                 , "City must be less than 14 characters"
-                                 , "State must be in abbreviated 2 character form"
-                                 , "Zip code must be 5 digits"
-                                 } );
-        }
-
+    ( !Validators::length(street, 25, 1) ) 
+        ? errors.push_back("Street address must be less than 25 characters")
+        : void();
+    ( !Validators::length(city, 14, 1) ) 
+        ? errors.push_back("City must be less than 14 character")
+        : void();
+    ( !Validators::length(state, 2, 2) ) 
+        ? errors.push_back("State must be in abbreviated 2 character format")
+        : void();
+    ( !Validators::length(std::to_string(zip), 5, 5) ) 
+        ? errors.push_back("Zip code must be 5 digits")
+        : void();
+    ( !errors.empty() ) 
+        ? throw invalid_address("Invalid address values", errors)
+        : void();
 }
 
-bool Address::ok() const
+bool Address::operator==(const Address& rhs) const
 {
-
-    if(street.length() > 25 || street.empty() || street == " ") return false;
-
-    if(city.length() > 14 || city.empty() || city == " ") return false;
-
-    if(state.length() > 2 || state.empty() || state == " ") return false;
-
-    // Range of 5 digit zip codes
-    if(zip > 99999 || zip <= 10000) return false;
-
-    return true;
+    return street == rhs.street && city == rhs.city && state == rhs.state && zip == rhs.zip;
 }
 
+bool Address::operator!=(const Address& rhs) const
+{
+    return !(*this == rhs);
+}
