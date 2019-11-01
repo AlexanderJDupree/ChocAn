@@ -68,6 +68,8 @@ OBJECTS := \
 	$(OBJDIR)/account.o \
 	$(OBJDIR)/address.o \
 	$(OBJDIR)/datetime.o \
+	$(OBJDIR)/name.o \
+	$(OBJDIR)/validators.o \
 
 RESOURCES := \
 
@@ -133,6 +135,12 @@ $(OBJDIR)/address.o: ../src/core/address.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/datetime.o: ../src/core/datetime.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/name.o: ../src/core/name.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/validators.o: ../src/core/validators.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

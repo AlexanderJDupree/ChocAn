@@ -18,7 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <iostream>
 #include <sstream>
 #include <catch.hpp>
-#include <ChocAn/core/datetime.hpp>
+#include <ChocAn/core/utils/datetime.hpp>
 
 std::ostream& operator<<(std::ostream& os, const DateTime& date)
 {
@@ -176,29 +176,21 @@ TEST_CASE("Testing ostream operator", "[datetime]")
     REQUIRE(oss.str() == "10-10-2020");
 }
 
-TEST_CASE("Testing invalid_datetime exception", "[exception]")
+TEST_CASE("Testing invalid_datetime exception", "[exception], [datetime]")
 {
-    SECTION("invalid_datetime error message and values")
+    SECTION("invalid_datetime error is populated with error messages")
     {
-        int i = 0;
+        chocan_user_exception::Info info;
         try
         {
             DateTime(Day(40), Month(13), Year(2040));
         }
         catch (const chocan_user_exception& err)
         {
+            info = err.info();
+            REQUIRE(std::string(err.what()) == "Invalid datetime values");
 
-            chocan_user_exception::info expected_values { 
-                                      "Day should be between 1 - 31"
-                                    , "Months should be between 1 - 12"
-                                    , "Years should be greater than 1970"
-                                };
-
-            for (const auto& info : err.get_info())
-            {
-                REQUIRE(info == expected_values[i++]);
-            }
         }
-        REQUIRE(i == 3);
+        REQUIRE(info.size() == 3);
     }
 }

@@ -22,7 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ctime>
 #include <chrono>
-#include <ChocAn/core/exception.hpp>
+#include <ChocAn/core/utils/exception.hpp>
 
 class datetime_unit
 {
@@ -144,17 +144,17 @@ class invalid_datetime : public chocan_user_exception
 public:
 
     const char* error;
-    info exception_info;
+    const Info exception_info;
 
-    invalid_datetime(const char* error, info exception_info)
+    invalid_datetime(const char* error, Info exception_info)
         : error(error), exception_info(std::move(exception_info)) {};
 
-    const char* what() const throw()
+    const char* what() const noexcept
     {
         return error;
     }
 
-    const info& get_info() const
+    const Info& info() const noexcept
     {
         return exception_info;
     }

@@ -33,11 +33,12 @@ https://github.com/AlexanderJDupree/ChocAn
 class chocan_user_exception : public std::exception
 {
 public:
-    typedef std::vector<std::string> info;
+    typedef std::vector<std::string> Info;
 
     virtual const char* what() const noexcept = 0;
 
-    virtual const info& get_info() const = 0;
+    virtual const Info& info() const noexcept = 0;
+
 };
 
 #endif // CHOCAN_EXCEPTION_HPP
