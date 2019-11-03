@@ -68,6 +68,7 @@ OBJECTS := \
 	$(OBJDIR)/account.o \
 	$(OBJDIR)/address.o \
 	$(OBJDIR)/datetime.o \
+	$(OBJDIR)/login_manager.o \
 	$(OBJDIR)/name.o \
 	$(OBJDIR)/validators.o \
 
@@ -135,6 +136,9 @@ $(OBJDIR)/address.o: ../src/core/address.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/datetime.o: ../src/core/datetime.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/login_manager.o: ../src/core/login_manager.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/name.o: ../src/core/name.cpp

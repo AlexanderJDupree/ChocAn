@@ -19,7 +19,8 @@ https://github.com/AlexanderJDupree/LinkedListsCPP
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/view/terminal_state_viewer.hpp>
 
-int main () {
+int main () 
+{
 
     State_Controller controller;
     Terminal_State_Viewer viewer;

@@ -32,9 +32,11 @@ class State_Controller
 {
 public:
 
+    using State_Ptr = State::State_Ptr;
+
     typedef std::set<size_t> End_State_Set;
 
-    State_Controller( State::State_Ptr initial_state = std::make_unique<Login_State>()
+    State_Controller( State_Ptr initial_state = std::make_unique<Login_State>()
                     , End_State_Set&&  end_states    = { Exit_State().id() } )
         : state     ( std::move(initial_state) )
         , end_states( std::move(end_states)    ) 
@@ -59,7 +61,7 @@ public:
 
 private:
 
-    State::State_Ptr state;
+    State_Ptr state;
     End_State_Set    end_states;
 };
 

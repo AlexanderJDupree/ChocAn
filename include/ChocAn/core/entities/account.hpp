@@ -18,9 +18,9 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_ACCOUNT_HPP
 #define CHOCAN_ACCOUNT_HPP
 
+#include <memory>
 #include <ChocAn/core/utils/name.hpp>
 #include <ChocAn/core/utils/address.hpp>
-#include <ChocAn/core/utils/exception.hpp>
 
 enum class Account_Type { Manager, Provider, Member };
 
@@ -28,8 +28,11 @@ class Account
 {
 public:
 
+    typedef std::shared_ptr<Account> Account_Ptr;
+
     Account(Name name, Address address, Account_Type type);
 
+    // Getters and setters?
     Name         name;
     Address      address;
 

@@ -26,6 +26,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <typeinfo>
 #include <optional>
 #include <functional>
+#include <ChocAn/core/chocan.hpp>
 
 // TODO evaluate prototype
 class State_Info
@@ -54,6 +55,10 @@ public:
     size_t id() const { return typeid(*this).hash_code(); }
 
     bool operator == (const State& rhs) const { return this->id() == rhs.id(); }
+
+protected:
+
+    static ChocAn chocan;
 };
 
 #endif  // CHOCAN_STATE_H

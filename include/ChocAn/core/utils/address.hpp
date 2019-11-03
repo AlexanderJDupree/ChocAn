@@ -36,7 +36,6 @@ public:
     const std::string city;
     const std::string state;
     const unsigned zip;
-
 };
 
 struct invalid_address : public chocan_user_exception
