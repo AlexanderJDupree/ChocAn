@@ -18,7 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_LOGIN_MANAGER_HPP
 #define CHOCAN_LOGIN_MANAGER_HPP
 
-#include <optional>
+#include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/chocan_service.hpp>
 #include <ChocAn/core/entities/account.hpp>
 
@@ -28,7 +28,8 @@ public:
 
     using Account_Ptr = Account::Account_Ptr;
 
-    Login_Manager() : ChocAn_Service(), _session_owner(nullptr) {}
+    Login_Manager(Database_Ptr db) 
+        :  ChocAn_Service(db), _session_owner(nullptr) {}
 
     bool login(const unsigned ID);
 

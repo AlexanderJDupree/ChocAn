@@ -24,7 +24,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <memory>
 #include <vector>
 #include <typeinfo>
-#include <optional>
 #include <functional>
 #include <ChocAn/core/chocan.hpp>
 
@@ -58,6 +57,7 @@ public:
 
 protected:
 
+    // Main ChocAn service shared between states
     static ChocAn chocan;
 };
 
