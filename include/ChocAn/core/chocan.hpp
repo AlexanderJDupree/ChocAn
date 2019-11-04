@@ -28,9 +28,9 @@ public:
     using Database_Ptr = Data_Gateway::Database_Ptr;
 
     ChocAn(Database_Ptr db)
-        : login_manager()
+        : login_manager(db)
         , db(db) 
-        { login_manager.set_gateway(db); }
+        { }
 
     Login_Manager login_manager;
 
