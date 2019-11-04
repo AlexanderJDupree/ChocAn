@@ -36,7 +36,12 @@ public:
     Name         name;
     Address      address;
 
+    const unsigned     id = 1111;
     const Account_Type type;
+
+    // Two accounts are equal iff they have the same id
+    bool operator == (const Account& rhs) const { return id == rhs.id;   }
+    bool operator != (const Account& rhs) const { return (*this) == rhs; }
 
 };
 
