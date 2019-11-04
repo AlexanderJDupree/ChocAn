@@ -19,21 +19,8 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_SERVICE_HPP
 #define CHOCAN_SERVICE_HPP
 
-#include <ChocAn/core/chocan.hpp>
 #include <ChocAn/core/data_gateway.hpp>
-
-class Service_Key
-{
-private:
-
-    friend class ChocAn;
-
-    Service_Key() = default;
-
-    Service_Key(const Service_Key&) = delete;
-    Service_Key& operator=(const Service_Key&) = delete;
-
-};
+#include <ChocAn/core/utils/exception.hpp>
 
 class ChocAn_Service
 {
@@ -41,11 +28,11 @@ public:
 
     using Database_Ptr = Data_Gateway::Database_Ptr;
 
-    ChocAn_Service() : database(nullptr) {}
+    ChocAn_Service(Database_Ptr db) 
+        : database(db) 
+        { if (!db) { throw std::exception(); } }
 
     virtual ~ChocAn_Service() {}
-
-    void set_gateway(Database_Ptr db) { database = db; }
 
 protected:
 
