@@ -19,7 +19,8 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_ACCOUNT_HPP
 
 #include <memory>
-//#include <ChocAn/core/id_generator.hpp> Causing cyclic dependency error
+#include <ChocAn/core/id_generator.hpp> 
+#include <ChocAn/core/utils/passkey.hpp>
 #include <ChocAn/core/entities/name.hpp>
 #include <ChocAn/core/entities/address.hpp>
 
@@ -31,10 +32,12 @@ public:
 
     typedef std::shared_ptr<Account> Account_Ptr;
 
-    //Account(Name name, Address address, Account_Type type, const ID_Generator& id_gen);
-    Account(Name name, Address address, Account_Type type, unsigned id);
+    // Client side account creation, utilizes the ChocAn Id generator
+    Account(Name name, Address address, Account_Type type, const ID_Generator& id_gen);
 
-    // Getters and setters?
+    // Database side Account de-serialization
+    Account(Name name, Address address, Account_Type type, unsigned id, Key<Data_Gateway>&);
+
     Name         name;
     Address      address;
 

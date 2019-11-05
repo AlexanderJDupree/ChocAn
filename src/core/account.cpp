@@ -1,12 +1,11 @@
 /* 
  
-File: account.hpp
+File: account.cpp
 
-Brief: account class standardizes the account format throughout the ChocAn data services
-       and provides methods for validation and reporting
+Brief: Account data class implementation
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski
@@ -18,16 +17,14 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/core/entities/account.hpp>
 
-/*
 Account::Account(Name name, Address address, Account_Type type, const ID_Generator& id_gen)
     : name    ( std::move(name)    )
     , address ( std::move(address) )
     , type    ( std::move(type)    )
     , id      ( id_gen.yield()     )
     {}
-    */
 
-Account::Account(Name name, Address address, Account_Type type, unsigned id)
+Account::Account(Name name, Address address, Account_Type type, unsigned id, Key<Data_Gateway>&)
     : name    ( std::move(name)    )
     , address ( std::move(address) )
     , type    ( std::move(type)    )
