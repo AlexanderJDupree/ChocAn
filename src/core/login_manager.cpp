@@ -19,7 +19,14 @@ https://github.com/AlexanderJDupree/ChocAn
 
 bool Login_Manager::login(const unsigned ID)
 {
-    return (_session_owner = database->retrieve_account(ID)) ? true : false;
+    std::optional<Account> maybe_account = database->get_account(ID);
+    
+    // If retrieval succeded and that account is not a member, then create session
+    _session_owner = (maybe_account && maybe_account.value().type != Account_Type::Member)
+                   ? std::make_unique<Account>(maybe_account.value())
+                   : nullptr;
+
+    return (_session_owner) ? true : false;
 }
 
 void Login_Manager::logout()

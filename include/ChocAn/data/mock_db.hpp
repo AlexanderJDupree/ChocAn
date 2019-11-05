@@ -20,10 +20,13 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <map>
 #include <ChocAn/core/data_gateway.hpp>
+#include <ChocAn/core/entities/account.hpp>
 
 class Mock_DB : public Data_Gateway
 {
 public:
+
+    Mock_DB();
 
     void update_account(const Account& account);
 
@@ -31,11 +34,11 @@ public:
 
     void delete_account(const unsigned ID);
 
-    Account_Ptr retrieve_account(const unsigned ID) const;
+    std::optional<Account> get_account(const unsigned ID) const;
 
     bool id_exists(const unsigned ID) const;
 
-    static std::map<unsigned, Account> account_table;
+    std::map<unsigned, Account> account_table;
 
 };
 
