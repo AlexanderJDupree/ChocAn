@@ -30,7 +30,7 @@ public:
 
     ChocAn_Service(Database_Ptr db) 
         : database(db) 
-        { if (!db) { throw std::system_error(); } }
+        { if (!db) { throw std::exception(); } }
 
     virtual ~ChocAn_Service() {}
 
