@@ -28,15 +28,15 @@ public:
     using Database_Ptr = Data_Gateway::Database_Ptr;
 
     ChocAn(Database_Ptr db)
-        : login_manager(db)
-        , db(db) 
+        : db(db) 
+        , login_manager(db)
         { }
 
+    Database_Ptr db;
     Login_Manager login_manager;
 
-private:
+protected:
 
-    Database_Ptr db;
 
 };
 

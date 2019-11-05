@@ -16,14 +16,16 @@ https://github.com/AlexanderJDupree/LinkedListsCPP
  
 */
 
+#include <ChocAn/data/mock_db.hpp>
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/view/terminal_state_viewer.hpp>
 
 int main () 
 {
-
     State_Controller controller;
     Terminal_State_Viewer viewer;
+
+    Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
 
     // TODO exit loop if viewer can't open view
     while(!controller.end_state())

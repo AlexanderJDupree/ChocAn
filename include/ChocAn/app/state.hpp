@@ -50,14 +50,18 @@ public:
 
     virtual State_Info info() const = 0;
 
+    void set_service_gateway() { }
+
     size_t id() const { return typeid(*this).hash_code(); }
 
     bool operator == (const State& rhs) const { return this->id() == rhs.id(); }
 
+
 protected:
 
-    // Main ChocAn service shared between states
-    static ChocAn chocan;
+    // References Main ChocAn Service
+    ChocAn& chocan;
+
 };
 
 #endif  // CHOCAN_STATE_H

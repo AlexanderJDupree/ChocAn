@@ -19,19 +19,26 @@ https://github.com/AlexanderJDupree/ChocAn
 
 std::map<unsigned, Account> Mock_DB::account_table
 {
-    { 1234, Account( Name ("John", "Doe")
+    { 1234, Account( Name ("John", "Manager")
                    , Address ( "1234 cool st."
                              , "Portland"
                              , "OR"
                              , 97030 )
                    , Account_Type::Manager ) },
 
-    { 5678, Account( Name ("Arman", "Doe")
+    { 5678, Account( Name ("Arman", "Provider")
                    , Address ( "1234 lame st."
                              , "Portland"
                              , "OR"
                              , 97030 )
-                   , Account_Type::Provider ) }
+                   , Account_Type::Provider ) },
+
+    { 6789, Account( Name ("Alex", "Member")
+                   , Address ( "1234 Meh st."
+                             , "Portland"
+                             , "OR"
+                             , 97030 )
+                   , Account_Type::Member ) }
 };
 
 void Mock_DB::update_account(const Account& account)

@@ -61,8 +61,8 @@ public:
 
 private:
 
-    State_Ptr state;
-    End_State_Set    end_states;
+    State_Ptr     state;
+    End_State_Set end_states;
 };
 
 #endif // CHOCAN_STATE_CONTROLLER_H
