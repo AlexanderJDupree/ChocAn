@@ -18,7 +18,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_LOGIN_MANAGER_HPP
 #define CHOCAN_LOGIN_MANAGER_HPP
 
-#include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/chocan_service.hpp>
 #include <ChocAn/core/entities/account.hpp>
 
