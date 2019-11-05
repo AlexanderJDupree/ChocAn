@@ -70,6 +70,7 @@ OBJECTS := \
 	$(OBJDIR)/account_tests.o \
 	$(OBJDIR)/address_tests.o \
 	$(OBJDIR)/datetime_tests.o \
+	$(OBJDIR)/id_generator_tests.o \
 	$(OBJDIR)/login_tests.o \
 	$(OBJDIR)/name_tests.o \
 	$(OBJDIR)/service_tests.o \
@@ -145,6 +146,9 @@ $(OBJDIR)/address_tests.o: ../tests/core/address_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/datetime_tests.o: ../tests/core/datetime_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/id_generator_tests.o: ../tests/core/id_generator_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/login_tests.o: ../tests/core/login_tests.cpp

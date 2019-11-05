@@ -19,6 +19,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_CORE_SERVICE_HPP
 
 #include <ChocAn/core/data_gateway.hpp>
+#include <ChocAn/core/id_generator.hpp>
 #include <ChocAn/core/login_manager.hpp>
 
 class ChocAn
@@ -30,11 +31,13 @@ public:
     typedef std::shared_ptr<ChocAn> ChocAn_Ptr;
 
     ChocAn(Database_Ptr db)
-        : db(db) 
-        , login_manager(db)
+        : db            ( db ) 
+        , id_generator  ( db )
+        , login_manager ( db )
         { }
 
-    Database_Ptr db;
+    Database_Ptr  db;
+    ID_Generator  id_generator;
     Login_Manager login_manager;
 
 protected:
