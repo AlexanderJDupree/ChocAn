@@ -17,32 +17,38 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/data/mock_db.hpp>
 
-std::map<unsigned, Account> Mock_DB::account_table
-{
-    { 5678, Account( Name ("John", "Manager")
-                   , Address ( "1234 cool st."
-                             , "Portland"
-                             , "OR"
-                             , 97030 )
-                   , Account_Type::Manager 
-                   , 5678 ) },
+Mock_DB::Mock_DB()
+    : account_table
+    ( {
 
-    { 1234, Account( Name ("Arman", "Provider")
-                   , Address ( "1234 lame st."
-                             , "Portland"
-                             , "OR"
-                             , 97030 )
-                   , Account_Type::Provider 
-                   , 1234 ) },
+        { 5678, Account( Name ("Dan", "Manager")
+                        , Address ( "1234 cool st."
+                                    , "Portland"
+                                    , "OR"
+                                    , 97030 )
+                        , Account_Type::Manager 
+                        , 5678
+                        , account_key ) },
 
-    { 6789, Account( Name ("Alex", "Member")
-                   , Address ( "1234 Meh st."
-                             , "Portland"
-                             , "OR"
-                             , 97030 )
-                   , Account_Type::Member 
-                   , 6789 ) }
-};
+        { 1234, Account( Name ("Arman", "Provider")
+                        , Address ( "1234 lame st."
+                                    , "Portland"
+                                    , "OR"
+                                    , 97030 )
+                        , Account_Type::Provider 
+                        , 1234
+                        , account_key ) },
+
+        { 6789, Account( Name ("Alex", "Member")
+                        , Address ( "1234 Meh st."
+                                    , "Portland"
+                                    , "OR"
+                                    , 97030 )
+                        , Account_Type::Member 
+                        , 6789 
+                        , account_key ) }
+    } )
+{ }
 
 void Mock_DB::update_account(const Account& account)
 {
@@ -61,17 +67,17 @@ void Mock_DB::delete_account(const unsigned ID)
     return;
 }
 
-Account::Account_Ptr Mock_DB::retrieve_account(const unsigned ID) const
+std::optional<Account> Mock_DB::get_account(const unsigned ID) const
 {
     try
     {
-        Account account(account_table.at(ID));
-
-        return std::make_unique<Account>(std::move(account));
+        // Just Account
+        return account_table.at(ID);
     }
     catch(const std::out_of_range& err)
     {
-        return nullptr;
+        // Return nothing
+        return { };
     }
 }
 
