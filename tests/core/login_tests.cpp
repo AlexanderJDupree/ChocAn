@@ -44,7 +44,7 @@ TEST_CASE("Using the Login_Manager", "[login], [service]")
     {
         chocan.login_manager.login(1234);
 
-        REQUIRE(*(chocan.login_manager.session_owner()) == Mock_DB::account_table.at(1234));
+        REQUIRE(*(chocan.login_manager.session_owner()) == db->get_account(1234).value());
     }
     SECTION("Session owner does not exist after user is logged out")
     {
