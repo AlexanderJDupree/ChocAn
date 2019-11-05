@@ -24,6 +24,7 @@ https://github.com/AlexanderJDupree/ChocAn
 class Exit_State : public State
 {
 public:
+
     State_Ptr evaluate(const Input_Vector& input);
 
     State_Info info() const;
