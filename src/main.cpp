@@ -22,10 +22,9 @@ https://github.com/AlexanderJDupree/LinkedListsCPP
 
 int main () 
 {
-    State_Controller controller;
     Terminal_State_Viewer viewer;
-
-    Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
+    ChocAn::Database_Ptr db = std::make_unique<Mock_DB>();
+    State_Controller controller(std::make_unique<ChocAn>(db));
 
     // TODO exit loop if viewer can't open view
     while(!controller.end_state())
