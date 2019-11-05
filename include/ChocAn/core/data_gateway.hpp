@@ -20,6 +20,8 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <memory>
 #include <optional>
+
+// Maybe just forward declare account?
 #include <ChocAn/core/entities/account.hpp>
 
 class Data_Gateway
@@ -41,10 +43,10 @@ public:
 
     // virtual void add_transactioni(const Transaction& transaction) = 0;
 
-    // Retrieval from a DB may fail, ensure to check for null
-    virtual Account_Ptr retrieve_account(const unsigned ID) = 0;
+    // Retrieval from a DB may fail, must check for NULL
+    virtual Account_Ptr retrieve_account(const unsigned ID) const = 0;
 
-    virtual bool id_exists(const unsigned ID) = 0;
+    virtual bool id_exists(const unsigned ID) const = 0;
 
 };
 

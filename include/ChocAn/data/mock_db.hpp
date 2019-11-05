@@ -31,9 +31,9 @@ public:
 
     void delete_account(const unsigned ID);
 
-    Account_Ptr retrieve_account(const unsigned ID);
+    Account_Ptr retrieve_account(const unsigned ID) const;
 
-    bool id_exists(const unsigned ID);
+    bool id_exists(const unsigned ID) const;
 
     static std::map<unsigned, Account> account_table;
 
