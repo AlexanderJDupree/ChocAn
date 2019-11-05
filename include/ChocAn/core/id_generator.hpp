@@ -2,7 +2,7 @@
  
 File: id_generator.hpp
 
-Brief: ID_Generator class generates unique ChocAn_IDs for accounts
+Brief: ID_Generator class generates unique ChocAn_IDs for Accounts
 
 Authors: Daniel Mendez 
          Alex Salazar

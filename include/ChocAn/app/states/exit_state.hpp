@@ -6,7 +6,7 @@ Brief: exit state is an end state for the chocAn application and will perform
        any necessary teardown.
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski

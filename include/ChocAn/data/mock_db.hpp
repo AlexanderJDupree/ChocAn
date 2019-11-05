@@ -2,7 +2,8 @@
 
 File: mock_db.cpp
 
-Brief: Provides a Data_Gateway implementation for use in testing
+Brief: Provides a Data_Gateway implementation for use in testing. 
+       Mock DB simply creates a tree in memory with a dummy account data.
 
 Authors: Daniel Mendez 
          Alex Salazar

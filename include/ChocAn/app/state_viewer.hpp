@@ -2,10 +2,11 @@
  
 File: state_viewer.hpp
 
-Brief:  
+Brief:  State Viewer interface defines the methods required for the main module
+        to interact with the state controller.
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski

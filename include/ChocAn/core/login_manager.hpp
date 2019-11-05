@@ -2,7 +2,7 @@
  
 File: login_manager.hpp
 
-Brief: login_manager handles authorization and authentication for ChocAn
+Brief: login_manager handles authorization and authentication for ChocAn services
 
 Authors: Daniel Mendez 
          Alex Salazar

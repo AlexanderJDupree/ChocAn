@@ -3,7 +3,7 @@
 File: passkey.hpp
 
 Brief: PassKey is a generic access protection class that allows users to expose
-       constructors or functions to specific classes. 
+       constructors or functions to specific classes.
 
 Authors: Daniel Mendez 
          Alex Salazar

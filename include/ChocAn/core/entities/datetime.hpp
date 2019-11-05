@@ -20,6 +20,9 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_DATETIME_HPP
 #define CHOCAN_DATETIME_HPP
 
+
+// TODO This needs refactoring, get rid of all the classes use strong typedefs
+
 #include <ctime>
 #include <chrono>
 #include <ChocAn/core/utils/exception.hpp>

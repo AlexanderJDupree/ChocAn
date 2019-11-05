@@ -9,7 +9,7 @@ Brief: State Controller models user interaction with the application as a
        verify that there exists a path to an end state. 
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski

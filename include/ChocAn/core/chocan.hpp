@@ -2,7 +2,9 @@
  
 File: chocan.hpp
 
-Brief: 
+Brief:  ChocAn is the main service gateway for use in the Application layer. 
+        ChocAn requires a valid Databse connection that the composed service
+        objects will use. 
 
 Authors: Daniel Mendez 
          Alex Salazar
@@ -35,8 +37,11 @@ public:
         , id_generator  ( db )
         , login_manager ( db )
         { }
+    
+    /* Service Objects */
 
-    Database_Ptr  db;
+    Database_Ptr  db; // TODO Review whether we should wrap DB methods
+
     ID_Generator  id_generator;
     Login_Manager login_manager;
 

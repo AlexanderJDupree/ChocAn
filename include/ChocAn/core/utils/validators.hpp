@@ -2,7 +2,8 @@
  
 File: validators.hpp
 
-Brief: Validitors file defines a set of validators for specific use cases
+Brief: Validitors file defines a set of validating functions for a variety of
+       use cases.
 
 Authors: Daniel Mendez 
          Alex Salazar
