@@ -27,7 +27,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <functional>
 #include <ChocAn/core/chocan.hpp>
 
-// TODO evaluate prototype
 class State_Info
 {
 public:
