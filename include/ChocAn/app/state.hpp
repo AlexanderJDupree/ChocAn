@@ -44,23 +44,34 @@ public:
 
     typedef std::map<std::string, std::function<State_Ptr()>> Transition_Table;
 
+    using ChocAn_Ptr = ChocAn::ChocAn_Ptr;
+
     virtual ~State() {};
 
     virtual State_Ptr evaluate(const Input_Vector& input) = 0;
 
     virtual State_Info info() const = 0;
 
-    void set_service_gateway() { }
+    /* Shared State Functions */
+    void set_service_instance(ChocAn_Ptr instance) 
+    { 
+        chocan = instance; 
+    }
 
-    size_t id() const { return typeid(*this).hash_code(); }
+    size_t id() const 
+    { 
+        return typeid(*this).hash_code(); 
+    }
 
-    bool operator == (const State& rhs) const { return this->id() == rhs.id(); }
-
+    bool operator == (const State& rhs) const 
+    { 
+        return this->id() == rhs.id(); 
+    }
 
 protected:
 
     // References Main ChocAn Service
-    ChocAn& chocan;
+    ChocAn_Ptr chocan;
 
 };
 

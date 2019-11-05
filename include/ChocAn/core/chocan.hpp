@@ -27,6 +27,8 @@ public:
 
     using Database_Ptr = Data_Gateway::Database_Ptr;
 
+    typedef std::shared_ptr<ChocAn> ChocAn_Ptr;
+
     ChocAn(Database_Ptr db)
         : db(db) 
         , login_manager(db)
@@ -36,7 +38,6 @@ public:
     Login_Manager login_manager;
 
 protected:
-
 
 };
 

@@ -17,6 +17,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <algorithm>
 #include <functional>
 
+#include <ChocAn/data/mock_db.hpp>
 #include <ChocAn/app/states/exit_state.hpp>
 #include <ChocAn/app/states/login_state.hpp>
 #include <ChocAn/app/states/manager_menu_state.hpp>
@@ -24,6 +25,10 @@ https://github.com/AlexanderJDupree/ChocAn
 
 TEST_CASE("State Behavior", "[state]")
 {
+    // TODO refactor mocking
+    ChocAn::Database_Ptr mock_db   = std::make_unique<Mock_DB>();
+    ChocAn::ChocAn_Ptr mock_chocan = std::make_unique<ChocAn>(mock_db);
+
     Login_State         login_state;
     Exit_State          exit_state;
     Manager_Menu_State  manager_menu_state;
@@ -34,6 +39,12 @@ TEST_CASE("State Behavior", "[state]")
                                , &manager_menu_state
                                , &provider_menu_state
                                }; 
+
+    std::for_each(states.begin(), states.end(), 
+    [&](State* state)
+    { 
+        state->set_service_instance(mock_chocan);
+    });
 
     SECTION("States do not transition on evaluation of invalid input")
     {
