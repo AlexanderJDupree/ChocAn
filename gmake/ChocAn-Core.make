@@ -13,19 +13,19 @@ endif
 ifeq ($(config),debug)
   RESCOMP = windres
   TARGETDIR = ../lib/debug
-  TARGET = $(TARGETDIR)/libChocAn-Core.a
+  TARGET = $(TARGETDIR)/libChocAn-Core.so
   OBJDIR = obj/debug/ChocAn-Core
   DEFINES += -DDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -fPIC -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -fPIC -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += -lgcov
   LDDEPS +=
-  ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+  ALL_LDFLAGS += $(LDFLAGS) -shared -Wl,-soname=libChocAn-Core.so
+  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -40,19 +40,19 @@ endif
 ifeq ($(config),release)
   RESCOMP = windres
   TARGETDIR = ../lib/release
-  TARGET = $(TARGETDIR)/libChocAn-Core.a
+  TARGET = $(TARGETDIR)/libChocAn-Core.so
   OBJDIR = obj/release/ChocAn-Core
   DEFINES += -DNDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -fPIC -Wall -Wextra -Wall -Wextra -Werror -std=c++17
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -fPIC -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS +=
   LDDEPS +=
-  ALL_LDFLAGS += $(LDFLAGS) -s
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+  ALL_LDFLAGS += $(LDFLAGS) -shared -Wl,-soname=libChocAn-Core.so -s
+  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS

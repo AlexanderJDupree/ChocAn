@@ -13,19 +13,19 @@ endif
 ifeq ($(config),debug)
   RESCOMP = windres
   TARGETDIR = ../lib/debug
-  TARGET = $(TARGETDIR)/libChocAn-Data.a
+  TARGET = $(TARGETDIR)/libChocAn-Data.so
   OBJDIR = obj/debug/ChocAn-Data
   DEFINES += -DDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -fPIC -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -fPIC -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/debug/libChocAn-Core.a -lgcov
-  LDDEPS += ../lib/debug/libChocAn-Core.a
-  ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+  LIBS += ../lib/debug/libChocAn-Core.so -lgcov
+  LDDEPS += ../lib/debug/libChocAn-Core.so
+  ALL_LDFLAGS += $(LDFLAGS) -Wl,-rpath,'$$ORIGIN' -shared -Wl,-soname=libChocAn-Data.so
+  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -40,19 +40,19 @@ endif
 ifeq ($(config),release)
   RESCOMP = windres
   TARGETDIR = ../lib/release
-  TARGET = $(TARGETDIR)/libChocAn-Data.a
+  TARGET = $(TARGETDIR)/libChocAn-Data.so
   OBJDIR = obj/release/ChocAn-Data
   DEFINES += -DNDEBUG
   INCLUDES += -I../include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -fPIC -Wall -Wextra -Wall -Wextra -Werror -std=c++17
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -fPIC -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/release/libChocAn-Core.a
-  LDDEPS += ../lib/release/libChocAn-Core.a
-  ALL_LDFLAGS += $(LDFLAGS) -s
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+  LIBS += ../lib/release/libChocAn-Core.so
+  LDDEPS += ../lib/release/libChocAn-Core.so
+  ALL_LDFLAGS += $(LDFLAGS) -Wl,-rpath,'$$ORIGIN' -shared -Wl,-soname=libChocAn-Data.so -s
+  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
