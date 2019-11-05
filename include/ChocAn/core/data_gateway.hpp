@@ -20,15 +20,13 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <memory>
 #include <optional>
+#include <ChocAn/core/utils/passkey.hpp>
 
-// Maybe just forward declare account?
-#include <ChocAn/core/entities/account.hpp>
+class Account;
 
 class Data_Gateway
 {
 public:
-
-    using Account_Ptr = Account::Account_Ptr;
 
     typedef std::shared_ptr<Data_Gateway> Database_Ptr;
 
@@ -43,10 +41,15 @@ public:
 
     // virtual void add_transactioni(const Transaction& transaction) = 0;
 
-    // Retrieval from a DB may fail, must check for NULL
-    virtual Account_Ptr retrieve_account(const unsigned ID) const = 0;
+    // Account retrieval may fail, wrap in Maybe type
+    virtual std::optional<Account> get_account(const unsigned ID) const = 0;
 
     virtual bool id_exists(const unsigned ID) const = 0;
+
+protected:
+
+    // Used for constructing account objects
+    Key<Data_Gateway> account_key;
 
 };
 
