@@ -19,7 +19,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/chocan.hpp>
 #include <ChocAn/data/mock_db.hpp>
 
-TEST_CASE("Using the Login_Manager", "[login]")
+TEST_CASE("Using the Login_Manager", "[login], [service]")
 {
     Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
 

@@ -15,7 +15,7 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#include <ChocAn/core/utils/name.hpp>
+#include <ChocAn/core/entities/name.hpp>
 #include <ChocAn/core/utils/validators.hpp>
 
 Name::Name(const std::string& first, const std::string& last)

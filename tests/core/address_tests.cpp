@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <catch.hpp>
-#include <ChocAn/core/utils/address.hpp>
+#include <ChocAn/core/entities/address.hpp>
 
 TEST_CASE("Constructors for address classes", "[constructors], [address]")
 {

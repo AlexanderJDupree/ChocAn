@@ -18,7 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <iostream>
 #include <sstream>
 #include <catch.hpp>
-#include <ChocAn/core/utils/datetime.hpp>
+#include <ChocAn/core/entities/datetime.hpp>
 
 std::ostream& operator<<(std::ostream& os, const DateTime& date)
 {

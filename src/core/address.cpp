@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#include <ChocAn/core/utils/address.hpp>
+#include <ChocAn/core/entities/address.hpp>
 #include <ChocAn/core/utils/validators.hpp>
 
 Address::Address( const std::string& street 

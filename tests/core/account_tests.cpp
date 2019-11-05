@@ -27,6 +27,7 @@ TEST_CASE("Constructors for account class", "[constructors], [account]")
                                          , "Portland"
                                          , "OR"
                                          , 97030)
-                                , Account_Type::Member ) );
+                                , Account_Type::Member 
+                                , 1234 ) );
     }
 }    
