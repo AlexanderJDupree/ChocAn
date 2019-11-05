@@ -65,6 +65,7 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
+	$(OBJDIR)/mock_db.o \
 
 RESOURCES := \
 
@@ -123,6 +124,9 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
+$(OBJDIR)/mock_db.o: ../src/data/mock_db.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))

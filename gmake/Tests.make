@@ -72,6 +72,7 @@ OBJECTS := \
 	$(OBJDIR)/datetime_tests.o \
 	$(OBJDIR)/login_tests.o \
 	$(OBJDIR)/name_tests.o \
+	$(OBJDIR)/service_tests.o \
 	$(OBJDIR)/test_config_main.o \
 
 RESOURCES := \
@@ -150,6 +151,9 @@ $(OBJDIR)/login_tests.o: ../tests/core/login_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/name_tests.o: ../tests/core/name_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/service_tests.o: ../tests/core/service_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/test_config_main.o: ../tests/test_config_main.cpp
