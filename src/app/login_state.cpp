@@ -20,6 +20,22 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/app/states/provider_menu_state.hpp>
 #include <ChocAn/app/states/manager_menu_state.hpp>
 
+struct Login_Event
+{
+    State::State_Ptr operator()(const Manager&)
+    {
+        return std::make_unique<Manager_Menu_State>();
+    }
+    State::State_Ptr operator()(const Provider&)
+    {
+        return std::make_unique<Provider_Menu_State>();
+    }
+    State::State_Ptr operator()(const Member&)
+    {
+        return std::make_unique<Login_State>("Member is not allowed to log in");
+    }
+};
+
 State::State_Ptr Login_State::evaluate(const Input_Vector& input)
 {
     // TODO check vector size??
@@ -29,11 +45,7 @@ State::State_Ptr Login_State::evaluate(const Input_Vector& input)
     }
     if(login(input.at(0)))
     {
-        if (chocan->login_manager.session_owner()->type == Account_Type::Manager)
-        {
-               return std::make_unique<Manager_Menu_State>();
-        }
-        return std::make_unique<Provider_Menu_State>();
+        return std::visit(Login_Event(), chocan->login_manager.session_owner()->type);
     }
     return std::make_unique<Login_State>("Invalid Login");
 }

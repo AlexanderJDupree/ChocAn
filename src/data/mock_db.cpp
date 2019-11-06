@@ -26,7 +26,7 @@ Mock_DB::Mock_DB()
                                     , "Portland"
                                     , "OR"
                                     , 97030 )
-                        , Account_Type::Manager 
+                        , Manager()
                         , 5678
                         , account_key ) },
 
@@ -35,7 +35,7 @@ Mock_DB::Mock_DB()
                                     , "Portland"
                                     , "OR"
                                     , 97030 )
-                        , Account_Type::Provider 
+                        , Provider()
                         , 1234
                         , account_key ) },
 
@@ -44,8 +44,17 @@ Mock_DB::Mock_DB()
                                     , "Portland"
                                     , "OR"
                                     , 97030 )
-                        , Account_Type::Member 
+                        , Member { Account_Status::Valid }
                         , 6789 
+                        , account_key ) },
+
+        { 9876, Account( Name ("Jane", "Member")
+                        , Address ( "1234 awesome st."
+                                    , "Portland"
+                                    , "OR"
+                                    , 97030 )
+                        , Member { Account_Status::Suspended }
+                        , 9876
                         , account_key ) }
     } )
 { }
