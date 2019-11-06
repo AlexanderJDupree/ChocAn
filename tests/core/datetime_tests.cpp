@@ -22,60 +22,39 @@ https://github.com/AlexanderJDupree/ChocAn
 
 std::ostream& operator<<(std::ostream& os, const DateTime& date)
 {
-    os << static_cast<unsigned>(date.day()) << "-" 
-       << static_cast<unsigned>(date.month()) << "-" 
-       << static_cast<unsigned>(date.year());
+    os << static_cast<unsigned>(date.day().count()) << "-" 
+       << static_cast<unsigned>(date.month().count()) << "-" 
+       << static_cast<unsigned>(date.year().count());
     return os;
 }
 
 TEST_CASE("Constructors for DateTime classes", "[constructors], [datetime]")
 {
-
-    SECTION("Construct valid Day object")
+    SECTION("Constructing Datetime in Day Month Year format")
     {
-        REQUIRE(Day(4).ok());
+        REQUIRE_NOTHROW(DateTime(Day(1), Month(1), Year(1970)));
     }
-    SECTION("Construct valid Month object")
+    SECTION("Datetime can be constructed with february 29th on leap years")
     {
-        REQUIRE(Month(7).ok());
+        REQUIRE_NOTHROW(DateTime(Day(29), Month(2), Year(2020)));
     }
-    SECTION("Construct valid Year object")
+    SECTION("Datetime cannot be constructed with february 29th on non-leap years")
     {
-        REQUIRE(Year(1776).ok());
+        REQUIRE_THROWS_AS(DateTime(Day(29), Month(2), Year(2019)), invalid_datetime);
     }
-    SECTION("Construct valid DateTime object")
-    {
-        REQUIRE(DateTime(Day(4), Month(7), Year(1776)).ok());
-    }
-    SECTION("Days outside range [1-31] will set ok status to false")
-    {
-        REQUIRE_FALSE(Day(32).ok());
-        REQUIRE_FALSE(Day(0).ok());
-    }
-    SECTION("Months outside range [1-12] will set ok status to false")
-    {
-        REQUIRE_FALSE(Month(13).ok());
-        REQUIRE_FALSE(Day(0).ok());
-    }
-    SECTION("Leap years account for 29 days in February")
-    {
-        REQUIRE(DateTime(Day(29), Month(2), Year(2020)).ok());
-    }
-    SECTION("Februrary has 28 days on non leap years")
-    {
-        REQUIRE(DateTime(Day(28), Month(2), Year(2019)).ok());
-    }
-    SECTION("Invalid date will throw invalid_datetime exception")
+    SECTION("Days must be be greater than 1 and less than the limit for that month")
     {  
-        Day   invalid_day(42);
-        Month invalid_month(13);
-        // TODO Establish year parameters and add to test
-
-        REQUIRE_THROWS_AS(DateTime(Day(22), invalid_month, Year(1991))
+        // No zeroth day
+        REQUIRE_THROWS_AS(DateTime(Day(0), Month(11), Year(1991))
                          , invalid_datetime);
 
-        REQUIRE_THROWS_AS(DateTime(invalid_day, Month(9), Year(1991))
+        // No september 31st
+        REQUIRE_THROWS_AS(DateTime(Day(31), Month(9), Year(1991))
                          , invalid_datetime);
+    }
+    SECTION("Dates must be greater than 1/1/1970")
+    {
+        REQUIRE_THROWS_AS(DateTime(Day(31), Month(12), Year(1969)), invalid_datetime);
     }
 }
 
@@ -83,19 +62,19 @@ TEST_CASE("Detecting Leap Years", "[leap_year], [datetime]")
 {
     SECTION("Non-leap year")
     {
-        REQUIRE_FALSE(Year(2019).is_leap_year());
+        REQUIRE_FALSE(DateTime::is_leap_year(Year(2019)));
     }
     SECTION("Years divisible by 4 are leap years")
     {
-        REQUIRE(Year(2020).is_leap_year());
+        REQUIRE(DateTime::is_leap_year(Year(2020)));
     }
     SECTION("Years divisible by 100 are not leap years")
     {
-        REQUIRE_FALSE(Year(1900).is_leap_year());
+        REQUIRE_FALSE(DateTime::is_leap_year(Year(1900)));
     }
     SECTION("Years divisible by 400 are leapyears")
     {
-        REQUIRE(Year(2000).is_leap_year());
+        REQUIRE(DateTime::is_leap_year(Year(2000)));
     }
 }
 
@@ -110,11 +89,9 @@ struct mock_clock
     {
         time = time_point(d);
     }
-    static tm get_utc_time()
+    static time_point now()
     {
-        time_t tt = clock::to_time_t(time);
-
-        return *gmtime(&tt);
+        return time;
     }
 };
 
@@ -142,8 +119,6 @@ TEST_CASE("Getting DateTime from system clock", "[clock], [datetime]")
 
 TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
 {
-// DateTime utilizes Day, Month, Year comparison operatos, as such we need only
-// Test the DateTime class operators
 
     SECTION("DateTime objects with equal values are equal")
     {
@@ -183,7 +158,7 @@ TEST_CASE("Testing invalid_datetime exception", "[exception], [datetime]")
         chocan_user_exception::Info info;
         try
         {
-            DateTime(Day(40), Month(13), Year(2040));
+            DateTime(Day(40), Month(12), Year(1200));
         }
         catch (const chocan_user_exception& err)
         {

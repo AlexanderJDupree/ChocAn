@@ -21,98 +21,39 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_DATETIME_HPP
 
 
-// TODO This needs refactoring, get rid of all the classes use strong typedefs
-
 #include <ctime>
 #include <chrono>
 #include <ChocAn/core/utils/exception.hpp>
 
-class datetime_unit
-{
-public:
+// A day is 24 hours
+using Day = std::chrono::duration
+    <int, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>::type>;
 
-    explicit datetime_unit(unsigned val = 1) : _val(val) {};
-    
-    virtual bool ok() const = 0;
-    
-    unsigned to_int() const { return _val; }
+// A year is 365.2425 Days
+using Year = std::chrono::duration
+    <int, std::ratio_multiply<std::ratio<146097, 400>, Day::period>::type>;
 
-    explicit operator unsigned() const { return _val; }
-
-protected:
-
-    unsigned _val;
-
-};
-
-class Day : public datetime_unit
-{
-public:
-
-    explicit Day(unsigned day = 1) : datetime_unit(day) {};
-
-    bool ok() const override;
-
-    bool operator <  (const Day& rhs) const;
-    bool operator >  (const Day& rhs) const;
-    bool operator >= (const Day& rhs) const;
-    bool operator <= (const Day& rhs) const;
-    bool operator == (const Day& rhs) const;
-};
-
-class Month : public datetime_unit
-{
-public:
-
-    explicit Month(unsigned month = 1) : datetime_unit(month) {};
-
-    bool ok() const override;
-
-    bool operator <  (const Month& rhs) const;
-    bool operator >  (const Month& rhs) const;
-    bool operator >= (const Month& rhs) const;
-    bool operator <= (const Month& rhs) const;
-    bool operator == (const Month& rhs) const;
-};
-
-class Year : public datetime_unit
-{
-public:
-
-    explicit Year(unsigned year = 2019) : datetime_unit(year) {};
-
-    bool ok() const override;
-    bool is_leap_year() const;
-
-    bool operator <  (const Year& rhs) const;
-    bool operator >  (const Year& rhs) const;
-    bool operator >= (const Year& rhs) const;
-    bool operator <= (const Year& rhs) const;
-    bool operator == (const Year& rhs) const;
-};
-
-
-// Wraps std::chrono methods to return a tm (time) object
-struct system_clock
-{
-    static tm get_utc_time();
-};
+// A Month is 1/12th of a Year
+using Month = std::chrono::duration
+    <int, std::ratio_divide<Year::period, std::ratio<12>>::type>;
 
 class DateTime
 {
 public:
 
-    DateTime(Day day, Month month, Year year);
+    DateTime(Day, Month, Year);
+    DateTime(Year, Month, Day);
+    DateTime(Month, Day, Year);
 
     // remove system clock dependency by templating clock type
-    template <typename clock_t = system_clock>
+    template <typename clock_t = std::chrono::system_clock>
     static DateTime get_current_datetime();
-
-    bool ok() const;
 
     const Day&   day() const;
     const Month& month() const;
     const Year&  year() const;
+
+    static bool is_leap_year(const Year& year);
 
     bool operator <  (const DateTime& rhs) const;
     bool operator >  (const DateTime& rhs) const;
@@ -121,6 +62,8 @@ public:
     bool operator == (const DateTime& rhs) const;
 
 protected:
+
+    bool ok() const;
 
     Day   _day;
     Month _month;
@@ -132,16 +75,19 @@ protected:
 template <typename clock_t>
 DateTime DateTime::get_current_datetime()
 {
-    tm utc_time = clock_t::get_utc_time();
+    using namespace std::chrono;
 
-    // TODO 1 and 1900  are magic numbers
-    return DateTime( Day(utc_time.tm_mday)
-                   , Month(utc_time.tm_mon + 1)
-                   , Year(utc_time.tm_year + 1900));
+    auto time_point = time_point_cast<seconds>(clock_t::now());
+
+    time_t time = system_clock::to_time_t(time_point);
+
+    tm utc_time = *gmtime(&time);
+
+    return DateTime( Day   { utc_time.tm_mday }
+                   , Month { utc_time.tm_mon + 1 }
+                   , Year  { utc_time.tm_year + 1900 } );
 }
 
-
-// Custom Exception
 class invalid_datetime : public chocan_user_exception
 {
 public:
