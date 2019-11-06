@@ -30,10 +30,10 @@ Address::Address( const std::string& street
 {
     chocan_user_exception::Info errors;
 
-    ( !Validators::length(street, 25, 1) ) 
+    ( !Validators::length(street, 1, 25) ) 
         ? errors.push_back("Street address must be less than 25 characters")
         : void();
-    ( !Validators::length(city, 14, 1) ) 
+    ( !Validators::length(city, 1, 14) ) 
         ? errors.push_back("City must be less than 14 character")
         : void();
     ( !Validators::length(state, 2, 2) ) 
