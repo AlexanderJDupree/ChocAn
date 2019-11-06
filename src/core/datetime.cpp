@@ -41,6 +41,22 @@ DateTime::DateTime(Day day, Month month, Year year)
         ? void() :throw invalid_datetime("Invalid datetime values", errors);
 }
 
+/* Out of Order constructors */
+DateTime::DateTime(Day day, Year year, Month month)
+    : DateTime(day, month, year) {}
+
+DateTime::DateTime(Month month, Day day, Year year)
+    : DateTime(day, month, year) {}
+
+DateTime::DateTime(Month month, Year year, Day day)
+    : DateTime(day, month, year) {}
+
+DateTime::DateTime(Year year, Month month, Day day)
+    : DateTime(day, month, year) {}
+
+DateTime::DateTime(Year year, Day day, Month month)
+    : DateTime(day, month, year) {}
+
 bool DateTime::ok() const
 {
     const Day calendar[] = 

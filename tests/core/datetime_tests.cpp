@@ -28,11 +28,70 @@ std::ostream& operator<<(std::ostream& os, const DateTime& date)
     return os;
 }
 
+struct mock_clock
+{
+    typedef std::chrono::system_clock clock;
+    typedef clock::time_point time_point;
+
+    static time_point time;
+
+    static void duration_since_epoch(clock::duration d)
+    {
+        time = time_point(d);
+    }
+    static time_point now()
+    {
+        return time;
+    }
+};
+
+// Initialized out of line because time point is not const
+mock_clock::time_point mock_clock::time = mock_clock::time_point();
+
+TEST_CASE("Getting DateTime from system clock", "[clock], [datetime]")
+{
+    DateTime epoch(Day(1), Month(1), Year(1970));
+    DateTime expected_date(Day(5), Month(10), Year(2019));
+
+    SECTION("0 seconds since epoch")
+    {
+        mock_clock::duration_since_epoch(std::chrono::seconds(0));
+
+        REQUIRE(DateTime::get_current_datetime<mock_clock>() == epoch);
+    }
+    SECTION("October 5th 2019, day I wrote this test")
+    {
+        mock_clock::duration_since_epoch(std::chrono::seconds(1570250129));
+
+        REQUIRE(DateTime::get_current_datetime<mock_clock>() == expected_date);
+    }
+}
+
 TEST_CASE("Constructors for DateTime classes", "[constructors], [datetime]")
 {
     SECTION("Constructing Datetime in Day Month Year format")
     {
         REQUIRE_NOTHROW(DateTime(Day(1), Month(1), Year(1970)));
+    }
+    SECTION("Constructing Datetime in Day Year Month format")
+    {
+        REQUIRE_NOTHROW(DateTime(Day(1), Year(1970), Month(1)));
+    }
+    SECTION("Constructing Datetime in Month Day Year format")
+    {
+        REQUIRE_NOTHROW(DateTime(Month(1), Day(1), Year(1970)));
+    }
+    SECTION("Constructing Datetime in Month Year Day format")
+    {
+        REQUIRE_NOTHROW(DateTime(Month(1), Year(1970), Day(1)));
+    }
+    SECTION("Constructing Datetime in Year Month Day format")
+    {
+        REQUIRE_NOTHROW(DateTime(Year(1970), Month(1), Day(1)));
+    }
+    SECTION("Constructing Datetime in Year Day Month format")
+    {
+        REQUIRE_NOTHROW(DateTime(Year(1970), Day(1), Month(1)));
     }
     SECTION("Datetime can be constructed with february 29th on leap years")
     {
@@ -75,45 +134,6 @@ TEST_CASE("Detecting Leap Years", "[leap_year], [datetime]")
     SECTION("Years divisible by 400 are leapyears")
     {
         REQUIRE(DateTime::is_leap_year(Year(2000)));
-    }
-}
-
-struct mock_clock
-{
-    typedef std::chrono::system_clock clock;
-    typedef clock::time_point time_point;
-
-    static time_point time;
-
-    static void duration_since_epoch(clock::duration d)
-    {
-        time = time_point(d);
-    }
-    static time_point now()
-    {
-        return time;
-    }
-};
-
-// Initialized out of line because time point is not const
-mock_clock::time_point mock_clock::time = mock_clock::time_point();
-
-TEST_CASE("Getting DateTime from system clock", "[clock], [datetime]")
-{
-    DateTime epoch(Day(1), Month(1), Year(1970));
-    DateTime expected_date(Day(5), Month(10), Year(2019));
-
-    SECTION("0 seconds since epoch")
-    {
-        mock_clock::duration_since_epoch(std::chrono::seconds(0));
-
-        REQUIRE(DateTime::get_current_datetime<mock_clock>() == epoch);
-    }
-    SECTION("October 5th 2019, day I wrote this test")
-    {
-        mock_clock::duration_since_epoch(std::chrono::seconds(1570250129));
-
-        REQUIRE(DateTime::get_current_datetime<mock_clock>() == expected_date);
     }
 }
 

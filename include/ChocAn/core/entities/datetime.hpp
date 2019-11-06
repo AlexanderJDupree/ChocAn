@@ -7,7 +7,7 @@ Brief: DateTime class standardizes the date time formats throughout ChocAn data
        the current date and time
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski
@@ -42,8 +42,11 @@ class DateTime
 public:
 
     DateTime(Day, Month, Year);
-    DateTime(Year, Month, Day);
+    DateTime(Day, Year, Month);
     DateTime(Month, Day, Year);
+    DateTime(Month, Year, Day);
+    DateTime(Year, Month, Day);
+    DateTime(Year, Day, Month);
 
     // remove system clock dependency by templating clock type
     template <typename clock_t = std::chrono::system_clock>
