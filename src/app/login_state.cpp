@@ -20,6 +20,22 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/app/states/provider_menu_state.hpp>
 #include <ChocAn/app/states/manager_menu_state.hpp>
 
+struct Login_Event
+{
+    State::State_Ptr operator()(const Manager&)
+    {
+        return std::make_unique<Manager_Menu_State>();
+    }
+    State::State_Ptr operator()(const Provider&)
+    {
+        return std::make_unique<Provider_Menu_State>();
+    }
+    State::State_Ptr operator()(const Member&)
+    {
+        return std::make_unique<Login_State>("Member is not allowed to log in");
+    }
+};
+
 State::State_Ptr Login_State::evaluate(const Input_Vector& input)
 {
     // TODO check vector size??
@@ -27,13 +43,9 @@ State::State_Ptr Login_State::evaluate(const Input_Vector& input)
     {
         return std::make_unique<Exit_State>();
     }
-    if(input.at(0) == "5678")
-    {
-        return std::make_unique<Manager_Menu_State>();
-    }
     if(login(input.at(0)))
     {
-        return std::make_unique<Provider_Menu_State>();
+        return std::visit(Login_Event(), chocan->login_manager.session_owner()->type);
     }
     return std::make_unique<Login_State>("Invalid Login");
 }
@@ -45,10 +57,13 @@ State_Info Login_State::info() const
 
 bool Login_State::login(const std::string& input)
 {
-    // TODO implement login logic
-    if (input == "1234")
+    try
     {
-        return true;
+        // stoi throws invalid_argument if input can't be converted to int
+        return chocan->login_manager.login(std::stoi(input));
     }
-    return false;
+    catch(const std::invalid_argument& err)
+    {
+        return false;
+    }
 }

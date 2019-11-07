@@ -2,10 +2,10 @@
 
 File: manager_menu_state.hpp
 
-Brief: Manager Menu is an intermediate state that directs user 
+Brief: Manager Menu is an intermediate state that directs user input
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski

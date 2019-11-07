@@ -41,5 +41,8 @@ public:
 
 };
 
+
+// TODO create a database exception?
+
 #endif // CHOCAN_EXCEPTION_HPP
 

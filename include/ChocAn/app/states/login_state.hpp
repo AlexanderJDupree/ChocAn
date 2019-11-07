@@ -5,7 +5,7 @@ File: login_state.hpp
 Brief: Login State controls login behavior for the ChocAn application
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski

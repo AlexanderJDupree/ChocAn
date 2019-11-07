@@ -15,15 +15,15 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#include <string>
 #include <ChocAn/core/utils/validators.hpp>
 
-bool Validators::length(const std::string& field, unsigned max, unsigned min)
+bool Validators::length(const std::string& field, unsigned min, unsigned max)
 {
     return min <= field.length() && field.length() <= max;
 }
 
-bool Validators::range(int value, int max, int min)
+bool Validators::range(int value, int min, int max)
 {
     return min <= value && value <= max;
 }
+

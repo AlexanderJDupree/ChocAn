@@ -16,17 +16,24 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <catch.hpp>
+#include <ChocAn/core/chocan.hpp>
+#include <ChocAn/data/mock_db.hpp>
 #include <ChocAn/core/entities/account.hpp>
 
 TEST_CASE("Constructors for account class", "[constructors], [account]")
 {
-    SECTION("Construct valid account object")
+    Data_Gateway::Database_Ptr mock_db = std::make_unique<Mock_DB>();
+
+    ChocAn chocan(mock_db);
+
+    SECTION("Account can only be constructed with the ID_Generator service")
     {
         REQUIRE_NOTHROW( Account( Name("John", "Doe")
                                 , Address( "1234 Cool St." 
                                          , "Portland"
                                          , "OR"
                                          , 97030)
-                                , Account_Type::Member ) );
+                                , Member()
+                                , chocan.id_generator ) );
     }
 }    

@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <catch.hpp>
-#include <ChocAn/core/utils/name.hpp>
+#include <ChocAn/core/entities/name.hpp>
 
 TEST_CASE("Constructing Name objects", "[constructors], [name]")
 {

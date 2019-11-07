@@ -6,7 +6,7 @@ Brief: Provider Menu is an intermediate state that directs user to a specific
        set of actions that a provider can do. 
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski

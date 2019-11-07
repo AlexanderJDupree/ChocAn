@@ -22,9 +22,9 @@ ifeq ($(config),debug)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -g -Wall -Wextra -fprofile-arcs -ftest-coverage -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/debug/libChocAn-Core.a ../lib/debug/libChocAn-Data.a ../lib/debug/libChocAn-App.a ../lib/debug/libChocAn-View.a -lgcov
-  LDDEPS += ../lib/debug/libChocAn-Core.a ../lib/debug/libChocAn-Data.a ../lib/debug/libChocAn-App.a ../lib/debug/libChocAn-View.a
-  ALL_LDFLAGS += $(LDFLAGS)
+  LIBS += ../lib/debug/libChocAn-Core.so ../lib/debug/libChocAn-Data.so ../lib/debug/libChocAn-App.so ../lib/debug/libChocAn-View.so -lgcov
+  LDDEPS += ../lib/debug/libChocAn-Core.so ../lib/debug/libChocAn-Data.so ../lib/debug/libChocAn-App.so ../lib/debug/libChocAn-View.so
+  ALL_LDFLAGS += $(LDFLAGS) -Wl,-rpath,'$$ORIGIN/../../lib/debug'
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -49,9 +49,9 @@ ifeq ($(config),release)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Werror -O2 -Wall -Wextra -Wall -Wextra -Werror -std=c++17
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += ../lib/release/libChocAn-Core.a ../lib/release/libChocAn-Data.a ../lib/release/libChocAn-App.a ../lib/release/libChocAn-View.a
-  LDDEPS += ../lib/release/libChocAn-Core.a ../lib/release/libChocAn-Data.a ../lib/release/libChocAn-App.a ../lib/release/libChocAn-View.a
-  ALL_LDFLAGS += $(LDFLAGS) -s
+  LIBS += ../lib/release/libChocAn-Core.so ../lib/release/libChocAn-Data.so ../lib/release/libChocAn-App.so ../lib/release/libChocAn-View.so
+  LDDEPS += ../lib/release/libChocAn-Core.so ../lib/release/libChocAn-Data.so ../lib/release/libChocAn-App.so ../lib/release/libChocAn-View.so
+  ALL_LDFLAGS += $(LDFLAGS) -Wl,-rpath,'$$ORIGIN/../../lib/release' -s
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef

@@ -15,37 +15,64 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#include <ChocAn/core/utils/datetime.hpp>
+#include <ChocAn/core/utils/validators.hpp>
+#include <ChocAn/core/entities/datetime.hpp>
 
 /** DATETIME CLASS **/
 
 DateTime::DateTime(Day day, Month month, Year year)
     : _day(day), _month(month), _year(year)
 {
-    if (!ok())
-    {
-        throw invalid_datetime( "Invalid datetime values",
-                              { "Day should be between 1 - 31"
-                              , "Months should be between 1 - 12"
-                              , "Years should be greater than 1970"
-                              } );
-    }
+    chocan_user_exception::Info errors;
+
+    (Validators::range(day.count(), 1, 31))
+        ? void() : errors.push_back("Day should be between 1 - 31");
+
+    (Validators::range(year.count(), 1970, Year::max().count()))
+        ? void() : errors.push_back("Year should be greater than 1970");
+
+    (Validators::range(month.count(), 1, 12) && ok()) 
+        ? void() : errors.push_back( "Month: " 
+                                   + std::to_string(month.count()) 
+                                   + ", and Day: "
+                                   + std::to_string(day.count())
+                                   + " does not exist." );
+    (errors.empty())
+        ? void() :throw invalid_datetime("Invalid datetime values", errors);
 }
+
+/* Out of Order constructors */
+DateTime::DateTime(Day day, Year year, Month month)
+    : DateTime(day, month, year) {}
+
+DateTime::DateTime(Month month, Day day, Year year)
+    : DateTime(day, month, year) {}
+
+DateTime::DateTime(Month month, Year year, Day day)
+    : DateTime(day, month, year) {}
+
+DateTime::DateTime(Year year, Month month, Day day)
+    : DateTime(day, month, year) {}
+
+DateTime::DateTime(Year year, Day day, Month month)
+    : DateTime(day, month, year) {}
 
 bool DateTime::ok() const
 {
     const Day calendar[] = 
     {
-        Day(31), Day((_year.is_leap_year() ? 29 : 28)), Day(31),
+        Day(31), Day((is_leap_year(_year) ? 29 : 28)), Day(31),
         Day(30), Day(31), Day(30), 
         Day(31), Day(31), Day(30), 
         Day(31), Day(31), Day(30)
     };
 
-    return _year.ok() 
-        && _month.ok() 
-        && _day.ok() 
-        && _day <= calendar[_month.to_int() - 1];
+    return _day <= calendar[_month.count() - 1];
+}
+
+bool DateTime::is_leap_year(const Year& year)
+{
+    return year.count() % 4 == 0 && (year.count() % 100 != 0 || year.count() % 400 == 0);
 }
 
 const Day&   DateTime::day() const 
@@ -80,105 +107,5 @@ bool DateTime::operator <= (const DateTime& rhs) const
 bool DateTime::operator == (const DateTime& rhs) const
 {
     return _year == rhs._year && _month == rhs._month && _day == rhs._day;
-}
-
-/** SYSTEM CLOCK INTERFACE **/
-
-tm system_clock::get_utc_time()
-{
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-
-    time_t time = std::chrono::system_clock::to_time_t(now);
-    
-    return *gmtime(&time);
-}
-
-/** DAY CLASS **/
-
-bool Day::ok() const
-{
-    return (1 <= _val && _val <= 31);
-};
-
-bool Day::operator <  (const Day& rhs) const
-{
-    return _val < rhs._val;
-}
-bool Day::operator >  (const Day& rhs) const
-{
-    return !(*this < rhs);
-}
-bool Day::operator >= (const Day& rhs) const
-{
-    return *this > rhs || *this == rhs;
-}
-bool Day::operator <= (const Day& rhs) const
-{
-    return *this < rhs || *this == rhs;
-}
-bool Day::operator == (const Day& rhs) const
-{
-    return _val == rhs._val;
-}
-
-/** MONTH CLASS **/
-
-bool Month::ok() const
-{
-    return (1 <= _val && _val <= 12);
-};
-
-bool Month::operator <  (const Month& rhs) const
-{
-    return _val < rhs._val;
-}
-bool Month::operator >  (const Month& rhs) const
-{
-    return !(*this < rhs);
-}
-bool Month::operator >= (const Month& rhs) const
-{
-    return *this > rhs || *this == rhs;
-}
-bool Month::operator <= (const Month& rhs) const
-{
-    return *this < rhs || *this == rhs;
-}
-bool Month::operator == (const Month& rhs) const
-{
-    return _val == rhs._val;
-}
-
-/** YEAR CLASS **/
-
-bool Year::ok() const
-{
-    return _val > 0;
-};
-
-bool Year::is_leap_year() const
-{
-    return _val % 4 == 0 && (_val % 100 != 0 || _val % 400 == 0);
-}
-
-bool Year::operator <  (const Year& rhs) const
-{
-    return _val < rhs._val;
-}
-bool Year::operator >  (const Year& rhs) const
-{
-    return !(*this < rhs);
-}
-bool Year::operator >= (const Year& rhs) const
-{
-    return *this > rhs || *this == rhs;
-}
-bool Year::operator <= (const Year& rhs) const
-{
-    return *this < rhs || *this == rhs;
-}
-bool Year::operator == (const Year& rhs) const
-{
-    return _val == rhs._val;
 }
 
