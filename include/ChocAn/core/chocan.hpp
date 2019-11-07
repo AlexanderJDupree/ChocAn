@@ -32,6 +32,7 @@ public:
 
     typedef std::shared_ptr<ChocAn> ChocAn_Ptr;
 
+    // Service Objects will throw exception if db is null
     ChocAn(Database_Ptr db)
         : db            ( db ) 
         , id_generator  ( db )

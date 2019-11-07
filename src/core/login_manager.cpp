@@ -22,7 +22,7 @@ bool Login_Manager::login(const unsigned ID)
     std::optional<Account> maybe_account = database->get_account(ID);
     
     // If retrieval succeded and that account is not a member, then create session
-    _session_owner = (maybe_account && maybe_account.value().type != Account_Type::Member)
+    _session_owner = (maybe_account && !std::holds_alternative<Member>(maybe_account.value().type))
                    ? std::make_unique<Account>(maybe_account.value())
                    : nullptr;
 
