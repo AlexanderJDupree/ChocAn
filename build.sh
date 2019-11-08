@@ -32,7 +32,7 @@ check_cpp17_compatible(){
 
     if [ "$CPP_VERSION" -lt "$CPP_REQUIRED" ]
     then
-        echo "ERROR: ChocAn requires g++ version 7 or greater to support c++ standard 17."
+        echo "ERROR: ChocAn requires g++ version" $CPP_REQUIRED  "or greater to support c++ standard 17."
         echo "current version: " $CPP_VERSION
         echo "required version: " $CPP_REQUIRED
         echo "Please update and try again."
