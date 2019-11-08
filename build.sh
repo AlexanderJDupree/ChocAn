@@ -4,7 +4,7 @@
 # To execute run:
 #   $ ./build.sh
 #
-# Alternatively, you can manually build the project by running the following in 
+# Alternatively, you can manually build the project by running the following in
 # 'gmake' directory
 #
 #   $ make all
@@ -24,13 +24,30 @@ export LibBashRepo="https://github.com/kigster/lib-bash"
 
 # We are using an awesome BASH library `lib-bash` for prettifying the output, and
 # running commands through their LibRun framework.
+
+check_cpp17_compatible(){
+
+    CPP_REQUIRED=7
+    CPP_VERSION=$(g++ -dumpversion)
+
+    if [ "$CPP_VERSION" -lt "$CPP_REQUIRED" ]
+    then
+        echo "ERROR: ChocAn requires g++ version 7 or greater to support c++ standard 17."
+        echo "current version: " $CPP_VERSION
+        echo "required version: " $CPP_REQUIRED
+        echo "Please update and try again."
+        exit
+    fi
+
+}
+
 lib-bash() {
   [[ ! -d ${BashLibRoot} ]] && curl -fsSL https://git.io/fxZSi | /usr/bin/env bash
-  [[ ! -d ${BashLibRoot} ]] && { 
+  [[ ! -d ${BashLibRoot} ]] && {
     printf "Unable to git clone lib-bash repo from ${LibBashRepo}"
     exit 1
   }
-  
+
   if [[ -f ${BashLibRoot}/Loader.bash ]]; then
     cd ${BashLibRoot} > /dev/null
     git reset --hard origin/master 2>&1 | cat >/dev/null
@@ -101,6 +118,8 @@ tests() {
 
 
 main() {
+
+  check_cpp17_compatible
   lib-bash
   header
   build
