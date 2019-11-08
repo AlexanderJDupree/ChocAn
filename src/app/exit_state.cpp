@@ -19,9 +19,11 @@ https://github.com/AlexanderJDupree/ChocAn
 
 State::State_Ptr Exit_State::evaluate(const Input_Vector& input)
 {
-    if(input.size() == 0)
+    // TODO the current loop in Main does not allow for exit state evaluation
+    if(input.size() == 0) {}
+    if( chocan )
     {
-        return std::make_unique<Exit_State>();
+        chocan->login_manager.logout();
     }
     return std::make_unique<Exit_State>();
 }

@@ -24,10 +24,9 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <memory>
 #include <vector>
 #include <typeinfo>
-#include <optional>
 #include <functional>
+#include <ChocAn/core/chocan.hpp>
 
-// TODO evaluate prototype
 class State_Info
 {
 public:
@@ -45,15 +44,35 @@ public:
 
     typedef std::map<std::string, std::function<State_Ptr()>> Transition_Table;
 
+    using ChocAn_Ptr = ChocAn::ChocAn_Ptr;
+
     virtual ~State() {};
 
     virtual State_Ptr evaluate(const Input_Vector& input) = 0;
 
     virtual State_Info info() const = 0;
 
-    size_t id() const { return typeid(*this).hash_code(); }
+    /* Shared State Functions */
+    void set_service_instance(ChocAn_Ptr instance) 
+    { 
+        chocan = instance; 
+    }
 
-    bool operator == (const State& rhs) const { return this->id() == rhs.id(); }
+    size_t id() const 
+    { 
+        return typeid(*this).hash_code(); 
+    }
+
+    bool operator == (const State& rhs) const 
+    { 
+        return this->id() == rhs.id(); 
+    }
+
+protected:
+
+    // References Main ChocAn Service
+    ChocAn_Ptr chocan;
+
 };
 
 #endif  // CHOCAN_STATE_H

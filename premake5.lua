@@ -45,7 +45,7 @@ workspace "CS300 Term Project"
     filter {} -- close filter
 
 project "ChocAn-Core"
-    kind "StaticLib"
+    kind "SharedLib"
     language "C++"
     targetdir "lib/%{cfg.buildcfg}/"
     targetname "ChocAn-Core"
@@ -57,7 +57,7 @@ project "ChocAn-Core"
     includedirs (include)
 
 project "ChocAn-Data"
-    kind "StaticLib"
+    kind "SharedLib"
     links "ChocAn-Core"
     language "C++"
     targetdir "lib/%{cfg.buildcfg}/"
@@ -70,7 +70,7 @@ project "ChocAn-Data"
     includedirs (include)
 
 project "ChocAn-App"
-    kind "StaticLib"
+    kind "SharedLib"
     links "ChocAn-Core"
     language "C++"
     targetdir "lib/%{cfg.buildcfg}/"
@@ -83,9 +83,8 @@ project "ChocAn-App"
     includedirs (include)
 
 project "ChocAn-View"
-    kind "StaticLib"
-    links "ChocAn-Core"
-    links "ChocAn-App"
+    kind "SharedLib"
+    links { "ChocAn-Core", "ChocAn-App" }
     language "C++"
     targetdir "lib/%{cfg.buildcfg}/"
     targetname "ChocAn-View"
@@ -99,10 +98,7 @@ project "ChocAn-View"
 project "ChocAn-Exe"
     kind "ConsoleApp"
     language "C++"
-    links "ChocAn-Core"
-    links "ChocAn-Data"
-    links "ChocAn-App"
-    links "ChocAn-View"
+    links { "ChocAn-Core", "ChocAn-Data", "ChocAn-App", "ChocAn-View" }
     targetdir "bin/%{cfg.buildcfg}/"
     targetname  "ChocAn_%{cfg.buildcfg}"
 
@@ -115,10 +111,7 @@ project "ChocAn-Exe"
 project "Tests"
     kind "ConsoleApp"
     language "C++"
-    links "ChocAn-Core"
-    links "ChocAn-Data"
-    links "ChocAn-App"
-    links "ChocAn-View"
+    links { "ChocAn-Core", "ChocAn-Data", "ChocAn-App", "ChocAn-View" }
     targetdir "bin/tests/"
     targetname "%{cfg.buildcfg}_tests"
 

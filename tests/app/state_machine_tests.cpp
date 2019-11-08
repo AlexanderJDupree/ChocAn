@@ -15,6 +15,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <catch.hpp>
+#include <ChocAn/data/mock_db.hpp>
 #include <ChocAn/app/state_controller.hpp>
 
 
@@ -54,19 +55,24 @@ State::State_Ptr Q2::evaluate(const Input_Vector& input)
 
 TEST_CASE("State Controller construction", "[constructors], [state_controller]")
 {
+    ChocAn::Database_Ptr db = std::make_unique<Mock_DB>();
+
     SECTION("State_Controller is constructed with initial state")
     {
-        State_Controller controller { std::make_unique<Q1>() , 
-                                    { Q2().id() } };
+        State_Controller controller { std::make_unique<ChocAn>(db)
+                                    , std::make_unique<Q1>() 
+                                    , { Q2().id() } };
 
         REQUIRE(controller.current_state() == Q1());
     }
 }
 TEST_CASE("State controller transitions state", "[transition], [state_controller]")
 {
+    ChocAn::Database_Ptr db = std::make_unique<Mock_DB>();
 
-    State_Controller controller { std::make_unique<Q1>() , 
-                                { Q2().id() } };
+    State_Controller controller { std::make_unique<ChocAn>(db)
+                                , std::make_unique<Q1>() 
+                                , { Q2().id() } };
 
     SECTION("Invalid input does not change state")
     {
