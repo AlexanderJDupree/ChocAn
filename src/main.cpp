@@ -18,23 +18,24 @@ https://github.com/AlexanderJDupree/LinkedListsCPP
 
 #include <ChocAn/data/mock_db.hpp>
 #include <ChocAn/app/state_controller.hpp>
+#include <ChocAn/app/input_controller.hpp>
 #include <ChocAn/view/terminal_state_viewer.hpp>
 
 int main () 
 {
-    Terminal_State_Viewer viewer;
-
     ChocAn::Database_Ptr db = std::make_unique<Mock_DB>();
 
-    State_Controller controller(std::make_unique<ChocAn>(db));
+    State_Controller controller ( std::make_unique<ChocAn>(db)
+                                , std::make_unique<Terminal_State_Viewer>()
+                                , std::make_unique<Input_Controller>() );
 
     // TODO exit loop if viewer can't open view
     while(!controller.end_state())
     {
-        viewer.render_state(controller.current_state());
-
-        controller.transition(viewer.interact());
+        controller.interact();
     }
+    // Required to render exit state, TODO refactor
+    controller.interact();
 
     return 0;
 }
