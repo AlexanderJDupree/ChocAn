@@ -29,6 +29,18 @@ bool Login_Manager::login(const unsigned ID)
     return (_session_owner) ? true : false;
 }
 
+bool Login_Manager::login(const std::string ID)
+{
+    try
+    {
+        return login(std::stoi(ID));
+    }
+    catch(const std::exception& err)
+    {
+        return false;
+    }
+}
+
 void Login_Manager::logout()
 {
     _session_owner = nullptr;
