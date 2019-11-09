@@ -75,6 +75,7 @@ OBJECTS := \
 	$(OBJDIR)/name_tests.o \
 	$(OBJDIR)/service_tests.o \
 	$(OBJDIR)/test_config_main.o \
+	$(OBJDIR)/terminal_state_viewer_tests.o \
 
 RESOURCES := \
 
@@ -161,6 +162,9 @@ $(OBJDIR)/service_tests.o: ../tests/core/service_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/test_config_main.o: ../tests/test_config_main.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/terminal_state_viewer_tests.o: ../tests/view/terminal_state_viewer_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

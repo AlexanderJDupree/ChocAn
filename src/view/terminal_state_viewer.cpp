@@ -65,7 +65,6 @@ Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
     , command_table  ({
           { "header",       [&](){ return render_view("header");  } }
         , { "footer",       [&](){ return render_view("footer");  } }
-        , { "datetime",     [&](){ return render_view("datetime");} }
         , { "prompt",       [&](){ return render_prompt();        } }
         , { "state_info",   [&](){ 
                 out_stream << std::visit(Render_State_Info_Event(), current_state);

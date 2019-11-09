@@ -4,7 +4,7 @@ File: state_controller_tests.cpp
 Brief: Unit tests for State Controller machine
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski
