@@ -65,7 +65,6 @@ all: prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/input_controller_tests.o \
 	$(OBJDIR)/state_controller_tests.o \
 	$(OBJDIR)/account_tests.o \
 	$(OBJDIR)/address_tests.o \
@@ -75,6 +74,7 @@ OBJECTS := \
 	$(OBJDIR)/name_tests.o \
 	$(OBJDIR)/service_tests.o \
 	$(OBJDIR)/test_config_main.o \
+	$(OBJDIR)/terminal_input_controller_tests.o \
 	$(OBJDIR)/terminal_state_viewer_tests.o \
 
 RESOURCES := \
@@ -134,9 +134,6 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/input_controller_tests.o: ../tests/app/input_controller_tests.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/state_controller_tests.o: ../tests/app/state_controller_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -162,6 +159,9 @@ $(OBJDIR)/service_tests.o: ../tests/core/service_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/test_config_main.o: ../tests/test_config_main.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/terminal_input_controller_tests.o: ../tests/view/terminal_input_controller_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/terminal_state_viewer_tests.o: ../tests/view/terminal_state_viewer_tests.cpp

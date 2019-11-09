@@ -20,10 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_INPUT_CONTROLLER_H
 
 #include <map>
-#include <limits>
 #include <string>
-#include <iostream>
-#include <algorithm>
 #include <functional>
 
 class Input_Controller
@@ -37,44 +34,11 @@ public:
 
     using Input_Control_Ptr = std::shared_ptr<Input_Controller>;
 
-    Input_Controller(std::istream& in_stream = std::cin)
-        : in_stream(in_stream) {}
+    // Read a single line of input
+    virtual std::string read_input() const = 0;
 
-    // TODO Use SFINAE to ensure T is default constructible
-    std::string read_input() const
-    {
-        std::string input;
-
-        std::getline(in_stream, input);
-
-        return input;
-    }
-
-    Form_Data& read_form(Form_Data& fields, Form_Prompt prompt)
-    {
-        // Read input into each field
-        std::for_each( fields.begin(), fields.end(),
-                       [&](Field_Data& field)
-                       {
-                           prompt(field.first);
-                           field.second = read_input();
-                       } );
-
-        return fields;
-    }
-
-private:
-
-    void reset_input_stream() const
-    {
-        in_stream.clear();
-
-        // discard characters up to the limit of the stream OR to newline
-        in_stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        return;
-    }
-
-    std::istream& in_stream;
+    // Read a line of input for each field in fields
+    virtual Form_Data& read_form(Form_Data& fields, Form_Prompt prompt) = 0;
 
 };
 

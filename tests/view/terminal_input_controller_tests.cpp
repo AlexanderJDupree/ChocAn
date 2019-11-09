@@ -1,10 +1,10 @@
 /* 
-File: input_controller_tests.cpp
+File: terminal_input_controller_tests.cpp
 
-Brief: Unit tests for Input Controller utility
+Brief: Unit tests for Terminal Input Controller utility
 
 Authors: Daniel Mendez 
-         Alexander Salazar
+         Alex Salazar
          Arman Alauizadeh 
          Alexander DuPree
          Kyle Zalewski
@@ -16,7 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <sstream>
 #include <catch.hpp>
-#include <ChocAn/app/input_controller.hpp>
+#include <ChocAn/view/terminal_input_controller.hpp>
 
 TEST_CASE("Retrieving input from the Input Controller", "[input_controller]")
 {
@@ -26,7 +26,7 @@ TEST_CASE("Retrieving input from the Input Controller", "[input_controller]")
 
         test_stream << "Hello World\n";
 
-        Input_Controller input_controller(test_stream);
+        Terminal_Input_Controller input_controller(test_stream);
 
         REQUIRE(input_controller.read_input() == "Hello World");
 
@@ -56,7 +56,7 @@ TEST_CASE("Retrieving input from the Input Controller", "[input_controller]")
                          test_stream << field.second << "\n";
                      } );
 
-        Input_Controller input_controller(test_stream);
+        Terminal_Input_Controller input_controller(test_stream);
 
         REQUIRE(input_controller.read_form(test_form, callback) == expected_data);
     }
