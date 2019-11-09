@@ -31,7 +31,7 @@ public:
         :  ChocAn_Service(db), _session_owner(nullptr) {}
 
     bool login(const unsigned ID);
-    bool login(const std::string ID);
+    bool login(const std::string& ID);
 
     // logout is idempotent
     void logout(); 

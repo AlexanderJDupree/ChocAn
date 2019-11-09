@@ -29,7 +29,7 @@ bool Login_Manager::login(const unsigned ID)
     return (_session_owner) ? true : false;
 }
 
-bool Login_Manager::login(const std::string ID)
+bool Login_Manager::login(const std::string& ID)
 {
     try
     {
