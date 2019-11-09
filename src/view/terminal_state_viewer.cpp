@@ -104,7 +104,7 @@ void Terminal_State_Viewer::render_view(const std::string& view_name)
     }
     else
     {
-        std::cerr << "Error: Unable to open view: " << view << std::endl;
+        out_stream << "Error: Unable to open view: " << view << std::endl;
     }
     return file.close();
 }
@@ -130,7 +130,7 @@ void Terminal_State_Viewer::execute_command(const std::string& command)
     }
     catch(const std::out_of_range& err)
     {
-        std::cerr << "Viewer Command: " << command << ", not recognized\n";
+        out_stream << "Viewer Command: " << command << ", not recognized\n";
     }
     return;
 }
