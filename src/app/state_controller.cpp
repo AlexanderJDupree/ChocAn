@@ -84,7 +84,7 @@ Application_State State_Controller::operator()(const Exit&)
 
 Application_State State_Controller::operator()(const Provider_Menu&)
 {
-    Transition_Table provider_menu
+    const Transition_Table provider_menu
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
@@ -102,7 +102,7 @@ Application_State State_Controller::operator()(const Provider_Menu&)
 
 Application_State State_Controller::operator()(const Manager_Menu&)
 {
-    Transition_Table manager_menu
+    const Transition_Table manager_menu
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
