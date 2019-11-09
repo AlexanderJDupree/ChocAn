@@ -27,68 +27,58 @@ struct View_Table
     const char* operator()(const Manager_Menu&)  { return "manager_menu"; }
 };
 
-struct Render_State_Info_Event
-{
-    void operator()(const Login& login)
-    {
-        std::cout << login.login_status;
-    }
-    void operator()(const Provider_Menu& menu)
-    {
-        std::cout << menu.status;
-    }
-    void operator()(const Manager_Menu& menu)
-    {
-        std::cout << menu.status;
-    }
-    void operator()(const Exit&)
-    {
-        return;
-    }
-};
-
 struct Render_State_Name_Event
 {
-    void operator()(const Login&)
+    const char* operator()(const Login&)         { return "Login Service"; }
+    const char* operator()(const Provider_Menu&) { return "Provider Menu"; }
+    const char* operator()(const Manager_Menu&)  { return "Manager Menu";  }
+    const char* operator()(const Exit&)          { return "Exit"; }
+};
+
+struct Render_State_Info_Event
+{
+    std::string operator()(const Login& login)
     {
-        std::cout << "Login Service";
+        return login.login_status;
     }
-    void operator()(const Provider_Menu&)
+    std::string operator()(const Provider_Menu& menu)
     {
-        std::cout << "Provider Menu";
+        return menu.status;
     }
-    void operator()(const Manager_Menu&)
+    std::string operator()(const Manager_Menu& menu)
     {
-        std::cout << "Manager Menu";
+        return menu.status;
     }
-    void operator()(const Exit&)
+    std::string operator()(const Exit&)
     {
-        return;
+        return "";
     }
 };
 
 Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
-                                            , std::string&& file_extension )
-    : current_state        ( Login() )
-    , view_location        ( view_location  )
-    , file_extension       ( file_extension )
-    , command_table ({
+                                            , std::string&& file_extension 
+                                            , std::ostream& out_stream )
+    : current_state  ( Login()        )
+    , view_location  ( view_location  )
+    , file_extension ( file_extension )
+    , out_stream     ( out_stream     )
+    , command_table  ({
           { "header",       [&](){ return render_view("header");  } }
         , { "footer",       [&](){ return render_view("footer");  } }
         , { "datetime",     [&](){ return render_view("datetime");} }
         , { "prompt",       [&](){ return render_prompt();        } }
         , { "state_info",   [&](){ 
-                std::visit(Render_State_Info_Event(), current_state);
+                out_stream << std::visit(Render_State_Info_Event(), current_state);
             } }
         , { "state_name",   [&](){ 
-                std::visit(Render_State_Name_Event(), current_state);
+                out_stream << std::visit(Render_State_Name_Event(), current_state);
             } }
     }) 
     {}
 
 void Terminal_State_Viewer::render_prompt(const char* prompt)
 {
-    std::cout << prompt;
+    out_stream << prompt;
 }
 
 void Terminal_State_Viewer::render_state(const Application_State& state)
@@ -110,7 +100,7 @@ void Terminal_State_Viewer::render_view(const std::string& view_name)
         {
             // Display characters until 'start command' character is reached
             if (symbol == '<') { execute_command(read_command(file)); }
-            else               { std::cout << symbol; }
+            else               { out_stream << symbol; }
         }
     }
     else

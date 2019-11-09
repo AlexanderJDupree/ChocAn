@@ -21,6 +21,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_TERMINAL_STATE_VIEWER_H
 
 #include <map>
+#include <iostream>
 #include <functional>
 #include <ChocAn/app/state_viewer.hpp>
 
@@ -31,8 +32,9 @@ public:
     // Viewer Command look up table
     typedef std::map<std::string, std::function<void()>> Command_Table;
 
-    Terminal_State_Viewer( std::string&& view_location = "views/" 
-                         , std::string&& file_extension = ".txt" );
+    Terminal_State_Viewer( std::string&& view_location  = "views/" 
+                         , std::string&& file_extension = ".txt" 
+                         , std::ostream& out_stream     = std::cout );
 
 
     // Looks up state view in view_table, renders the view.
@@ -44,7 +46,6 @@ private:
 
     void render_view(const std::string& view_name);
 
-    // Reads input from STDIN into a string
     std::string read_command(std::ifstream& file);
 
     // Looks up viewer command from command table, executes function
@@ -53,10 +54,12 @@ private:
     Application_State current_state;
 
     // Relative file location where view files are located
-    const std::string view_location; 
-    const std::string file_extension;
+    const std::string   view_location; 
+    const std::string   file_extension;
+    std::ostream& out_stream;
 
     const Command_Table command_table;
+
 };
 
 #endif // CHOCAN_TERMINAL_STATE_VIEWER_H
