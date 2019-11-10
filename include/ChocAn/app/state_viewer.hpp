@@ -19,18 +19,18 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_STATE_VIEWER_H
 #define CHOCAN_STATE_VIEWER_H
 
-#include <ChocAn/app/state.hpp>
+#include <memory>
+#include <ChocAn/app/application_state.hpp>
 
 class State_Viewer
 {
 public:
 
+    using State_Viewer_Ptr = std::shared_ptr<State_Viewer>;
+
     virtual ~State_Viewer() {}
 
-    virtual const State::Input_Vector& interact() = 0;
-
-    virtual void render_state(const State& state) = 0;
-
+    virtual void render_state(const Application_State& state) = 0;
 };
 
 #endif // CHOCAN_STATE_VIEWER_H

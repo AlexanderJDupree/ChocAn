@@ -1,3 +1,0 @@
-Enter Day: <empty_prompt> 
-Enter Month: <empty_prompt> 
-Enter Year: <empty_prompt>
