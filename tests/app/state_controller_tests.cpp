@@ -91,12 +91,31 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
                                , mocks.state_viewer
                                , mocks.input_controller
                                , Login());
+    
+    /* Ensure A manager and provider account exist in mock db */
+    Account provider( Name("John", "Doe")
+                    , Address( "1234 Cool St."
+                             , "Portland"
+                             , "OR"
+                             , 97030 )
+                    , Provider()
+                    , mocks.chocan->id_generator );
+    mocks.chocan->db->create_account(provider);
+
+    Account manager( Name("Jane", "Doe")
+                    , Address( "1234 Meh St."
+                             , "Portland"
+                             , "OR"
+                             , 97030 )
+                    , Manager()
+                    , mocks.chocan->id_generator );
+    mocks.chocan->db->create_account(manager);
 
     SECTION("Login transitions to provider menu when given a valid provider ID")
     {
         Application_State expected_state { Provider_Menu() };
 
-        mocks.in_stream << "1234\n";
+        mocks.in_stream << provider.id << '\n';
 
         REQUIRE(controller.transition().current_state().index() == expected_state.index());
     }
@@ -104,7 +123,7 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
     {
         Application_State expected_state { Manager_Menu() };
 
-        mocks.in_stream << "5678\n";
+        mocks.in_stream << manager.id << '\n';
 
         REQUIRE(controller.transition().current_state().index() == expected_state.index());
     }
