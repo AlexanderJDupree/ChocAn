@@ -54,12 +54,12 @@ private:
     Application_State current_state;
 
     // Relative file location where view files are located
+    // TODO Update view_location to use absolute paths
     const std::string   view_location; 
     const std::string   file_extension;
-    std::ostream& out_stream;
+    std::ostream&       out_stream;
 
     const Command_Table command_table;
-
 };
 
 #endif // CHOCAN_TERMINAL_STATE_VIEWER_H

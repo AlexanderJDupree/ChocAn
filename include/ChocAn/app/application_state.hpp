@@ -2,7 +2,9 @@
 
 File: application_state.hpp
 
-Brief:
+Brief: Application State is a discriminated union of several other different,
+       but fixed types. Each type represents a specific state within the 
+       application.
 
 Authors: Daniel Mendez 
          Alex Salazar

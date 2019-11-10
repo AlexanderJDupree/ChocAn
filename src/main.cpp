@@ -3,7 +3,6 @@
 File: main.cpp
 
 Brief: Provides the entry point for the ChocAn data processing application.
-       Main module utilizes a state machine model to control user interaction.
 
 Authors: Daniel Mendez 
          Alexander Salazar

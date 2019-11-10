@@ -3,10 +3,7 @@
 File: state_controller.hpp
 
 Brief: State Controller models user interaction with the application as a 
-       Finte State Machine. State Controller must be provided with an initial 
-       state and an end state. Currently, controller can't enforce that there
-       must be a path to an end state, and is dependent on the programmer to 
-       verify that there exists a path to an end state. 
+       Finte State Machine. 
 
 Authors: Daniel Mendez 
          Alex Salazar
@@ -39,7 +36,7 @@ public:
     using Transition_Table  = std::map<std::string, std::function<Application_State()>>;
 
     // TODO set default instances
-    State_Controller( ChocAn_Ptr chocan
+    State_Controller( ChocAn_Ptr        chocan
                     , State_Viewer_Ptr  state_viewer
                     , Input_Control_Ptr input_controller
                     , Application_State initial_state = Login() );

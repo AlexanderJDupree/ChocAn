@@ -31,7 +31,6 @@ public:
     virtual ~State_Viewer() {}
 
     virtual void render_state(const Application_State& state) = 0;
-
 };
 
 #endif // CHOCAN_STATE_VIEWER_H

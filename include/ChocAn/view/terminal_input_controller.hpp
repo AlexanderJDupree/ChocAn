@@ -31,8 +31,6 @@ class Terminal_Input_Controller : public Input_Controller
 {
 public:
 
-
-
     Terminal_Input_Controller(std::istream& in_stream = std::cin)
         : in_stream(in_stream) {}
 
