@@ -43,6 +43,7 @@ public:
 
     // Account retrieval may fail, wrap in Maybe type
     virtual std::optional<Account> get_account(const unsigned ID) const = 0;
+    virtual std::optional<Account> get_account(const std::string& ID) const = 0;
 
     virtual bool id_exists(const unsigned ID) const = 0;
 

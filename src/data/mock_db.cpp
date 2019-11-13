@@ -83,9 +83,21 @@ std::optional<Account> Mock_DB::get_account(const unsigned ID) const
         // Just Account
         return account_table.at(ID);
     }
-    catch(const std::out_of_range& err)
+    catch(const std::out_of_range&)
     {
         // Return nothing
+        return { };
+    }
+}
+
+std::optional<Account> Mock_DB::get_account(const std::string& ID) const
+{
+    try
+    {
+        return get_account(std::stoi(ID));
+    }
+    catch(const std::exception&)
+    {
         return { };
     }
 }

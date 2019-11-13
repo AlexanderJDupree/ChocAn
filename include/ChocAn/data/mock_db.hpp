@@ -29,15 +29,16 @@ public:
 
     Mock_DB();
 
-    void update_account(const Account& account);
+    void update_account(const Account& account) override;
 
-    void create_account(const Account& account);
+    void create_account(const Account& account) override;
 
-    void delete_account(const unsigned ID);
+    void delete_account(const unsigned ID) override;
 
-    std::optional<Account> get_account(const unsigned ID) const;
+    std::optional<Account> get_account(const unsigned ID) const override;
+    std::optional<Account> get_account(const std::string& ID) const override;
 
-    bool id_exists(const unsigned ID) const;
+    bool id_exists(const unsigned ID) const override;
 
     std::map<unsigned, Account> account_table;
 
