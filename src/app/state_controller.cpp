@@ -87,7 +87,8 @@ Application_State State_Controller::operator()(const Provider_Menu&)
     const Transition_Table provider_menu
     {
         { "exit", [&](){ return Exit();  } },
-        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
+        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
+        { "5"   , [&](){ return Add_Transaction(); } }
     };
 
     try
@@ -116,4 +117,33 @@ Application_State State_Controller::operator()(const Manager_Menu&)
     {
         return Manager_Menu { "Unrecognized Input" };
     }
+}
+
+Application_State State_Controller::operator()(const Add_Transaction&)
+{
+    std::optional<Account> maybe_member = chocan->db->get_account(input_controller->read_input());
+
+    if(!maybe_member) { return Add_Transaction { "Invalid ID" }; }
+
+    if(!std::holds_alternative<Member>(maybe_member.value().type))
+    {
+        return Add_Transaction { "Non-Member account ID was entered" };
+    }
+    if(std::get<Member>(maybe_member.value().type).status() == Account_Status::Suspended)
+    {
+        return Add_Transaction { "Member Account is Suspended" };
+    }
+
+    Input_Controller::Form_Data transaction_form = input_controller->read_form
+    ( { "Date of Provided Service (MM-DD-YYYY)"
+      , "Service Code"
+      , "Comments" }
+
+    , [&](const std::string& field)
+      {
+          return state_viewer->render_prompt("Enter " + field + ": ");
+      }
+    );
+
+    return Provider_Menu();
 }
