@@ -18,7 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/data/mock_db.hpp>
 
 Mock_DB::Mock_DB()
-    : account_table
+    : _account_table
     ( {
 
         { 5678, Account( Name ("Dan", "Manager")
@@ -57,17 +57,17 @@ Mock_DB::Mock_DB()
                         , 9876
                         , db_key ) }
     } )
-    , service_directory 
+    , _service_directory 
     ( {
-        { 123456, Service ( 123456, 29.99, "Back Rub", db_key ) },
-        { 111111, Service ( 111111, 59.99, "Addiction Consulting", db_key ) },
-        { 222222, Service ( 222222, 100.00, "Addiction Treatment", db_key ) }
+        { 123456, Service ( 123456, USD { 29.99 }, "Back Rub", db_key ) },
+        { 111111, Service ( 111111, USD { 59.99 }, "Addiction Consulting", db_key ) },
+        { 222222, Service ( 222222, USD { 100.00 }, "Addiction Treatment", db_key ) }
     })
 { }
 
 void Mock_DB::update_account(const Account& account)
 {
-    account_table.insert( {account.id, account} );
+    _account_table.insert( {account.id, account} );
     return;
 }
 
@@ -78,7 +78,7 @@ void Mock_DB::create_account(const Account& account)
 
 void Mock_DB::delete_account(const unsigned ID)
 {
-    account_table.erase(ID);
+    _account_table.erase(ID);
     return;
 }
 
@@ -87,7 +87,7 @@ std::optional<Account> Mock_DB::get_account(const unsigned ID) const
     try
     {
         // Just Account
-        return account_table.at(ID);
+        return _account_table.at(ID);
     }
     catch(const std::out_of_range&)
     {
@@ -112,7 +112,7 @@ std::optional<Service> Mock_DB::lookup_service(const unsigned code) const
 {
     try
     {
-        return service_directory.at(code);
+        return _service_directory.at(code);
     }
     catch(const std::out_of_range&)
     {
@@ -120,7 +120,12 @@ std::optional<Service> Mock_DB::lookup_service(const unsigned code) const
     }
 }
 
+const Data_Gateway::Service_Directory& Mock_DB::service_directory() const
+{
+    return _service_directory;
+}
+
 bool Mock_DB::id_exists(const unsigned ID) const
 {
-    return account_table.find(ID) != account_table.end();
+    return _account_table.find(ID) != _account_table.end();
 }

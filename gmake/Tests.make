@@ -72,6 +72,7 @@ OBJECTS := \
 	$(OBJDIR)/id_generator_tests.o \
 	$(OBJDIR)/login_tests.o \
 	$(OBJDIR)/name_tests.o \
+	$(OBJDIR)/transaction_tests.o \
 	$(OBJDIR)/test_config_main.o \
 	$(OBJDIR)/terminal_input_controller_tests.o \
 	$(OBJDIR)/terminal_state_viewer_tests.o \
@@ -152,6 +153,9 @@ $(OBJDIR)/login_tests.o: ../tests/core/login_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/name_tests.o: ../tests/core/name_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/transaction_tests.o: ../tests/core/transaction_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/test_config_main.o: ../tests/test_config_main.cpp

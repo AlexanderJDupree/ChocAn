@@ -23,11 +23,11 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/utils/passkey.hpp>
 
+struct USD { double value = 0; };
+
 class Service
 {
 public:
-
-    using USD = double;
 
     Service(unsigned code, USD cost, const std::string& service_name, Key<Data_Gateway>&)
         : cost(cost)

@@ -19,7 +19,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_MOCK_DB_HPP
 #define CHOCAN_MOCK_DB_HPP
 
-#include <map>
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/account.hpp>
 #include <ChocAn/core/entities/service.hpp>
@@ -38,13 +37,17 @@ public:
 
     std::optional<Account> get_account(const unsigned ID)     const override;
     std::optional<Account> get_account(const std::string& ID) const override;
-
     std::optional<Service> lookup_service(const unsigned code)  const override;
+
+    const Service_Directory& service_directory() const override;
 
     bool id_exists(const unsigned ID) const override;
 
-    std::map<unsigned, Account> account_table;
-    std::map<unsigned, Service> service_directory;
+private:
+
+    std::map<unsigned, Account> _account_table;
+    Service_Directory _service_directory;
+
 };
 
 #endif // CHOCAN_MOCK_DB_HPP

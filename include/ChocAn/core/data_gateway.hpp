@@ -18,6 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_DATA_GATEWAY_HPP
 #define CHOCAN_DATA_GATEWAY_HPP
 
+#include <map>
 #include <memory>
 #include <optional>
 #include <ChocAn/core/utils/passkey.hpp>
@@ -30,7 +31,8 @@ class Data_Gateway
 {
 public:
 
-    typedef std::shared_ptr<Data_Gateway> Database_Ptr;
+    using Database_Ptr      = std::shared_ptr<Data_Gateway>;
+    using Service_Directory = std::map<unsigned, Service>;
 
     virtual ~Data_Gateway() {}
 
@@ -47,6 +49,8 @@ public:
     virtual std::optional<Account> get_account(const unsigned ID)      const = 0;
     virtual std::optional<Account> get_account(const std::string& ID)  const = 0;
     virtual std::optional<Service> lookup_service(const unsigned code) const = 0;
+
+    virtual const Service_Directory& service_directory() const = 0;
 
     virtual bool id_exists(const unsigned ID) const = 0;
 
