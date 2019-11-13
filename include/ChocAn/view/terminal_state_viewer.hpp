@@ -40,7 +40,7 @@ public:
     // Looks up state view in view_table, renders the view.
     void render_state(const Application_State& state) override;
 
-    void render_prompt(const char* prompt = "> ");
+    void render_prompt(const std::string& prompt = "> ") override;
 
 private:
 
