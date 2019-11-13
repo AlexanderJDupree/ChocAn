@@ -41,16 +41,21 @@ public:
 
     // By Default, Member accounts are valid
     Member(Account_Status status = Account_Status::Valid)
-        : status(status) {}
+        : _status(status) {}
 
     void set_account_status(Account_Status status, Key<Manager>&)
     {
-        this->status = status;
+        _status = status;
+    }
+
+    const Account_Status& status() const
+    {
+        return _status;
     }
 
 private: 
 
-    Account_Status status;
+    Account_Status _status;
 };
 
 class Account
