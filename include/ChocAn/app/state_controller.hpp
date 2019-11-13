@@ -56,6 +56,7 @@ public:
     Application_State operator()(const Exit&);
     Application_State operator()(const Provider_Menu&);
     Application_State operator()(const Manager_Menu&);
+    Application_State operator()(const Add_Transaction&);
 
 private:
 

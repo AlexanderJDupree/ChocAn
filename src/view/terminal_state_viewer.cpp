@@ -21,18 +21,21 @@ https://github.com/AlexanderJDupree/ChocAn
 
 struct View_Table
 {
-    const char* operator()(const Login&)         { return "login"; }
-    const char* operator()(const Exit&)          { return "exit"; }
-    const char* operator()(const Provider_Menu&) { return "provider_menu"; }
-    const char* operator()(const Manager_Menu&)  { return "manager_menu"; }
+    const char* operator()(const Login&)            { return "login"; }
+    const char* operator()(const Exit&)             { return "exit"; }
+    const char* operator()(const Provider_Menu&)    { return "provider_menu"; }
+    const char* operator()(const Manager_Menu&)     { return "manager_menu"; }
+    const char* operator()(const Add_Transaction&)  { return "add_transaction"; }
+
 };
 
 struct Render_State_Name_Event
 {
-    const char* operator()(const Login&)         { return "Login Service"; }
-    const char* operator()(const Provider_Menu&) { return "Provider Menu"; }
-    const char* operator()(const Manager_Menu&)  { return "Manager Menu";  }
-    const char* operator()(const Exit&)          { return "Exit"; }
+    const char* operator()(const Exit&)             { return "Exit"; }
+    const char* operator()(const Login&)            { return "Login Service"; }
+    const char* operator()(const Provider_Menu&)    { return "Provider Menu"; }
+    const char* operator()(const Manager_Menu&)     { return "Manager Menu";  }
+    const char* operator()(const Add_Transaction&)  { return "Transaction Manager"; }
 };
 
 struct Render_State_Info_Event
@@ -48,6 +51,10 @@ struct Render_State_Info_Event
     std::string operator()(const Manager_Menu& menu)
     {
         return menu.status;
+    }
+    std::string operator()(const Add_Transaction& transaction)
+    {
+        return transaction.status;
     }
     std::string operator()(const Exit&)
     {
@@ -66,6 +73,7 @@ Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
           { "header",       [&](){ return render_view("header");  } }
         , { "footer",       [&](){ return render_view("footer");  } }
         , { "prompt",       [&](){ return render_prompt();        } }
+        , { "empty_prompt", [&](){ return render_prompt("");      } }
         , { "state_info",   [&](){ 
                 out_stream << std::visit(Render_State_Info_Event(), current_state);
             } }
@@ -75,7 +83,7 @@ Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
     }) 
     {}
 
-void Terminal_State_Viewer::render_prompt(const char* prompt)
+void Terminal_State_Viewer::render_prompt(const std::string& prompt)
 {
     out_stream << prompt;
 }

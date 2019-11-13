@@ -64,6 +64,7 @@ TEST_CASE("State Behavior", "[state], [state_controller]")
                                           , Exit()
                                           , Provider_Menu()
                                           , Manager_Menu()
+                                          , Add_Transaction()
                                           };
 
     SECTION("State Controller does not transition state on invalid input")
@@ -146,6 +147,14 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 
         REQUIRE(controller.transition().current_state().index() == expected_state.index());
     }
+    SECTION("Provider menu transitions to Add Transaction on input '5'")
+    {
+        Application_State expected_state { Add_Transaction() };
+
+        mocks.in_stream << "5\n";
+
+        REQUIRE(controller.transition().current_state().index() == expected_state.index());
+    }
     SECTION("Provider menu transition to exit on input 'exit'")
     {
         Application_State expected_state { Exit() };
@@ -181,4 +190,9 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(controller.transition().current_state().index() == expected_state.index());
     }
+}
+
+TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controller]")
+{
+
 }

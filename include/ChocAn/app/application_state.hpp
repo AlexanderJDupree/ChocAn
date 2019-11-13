@@ -28,6 +28,8 @@ public:
     std::string login_status = "Welcome";
 };
 
+class Exit { };
+
 class Provider_Menu
 {
 public:
@@ -40,13 +42,23 @@ public:
     std::string status;
 };
 
-class Exit { };
 
+class Add_Transaction 
+{ 
+public:
+    std::string status;
+};
+
+class View_Account   { };
+class Delete_Account { };
+class Create_Account { };
+class Update_Account { };
 
 using Application_State = std::variant< Login
                                       , Exit
                                       , Provider_Menu
                                       , Manager_Menu
+                                      , Add_Transaction
                                       >;
 
 #endif // CHOCAN_APPLICATION_STATE
