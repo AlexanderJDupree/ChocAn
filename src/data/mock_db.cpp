@@ -28,7 +28,7 @@ Mock_DB::Mock_DB()
                                     , 97030 )
                         , Manager()
                         , 5678
-                        , account_key ) },
+                        , db_key ) },
 
         { 1234, Account( Name ("Arman", "Provider")
                         , Address ( "1234 lame st."
@@ -37,7 +37,7 @@ Mock_DB::Mock_DB()
                                     , 97030 )
                         , Provider()
                         , 1234
-                        , account_key ) },
+                        , db_key ) },
 
         { 6789, Account( Name ("Alex", "Member")
                         , Address ( "1234 Meh st."
@@ -46,7 +46,7 @@ Mock_DB::Mock_DB()
                                     , 97030 )
                         , Member { Account_Status::Valid }
                         , 6789 
-                        , account_key ) },
+                        , db_key ) },
 
         { 9876, Account( Name ("Jane", "Member")
                         , Address ( "1234 awesome st."
@@ -55,8 +55,14 @@ Mock_DB::Mock_DB()
                                     , 97030 )
                         , Member { Account_Status::Suspended }
                         , 9876
-                        , account_key ) }
+                        , db_key ) }
     } )
+    , service_directory 
+    ( {
+        { 123456, Service ( 123456, 29.99, "Back Rub", db_key ) },
+        { 111111, Service ( 111111, 59.99, "Addiction Consulting", db_key ) },
+        { 222222, Service ( 222222, 100.00, "Addiction Treatment", db_key ) }
+    })
 { }
 
 void Mock_DB::update_account(const Account& account)
@@ -97,6 +103,18 @@ std::optional<Account> Mock_DB::get_account(const std::string& ID) const
         return get_account(std::stoi(ID));
     }
     catch(const std::exception&)
+    {
+        return { };
+    }
+}
+
+std::optional<Service> Mock_DB::lookup_service(const unsigned code) const
+{
+    try
+    {
+        return service_directory.at(code);
+    }
+    catch(const std::out_of_range&)
     {
         return { };
     }

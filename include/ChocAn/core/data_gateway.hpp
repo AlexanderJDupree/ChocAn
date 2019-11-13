@@ -22,7 +22,9 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <optional>
 #include <ChocAn/core/utils/passkey.hpp>
 
+// Forward Declare
 class Account;
+class Service;
 
 class Data_Gateway
 {
@@ -41,16 +43,17 @@ public:
 
     // virtual void add_transactioni(const Transaction& transaction) = 0;
 
-    // Account retrieval may fail, wrap in Maybe type
-    virtual std::optional<Account> get_account(const unsigned ID) const = 0;
-    virtual std::optional<Account> get_account(const std::string& ID) const = 0;
+    // DB retrieval may fail, wrap in Maybe type
+    virtual std::optional<Account> get_account(const unsigned ID)      const = 0;
+    virtual std::optional<Account> get_account(const std::string& ID)  const = 0;
+    virtual std::optional<Service> lookup_service(const unsigned code) const = 0;
 
     virtual bool id_exists(const unsigned ID) const = 0;
 
 protected:
 
-    // Used for constructing account objects
-    Key<Data_Gateway> account_key;
+    // Used for de-serializing domain entities
+    Key<Data_Gateway> db_key;
 
 };
 

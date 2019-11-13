@@ -18,15 +18,23 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_ID_GEN_HPP
 #define CHOCAN_ID_GEN_HPP
 
-#include <ChocAn/core/chocan_service.hpp>
+#include <ChocAn/core/data_gateway.hpp>
 
-class ID_Generator : public ChocAn_Service
+class ID_Generator
 {
 public:
 
-    ID_Generator(Database_Ptr db) : ChocAn_Service(db) {}
+    using Database_Ptr = Data_Gateway::Database_Ptr;
+
+    ID_Generator(Database_Ptr db) 
+        : database(db) 
+        { if(!db) { throw std::exception(); } }
 
     unsigned yield() const;
+
+private:
+
+    Database_Ptr database;
 
 };
 

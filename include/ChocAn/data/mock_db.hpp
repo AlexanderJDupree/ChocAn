@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <map>
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/account.hpp>
+#include <ChocAn/core/entities/service.hpp>
 
 class Mock_DB : public Data_Gateway
 {
@@ -35,13 +36,15 @@ public:
 
     void delete_account(const unsigned ID) override;
 
-    std::optional<Account> get_account(const unsigned ID) const override;
+    std::optional<Account> get_account(const unsigned ID)     const override;
     std::optional<Account> get_account(const std::string& ID) const override;
+
+    std::optional<Service> lookup_service(const unsigned code)  const override;
 
     bool id_exists(const unsigned ID) const override;
 
     std::map<unsigned, Account> account_table;
-
+    std::map<unsigned, Service> service_directory;
 };
 
 #endif // CHOCAN_MOCK_DB_HPP

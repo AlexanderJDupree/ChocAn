@@ -18,17 +18,19 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_LOGIN_MANAGER_HPP
 #define CHOCAN_LOGIN_MANAGER_HPP
 
-#include <ChocAn/core/chocan_service.hpp>
+#include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/account.hpp>
 
-class Login_Manager : public ChocAn_Service
+class Login_Manager
 {
 public:
 
-    using Account_Ptr = Account::Account_Ptr;
+    using Database_Ptr = Data_Gateway::Database_Ptr;
+    using Account_Ptr  = Account::Account_Ptr;
 
     Login_Manager(Database_Ptr db) 
-        :  ChocAn_Service(db), _session_owner(nullptr) {}
+        :  database(db), _session_owner(nullptr) 
+        { if(!db) { throw std::exception(); } }
 
     bool login(const unsigned ID);
     bool login(const std::string& ID);
@@ -40,6 +42,7 @@ public:
 
 private:
 
+    Database_Ptr database;
     Account_Ptr _session_owner;
 
 };
