@@ -16,6 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <ChocAn/data/mock_db.hpp>
+#include <ChocAn/core/utils/overloaded.hpp>
 
 Mock_DB::Mock_DB()
     : _account_table
@@ -77,9 +78,6 @@ Mock_DB::Mock_DB()
         { 222222, Service ( 222222, USD { 100.00 }, "Addiction Treatment", db_key ) }
     })
 { }
-
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 void Mock_DB::update_account(const Account& account)
 {
