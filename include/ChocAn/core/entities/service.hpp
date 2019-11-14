@@ -30,14 +30,20 @@ class Service
 public:
 
     Service(unsigned code, USD cost, const std::string& service_name, Key<Data_Gateway>&)
-        : cost(cost)
-        , code(code)
-        , name(service_name)
+        : _cost(cost)
+        , _code(code)
+        , _name(service_name)
         { }
 
-    const USD         cost;
-    const unsigned    code;
-    const std::string name;
+    const USD&         cost() const { return _cost; }
+    unsigned           code() const { return _code; }
+    const std::string& name() const { return _name; }
+    
+private:
+
+    USD         _cost;
+    unsigned    _code;
+    std::string _name;
 };
 
 #endif // CHOCAN_SERVICE_HPP

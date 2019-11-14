@@ -33,36 +33,33 @@ public:
                , const Service& service 
                , const std::string& comments );
 
-    const DateTime service_date;
-    const DateTime current_date;
+    const DateTime& service_date() const { return _service_date; }
+    const DateTime& filed_date()   const { return _filed_date;   }
 
-    const Account provider;
-    const Account member;
+    const Account& provider() const { return _provider; }
+    const Account& member()   const { return _member;   }
 
-    const Service& service;
-    const std::string& comments;
+    const Service& service() const { return _service; }
 
+    const std::string& comments() const { return _comments; }
+
+private:
+
+    DateTime _service_date;
+    DateTime _filed_date;
+
+    Account _provider;
+    Account _member;
+
+    Service _service;
+    std::string _comments;
 };
 
 struct invalid_transaction : public chocan_user_exception
 {
     explicit invalid_transaction(const char* err, Info info) 
-        : error_info ( std::move(info) )
-        , error_msg  ( err ) 
+        : chocan_user_exception(err, info)
         { }
-
-    const char* what() const noexcept
-    {
-        return error_msg;
-    }
-
-    const Info& info() const noexcept
-    {
-        return error_info;
-    }
-
-    const Info error_info;
-    const char* error_msg;
 };
 
 #endif  // CHOCAN_TRANSACTION_HPP

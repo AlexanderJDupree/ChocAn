@@ -54,7 +54,6 @@ public:
     }
 
 private: 
-
     Account_Status _status;
 };
 
@@ -66,22 +65,40 @@ public:
     typedef std::variant<Manager, Member, Provider> Account_Type;
 
     // Client side account creation, utilizes the ChocAn Id generator
-    Account(Name name, Address address, Account_Type type, const ID_Generator& id_gen);
+    Account( Name name
+           , Address address
+           , Account_Type type
+           , const ID_Generator& id_gen );
 
     // Database side Account de-serialization
-    Account(Name name, Address address, Account_Type type, unsigned id, Key<Data_Gateway>&);
+    Account( Name name
+           , Address address
+           , Account_Type type
+           , unsigned id
+           , Key<Data_Gateway>& );
 
-    // Name and Address fields are mutable
-    Name         name;
-    Address      address;
+    /* Name and Address are Mutable */
+    Name& name() { return _name; }
+    const Name& name() const { return _name; }
 
-    const Account_Type type;
-    const unsigned     id;
+    Address& address() { return _address; }
+    const Address& address() const { return _address; }
+
+    /* Type and ID are immutable */
+    const Account_Type& type() const { return _type; }
+    unsigned id() const { return _id; }
+
 
     // Two accounts are equal iff they have the same id
-    bool operator == (const Account& rhs) const { return id == rhs.id;   }
+    bool operator == (const Account& rhs) const { return _id == rhs._id;   }
     bool operator != (const Account& rhs) const { return (*this) == rhs; }
 
+private:
+
+    Name         _name;
+    Address      _address;
+    Account_Type _type;
+    unsigned     _id;
 };
 
 #endif // CHOCAN_ACCOUNT_HPP

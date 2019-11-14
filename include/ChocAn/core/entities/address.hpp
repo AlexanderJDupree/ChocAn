@@ -32,31 +32,24 @@ public:
     bool operator == (const Address& rhs) const;
     bool operator != (const Address& rhs) const;
 
-    const std::string street;
-    const std::string city;
-    const std::string state;
-    const unsigned zip;
+    const std::string& street() const { return _street; }
+    const std::string& city()   const { return _city;   }
+    const std::string& state()  const { return _state;  }
+    unsigned zip() const { return _zip;    }
+
+private:
+
+    std::string _street;
+    std::string _city;
+    std::string _state;
+    unsigned _zip;
 };
 
 struct invalid_address : public chocan_user_exception
 {
     explicit invalid_address(const char* err, Info info) 
-        : error_info ( std::move(info) )
-        , error_msg  ( err ) 
+        : chocan_user_exception(err, info)
         { }
-
-    const char* what() const noexcept
-    {
-        return error_msg;
-    }
-
-    const Info& info() const noexcept
-    {
-        return error_info;
-    }
-
-    const Info error_info;
-    const char* error_msg;
 };
 
 #endif // CHOCAN_ADDRESS_HPP
