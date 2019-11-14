@@ -160,6 +160,11 @@ TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
         REQUIRE( DateTime(Day(10), Month(10), Year(2020)) 
               <= DateTime(Day(11), Month(10), Year(2020)));
     }
+    SECTION("Greater than operator")
+    {
+        REQUIRE( DateTime(Month(10), Day(10), Year(4020)) 
+               > DateTime(Month(10), Day(10), Year(2010)));
+    }
 }
 
 TEST_CASE("Testing ostream operator", "[datetime]")

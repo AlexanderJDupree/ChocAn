@@ -52,19 +52,19 @@ TEST_CASE("State Controller construction", "[constructors], [state_controller]")
                                         , mocks.state_viewer
                                         , mocks.input_controller ));
     }
-    SECTION("State Controlle throws if any dependency is null")
+    SECTION("State Controller throws if any dependency is null")
     {
         REQUIRE_THROWS(State_Controller(nullptr, nullptr, nullptr));
     }
 }
-TEST_CASE("State Behavior", "[state], [state_controller]")
+
+TEST_CASE("Shared State Behavior", "[state], [state_controller]")
 {
     mock_dependencies mocks;
     std::vector<Application_State> states { Login()
                                           , Exit()
                                           , Provider_Menu()
                                           , Manager_Menu()
-                                          , Add_Transaction()
                                           };
 
     SECTION("State Controller does not transition state on invalid input")
@@ -75,9 +75,9 @@ TEST_CASE("State Behavior", "[state], [state_controller]")
             mocks.in_stream << "Bad Input\n";
 
             State_Controller controller( mocks.chocan
-                                        , mocks.state_viewer
-                                        , mocks.input_controller
-                                        , state);
+                                       , mocks.state_viewer
+                                       , mocks.input_controller
+                                       , state);
 
             REQUIRE(controller.transition().current_state().index() == state.index());
         } );
@@ -91,7 +91,7 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
     State_Controller controller( mocks.chocan
                                , mocks.state_viewer
                                , mocks.input_controller
-                               , Login());
+                               , Login() );
     
     /* Ensure A manager and provider account exist in mock db */
     Account provider( Name("John", "Doe")
@@ -116,7 +116,7 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
     {
         Application_State expected_state { Provider_Menu() };
 
-        mocks.in_stream << provider.id << '\n';
+        mocks.in_stream << provider.id() << '\n';
 
         REQUIRE(controller.transition().current_state().index() == expected_state.index());
     }
@@ -124,7 +124,7 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
     {
         Application_State expected_state { Manager_Menu() };
 
-        mocks.in_stream << manager.id << '\n';
+        mocks.in_stream << manager.id() << '\n';
 
         REQUIRE(controller.transition().current_state().index() == expected_state.index());
     }
@@ -149,7 +149,7 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
     }
     SECTION("Provider menu transitions to Add Transaction on input '5'")
     {
-        Application_State expected_state { Add_Transaction() };
+        Application_State expected_state { Add_Transaction { &mocks.chocan->transaction_builder } };
 
         mocks.in_stream << "5\n";
 
@@ -194,5 +194,14 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
 TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controller]")
 {
+    mock_dependencies mocks;
 
+    State_Controller controller( mocks.chocan
+                               , mocks.state_viewer
+                               , mocks.input_controller
+                               , Add_Transaction{ &mocks.chocan->transaction_builder } );
+
+    SECTION("Add transaction transitions to Confrim Transaction when a transaction is built")
+    {
+    }
 }
