@@ -21,21 +21,22 @@ https://github.com/AlexanderJDupree/ChocAn
 
 struct View_Table
 {
-    const char* operator()(const Login&)            { return "login"; }
-    const char* operator()(const Exit&)             { return "exit"; }
-    const char* operator()(const Provider_Menu&)    { return "provider_menu"; }
-    const char* operator()(const Manager_Menu&)     { return "manager_menu"; }
-    const char* operator()(const Add_Transaction&)  { return "add_transaction"; }
-
+    const char* operator()(const Login&)               { return "login"; }
+    const char* operator()(const Exit&)                { return "exit"; }
+    const char* operator()(const Provider_Menu&)       { return "provider_menu"; }
+    const char* operator()(const Manager_Menu&)        { return "manager_menu"; }
+    const char* operator()(const Add_Transaction&)     { return "add_transaction"; }
+    const char* operator()(const Confirm_Transaction&) { return "confirm_transaction"; }
 };
 
 struct Render_State_Name_Event
 {
-    const char* operator()(const Exit&)             { return "Exit"; }
-    const char* operator()(const Login&)            { return "Login Service"; }
-    const char* operator()(const Provider_Menu&)    { return "Provider Menu"; }
-    const char* operator()(const Manager_Menu&)     { return "Manager Menu";  }
-    const char* operator()(const Add_Transaction&)  { return "Transaction Manager"; }
+    const char* operator()(const Exit&)                { return "Exit"; }
+    const char* operator()(const Login&)               { return "Login Service"; }
+    const char* operator()(const Provider_Menu&)       { return "Provider Menu"; }
+    const char* operator()(const Manager_Menu&)        { return "Manager Menu";  }
+    const char* operator()(const Add_Transaction&)     { return "Transaction Manager"; }
+    const char* operator()(const Confirm_Transaction&) { return "Confrim Transaction"; }
 };
 
 struct Render_State_Info_Event
@@ -54,7 +55,34 @@ struct Render_State_Info_Event
     }
     std::string operator()(const Add_Transaction& transaction)
     {
-        return transaction.status;
+        std::stringstream stream;
+
+        if(auto maybe_error = transaction.builder->get_last_error())
+        {
+            stream << maybe_error.value().what() << "\n";
+            for (const std::string& err : maybe_error.value().info())
+            {
+                stream << '\t' << err << '\n';
+            }
+        }
+        stream << "\nEnter " << transaction.builder->get_current_field() << ": ";
+        return stream.str();
+    }
+    std::string operator()(const Confirm_Transaction& confirm)
+    {
+        std::stringstream stream;
+
+        stream << "Date of Service:  " << confirm.transaction.service_date().month().count() << '-'
+                                       << confirm.transaction.service_date().day().count()   << '-' 
+                                       << confirm.transaction.service_date().year().count()  << '\n'
+               << "\nProvider ID:\t" << confirm.transaction.provider().id() << "\n"
+               << "Member ID:\t"   << confirm.transaction.member().id()   << '\n'
+               << "\n"
+               << "Service:\t"     << confirm.transaction.service().code() << " : "
+                                   << confirm.transaction.service().name() << '\n'
+               << "Service Fee:\t$"<< confirm.transaction.service().cost().value << '\n'
+               << "\nComments:\n"  << confirm.transaction.comments();
+        return stream.str();
     }
     std::string operator()(const Exit&)
     {
@@ -88,10 +116,24 @@ void Terminal_State_Viewer::render_prompt(const std::string& prompt)
     out_stream << prompt;
 }
 
+void Terminal_State_Viewer::render_user_error(const chocan_user_exception& error)
+{
+    out_stream << error.what() << ":\n";
+    std::for_each(error.info().begin(), error.info().end(), [&](const std::string& err)
+    {
+        out_stream << '\t' << err << '\n';
+    });
+}
 void Terminal_State_Viewer::render_state(const Application_State& state)
 {
     current_state = state;
-    render_view(std::visit(View_Table(), state));
+
+    return this->update();
+}
+
+void Terminal_State_Viewer::update()
+{
+    render_view(std::visit(View_Table(), current_state));
     return;
 }
 
