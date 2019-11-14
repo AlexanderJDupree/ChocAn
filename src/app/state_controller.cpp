@@ -16,15 +16,16 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <ChocAn/app/state_controller.hpp>
+#include <ChocAn/core/utils/transaction_builder.hpp>
 
-State_Controller::State_Controller( ChocAn_Ptr chocan
+State_Controller::State_Controller( ChocAn_Ptr        chocan
                                   , State_Viewer_Ptr  state_viewer
                                   , Input_Control_Ptr input_controller
                                   , Application_State initial_state )
     : chocan           ( chocan           )
     , state_viewer     ( state_viewer     ) 
     , input_controller ( input_controller )
-    , state            ( initial_state    )
+    , state            ( initial_state )
     { 
         if (!(chocan && state_viewer && input_controller))
         {
@@ -43,6 +44,7 @@ State_Controller& State_Controller::interact()
 State_Controller& State_Controller::transition()
 {
     state = std::visit(*this, state);
+
     return *this;
 }
 
@@ -66,11 +68,11 @@ Application_State State_Controller::operator()(const Login&)
     if(chocan->login_manager.login(input))
     {
         Account session_owner = *chocan->login_manager.session_owner();
-        if(std::holds_alternative<Manager>(session_owner.type))
+        if(std::holds_alternative<Manager>(session_owner.type()))
         {
-            return Manager_Menu { "Welcome, " + session_owner.name.first };
+            return Manager_Menu { "Welcome, " + session_owner.name().first() };
         }
-        return Provider_Menu { "Welcome, " + session_owner.name.first };
+        return Provider_Menu { "Welcome, " + session_owner.name().first() };
     }
     return Login { "Invalid Login" };
 }
@@ -88,7 +90,7 @@ Application_State State_Controller::operator()(const Provider_Menu&)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-        { "5"   , [&](){ return Add_Transaction(); } }
+        { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder }; } }
     };
 
     try
@@ -119,31 +121,35 @@ Application_State State_Controller::operator()(const Manager_Menu&)
     }
 }
 
-Application_State State_Controller::operator()(const Add_Transaction&)
+Application_State State_Controller::operator()(Add_Transaction&)
 {
-    std::optional<Account> maybe_member = chocan->db->get_account(input_controller->read_input());
+    chocan->transaction_builder.reset();
 
-    if(!maybe_member) { return Add_Transaction { "Invalid ID" }; }
-
-    if(!std::holds_alternative<Member>(maybe_member.value().type))
+    while(!chocan->transaction_builder.buildable())
     {
-        return Add_Transaction { "Non-Member account ID was entered" };
+        std::string input = input_controller->read_input();
+
+        if(input == "exit")   { return Exit(); }
+        if(input == "cancel") { return Provider_Menu(); }
+
+        chocan->transaction_builder.set_current_field(input);
+
+        state_viewer->update();
     }
-    if(std::get<Member>(maybe_member.value().type).status() == Account_Status::Suspended)
+    return Confirm_Transaction { chocan->transaction_builder.build() };
+}
+
+Application_State State_Controller::operator()(const Confirm_Transaction& state)
+{
+    std::string input = input_controller->read_input();
+
+    if (input == "y" || input == "yes"  || input == "Y" || input == "YES" )
     {
-        return Add_Transaction { "Member Account is Suspended" };
+        chocan->db->add_transaction(state.transaction);
     }
-
-    Input_Controller::Form_Data transaction_form = input_controller->read_form
-    ( { "Date of Provided Service (MM-DD-YYYY)"
-      , "Service Code"
-      , "Comments" }
-
-    , [&](const std::string& field)
-      {
-          return state_viewer->render_prompt("Enter " + field + ": ");
-      }
-    );
-
+    else if (input == "n" || input == "no" || input == "N" || input == "NO")
+    {
+        return Add_Transaction { &chocan->transaction_builder };
+    }
     return Provider_Menu();
 }
