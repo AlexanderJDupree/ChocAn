@@ -23,22 +23,22 @@ Transaction::Transaction( const Account&     provider
                         , const DateTime&    service_date
                         , const Service&     service
                         , const std::string& comments)
-                : service_date ( service_date )
-                , current_date ( DateTime::get_current_datetime() )
-                , provider     ( provider )
-                , member       ( member )
-                , service      ( service )
-                , comments     ( comments )
+                : _service_date ( service_date )
+                , _filed_date   ( DateTime::get_current_datetime() )
+                , _provider     ( provider )
+                , _member       ( member )
+                , _service      ( service )
+                , _comments     ( comments )
 {
     chocan_user_exception::Info errors;
 
-    ( !std::holds_alternative<Provider>(provider.type) )
+    ( !std::holds_alternative<Provider>(_provider.type()) )
         ? errors.push_back("Account is not of type: Provider")
         : void();
-    ( !std::holds_alternative<Member>(member.type) )
+    ( !std::holds_alternative<Member>(_member.type()) )
         ? errors.push_back("Account is not of type: Member")
         : void();
-    ( service_date > current_date )
+    ( service_date > _filed_date )
         ? errors.push_back("Service date cannot be future dated")
         : void();
     ( !Validators::length(comments, 0, 100) )

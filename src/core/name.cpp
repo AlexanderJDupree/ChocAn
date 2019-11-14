@@ -19,7 +19,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/utils/validators.hpp>
 
 Name::Name(const std::string& first, const std::string& last)
-        : first ( first ) , last ( last ) 
+        : _first ( first ) , _last ( last ) 
 {
     chocan_user_exception::Info errors;
 
@@ -40,7 +40,7 @@ Name::Name(const std::string& first, const std::string& last)
 
 bool Name::operator==(const Name& rhs) const
 {
-    return first == rhs.first && last == rhs.last;
+    return _first == rhs._first && _last == rhs._last;
 }
 
 bool Name::operator!=(const Name& rhs) const

@@ -23,10 +23,10 @@ Address::Address( const std::string& street
                 , const std::string& city 
                 , const std::string& state 
                 , const unsigned     zip   )
-            : street ( street )
-            , city   ( city   )
-            , state  ( state  )
-            , zip    ( zip    )
+            : _street ( street )
+            , _city   ( city   )
+            , _state  ( state  )
+            , _zip    ( zip    )
 {
     chocan_user_exception::Info errors;
 
@@ -49,7 +49,7 @@ Address::Address( const std::string& street
 
 bool Address::operator==(const Address& rhs) const
 {
-    return street == rhs.street && city == rhs.city && state == rhs.state && zip == rhs.zip;
+    return _street == rhs._street && _city == rhs._city && _state == rhs._state && _zip == rhs._zip;
 }
 
 bool Address::operator!=(const Address& rhs) const
