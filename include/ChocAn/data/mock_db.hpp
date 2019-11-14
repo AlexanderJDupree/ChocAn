@@ -27,6 +27,9 @@ class Mock_DB : public Data_Gateway
 {
 public:
 
+    using Account_Table   = std::map<unsigned, Account>;
+    using Reference_Table = std::map<unsigned, Account&>;
+
     Mock_DB();
 
     void update_account(const Account& account) override;
@@ -35,17 +38,35 @@ public:
 
     void delete_account(const unsigned ID) override;
 
+    void add_transaction(const Transaction& transaction) override;
+
     std::optional<Account> get_account(const unsigned ID)     const override;
     std::optional<Account> get_account(const std::string& ID) const override;
-    std::optional<Service> lookup_service(const unsigned code)  const override;
+
+    std::optional<Account> get_member_account(const unsigned ID)      const;
+    std::optional<Account> get_member_account(const std::string& ID)  const;
+
+    std::optional<Account> get_provider_account(const unsigned ID)      const;
+    std::optional<Account> get_provider_account(const std::string& ID)  const;
+
+    std::optional<Account> get_manager_account(const unsigned ID)      const;
+    std::optional<Account> get_manager_account(const std::string& ID)  const;
+
+    std::optional<Service> lookup_service(const unsigned code)      const override;
+    std::optional<Service> lookup_service(const std::string& code)  const override;
 
     const Service_Directory& service_directory() const override;
 
     bool id_exists(const unsigned ID) const override;
 
-private:
+    std::optional<Account> account_table_lookup(const unsigned ID, const Account_Table& table) const;
+    std::optional<Account> account_table_lookup(const unsigned ID, const Reference_Table& table) const;
 
     std::map<unsigned, Account> _account_table;
+    std::map<unsigned, Account&> _member_table;
+    std::map<unsigned, Account&> _provider_table;
+    std::map<unsigned, Account&> _manager_table;
+
     Service_Directory _service_directory;
 
 };

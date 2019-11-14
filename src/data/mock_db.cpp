@@ -57,6 +57,19 @@ Mock_DB::Mock_DB()
                         , 9876
                         , db_key ) }
     } )
+    , _member_table 
+    ( {
+        { 6789, _account_table.at(6789) },
+        { 9876, _account_table.at(9876) }
+    } )
+    , _provider_table
+    ( {
+        { 1234, _account_table.at(1234) }
+    } )
+    , _manager_table
+    ( {
+        { 5678, _account_table.at(5678) }
+    } )
     , _service_directory 
     ( {
         { 123456, Service ( 123456, USD { 29.99 }, "Back Rub", db_key ) },
@@ -65,9 +78,22 @@ Mock_DB::Mock_DB()
     })
 { }
 
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
 void Mock_DB::update_account(const Account& account)
 {
-    _account_table.insert( {account.id, account} );
+    unsigned id = account.id();
+
+    // Insert to master table
+    _account_table.insert( { id, account } );
+
+    // Update auxillary tables
+    std::visit( overloaded {
+        [&](const Manager&) { _manager_table.insert  ( { id, _account_table.at(id)} ); },
+        [&](const Provider&){ _member_table.insert   ( { id, _account_table.at(id)} ); },
+        [&](const Member&)  { _provider_table.insert ( { id, _account_table.at(id)} ); }
+    }, account.type() );
     return;
 }
 
@@ -82,18 +108,40 @@ void Mock_DB::delete_account(const unsigned ID)
     return;
 }
 
-std::optional<Account> Mock_DB::get_account(const unsigned ID) const
+void Mock_DB::add_transaction(const Transaction&)
+{
+    return;
+}
+
+std::optional<Account> Mock_DB::account_table_lookup(const unsigned ID, const Account_Table& table) const
 {
     try
     {
         // Just Account
-        return _account_table.at(ID);
+        return table.at(ID);
     }
     catch(const std::out_of_range&)
     {
-        // Return nothing
+        // Nothing
         return { };
     }
+}
+std::optional<Account> Mock_DB::account_table_lookup(const unsigned ID, const Reference_Table& table) const
+{
+    try
+    {
+        // Just Account
+        return table.at(ID);
+    }
+    catch(const std::out_of_range&)
+    {
+        // Nothing
+        return { };
+    }
+}
+std::optional<Account> Mock_DB::get_account(const unsigned ID) const
+{
+    return account_table_lookup(ID, _account_table);
 }
 
 std::optional<Account> Mock_DB::get_account(const std::string& ID) const
@@ -101,6 +149,51 @@ std::optional<Account> Mock_DB::get_account(const std::string& ID) const
     try
     {
         return get_account(std::stoi(ID));
+    }
+    catch(const std::exception&)
+    {
+        return { };
+    }
+}
+std::optional<Account> Mock_DB::get_member_account(const unsigned ID) const
+{
+    return account_table_lookup(ID, _member_table);
+}
+std::optional<Account> Mock_DB::get_member_account(const std::string& ID)  const
+{
+    try
+    {
+        return get_member_account(std::stoi(ID));
+    }
+    catch(const std::exception&)
+    {
+        return { };
+    }
+}
+std::optional<Account> Mock_DB::get_provider_account(const unsigned ID) const
+{
+    return account_table_lookup(ID, _provider_table);
+}
+std::optional<Account> Mock_DB::get_provider_account(const std::string& ID) const
+{
+    try
+    {
+        return get_provider_account(std::stoi(ID));
+    }
+    catch(const std::exception&)
+    {
+        return { };
+    }
+}
+std::optional<Account> Mock_DB::get_manager_account(const unsigned ID) const
+{
+    return account_table_lookup(ID, _manager_table);
+}
+std::optional<Account> Mock_DB::get_manager_account(const std::string& ID) const
+{
+    try
+    {
+        return get_manager_account(std::stoi(ID));
     }
     catch(const std::exception&)
     {
@@ -115,6 +208,18 @@ std::optional<Service> Mock_DB::lookup_service(const unsigned code) const
         return _service_directory.at(code);
     }
     catch(const std::out_of_range&)
+    {
+        return { };
+    }
+}
+
+std::optional<Service> Mock_DB::lookup_service(const std::string& code) const
+{
+    try
+    {
+        return lookup_service(std::stoi(code));
+    }
+    catch(const std::exception&)
     {
         return { };
     }
