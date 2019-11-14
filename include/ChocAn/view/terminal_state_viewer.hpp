@@ -37,10 +37,15 @@ public:
                          , std::ostream& out_stream     = std::cout );
 
 
-    // Looks up state view in view_table, renders the view.
+    // Re-renders the stored state
+    void update() override;
+
+    // Stores state, looks up state in view table, renders view
     void render_state(const Application_State& state) override;
 
     void render_prompt(const std::string& prompt = "> ") override;
+
+    void render_user_error(const chocan_user_exception& error) override;
 
 private:
 
