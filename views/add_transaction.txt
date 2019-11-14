@@ -1,6 +1,7 @@
 
 <header>
 
-<state_info>
+<footer>
+( Entering 'cancel' will cancel the transaction )
 
-Enter Member ID: <empty_prompt>
+<state_info><empty_prompt>

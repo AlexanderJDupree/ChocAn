@@ -72,6 +72,7 @@ OBJECTS := \
 	$(OBJDIR)/login_manager.o \
 	$(OBJDIR)/name.o \
 	$(OBJDIR)/transaction.o \
+	$(OBJDIR)/transaction_builder.o \
 	$(OBJDIR)/validators.o \
 
 RESOURCES := \
@@ -150,6 +151,9 @@ $(OBJDIR)/name.o: ../src/core/name.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/transaction.o: ../src/core/transaction.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/transaction_builder.o: ../src/core/transaction_builder.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/validators.o: ../src/core/validators.cpp
