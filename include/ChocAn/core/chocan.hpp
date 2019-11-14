@@ -23,6 +23,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/id_generator.hpp>
 #include <ChocAn/core/login_manager.hpp>
+#include <ChocAn/core/utils/transaction_builder.hpp>
 
 class ChocAn
 {
@@ -37,6 +38,7 @@ public:
         : db            ( db ) 
         , id_generator  ( db )
         , login_manager ( db )
+        , transaction_builder ( db )
         { }
     
     /* Service Objects */
@@ -45,6 +47,7 @@ public:
 
     ID_Generator  id_generator;
     Login_Manager login_manager;
+    Transaction_Builder transaction_builder;
 
 protected:
 
