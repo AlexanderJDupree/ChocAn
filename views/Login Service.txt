@@ -1,6 +1,6 @@
 <header>
 
-<state_info>, 
+<@login_status>, 
 
 Please enter your ChocAn Provider or Manager ID. 
 

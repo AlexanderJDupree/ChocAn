@@ -1,0 +1,13 @@
+
+<header>
+
+Date of Service: <@service_date.month>-<@service_date.day>-<@service_date.year>
+
+Member ID:       <@member.id>
+Provider ID:     <@provider.id>
+
+Service: <@service.code> : <@service.name>
+Comments:
+<@comments>
+
+Is this correct? (Y/N): <empty_prompt>

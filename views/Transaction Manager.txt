@@ -4,4 +4,5 @@
 <footer>
 ( Entering 'cancel' will cancel the transaction )
 
-<state_info><empty_prompt>
+<@builder.user_error>
+Enter <@builder.current_field>: <empty_prompt>

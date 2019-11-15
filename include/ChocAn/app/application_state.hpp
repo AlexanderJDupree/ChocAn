@@ -64,6 +64,6 @@ using Application_State = std::variant< Login
                                       , Confirm_Transaction
                                       >;
 
-using State_Ptr = std::unique_ptr<Application_State>;
+using State_Ptr = std::shared_ptr<Application_State>;
 
 #endif // CHOCAN_APPLICATION_STATE
