@@ -125,8 +125,7 @@ Application_State State_Controller::operator()(Add_Transaction&)
 {
     chocan->transaction_builder.reset();
 
-    while(!chocan->transaction_builder.buildable())
-    {
+    do {
         std::string input = input_controller->read_input();
 
         if(input == "exit")   { return Exit(); }
@@ -135,7 +134,8 @@ Application_State State_Controller::operator()(Add_Transaction&)
         chocan->transaction_builder.set_current_field(input);
 
         state_viewer->update();
-    }
+    } while(!chocan->transaction_builder.buildable());
+
     return Confirm_Transaction { chocan->transaction_builder.build() };
 }
 
@@ -146,10 +146,11 @@ Application_State State_Controller::operator()(const Confirm_Transaction& state)
     if (input == "y" || input == "yes"  || input == "Y" || input == "YES" )
     {
         chocan->db->add_transaction(state.transaction);
+        return Provider_Menu { "Transaction Processed!" };
     }
-    else if (input == "n" || input == "no" || input == "N" || input == "NO")
+    if (input == "n" || input == "no" || input == "N" || input == "NO")
     {
         return Add_Transaction { &chocan->transaction_builder };
     }
-    return Provider_Menu();
+    return state;
 }

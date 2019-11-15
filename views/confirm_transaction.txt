@@ -1,6 +1,13 @@
 
 <header>
 
-<state_info>
+Date of Service: <transaction.service_date>
+
+Member ID:       <transaction.member-id>
+Provider ID:     <transaction.provider-id>
+
+Service: <transaction.service-code> : <transaction.service-name>
+Comments:
+<transaction.comments>
 
 Is this correct? (Y/N): <empty_prompt>

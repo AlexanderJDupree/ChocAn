@@ -188,7 +188,7 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         mocks.in_stream << "exit\n";
 
-        REQUIRE(controller.transition().current_state().index() == expected_state.index());
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
 }
 
@@ -203,5 +203,81 @@ TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controlle
 
     SECTION("Add transaction transitions to Confrim Transaction when a transaction is built")
     {
+        // This input sequence will change if we make changes to the transaction builder
+        mocks.in_stream << "1234\n6789\n10-10-2019\n123456\ncomments\n";
+
+        REQUIRE(std::holds_alternative<Confirm_Transaction>(controller.interact().current_state()));
+    }
+    SECTION("Add transaction transitions back to provider menu on input 'cancel'")
+    {
+        // This input sequence will change if we make changes to the transaction builder
+        mocks.in_stream << "cancel\n";
+
+        REQUIRE(std::holds_alternative<Provider_Menu>(controller.interact().current_state()));
+    }
+    SECTION("Add transaction transitions to Exit on input 'exit'")
+    {
+        // This input sequence will change if we make changes to the transaction builder
+        mocks.in_stream << "exit\n";
+
+        REQUIRE(std::holds_alternative<Exit>(controller.interact().current_state()));
+    }
+}
+
+TEST_CASE("Confirm Transaction State Behavior", "[confirm_transaction], [state_controller]")
+{
+    mock_dependencies mocks;
+
+    State_Controller controller( mocks.chocan
+                               , mocks.state_viewer
+                               , mocks.input_controller
+                               , Add_Transaction{ &mocks.chocan->transaction_builder } );
+
+    mocks.in_stream << "1234\n6789\n10-10-2019\n123456\ncomments\n";
+
+    controller.interact();
+
+    SECTION("Confrim transaction transitions to provider menu when transaction is confirmed")
+    {
+        mocks.in_stream << "yes\n";
+
+        REQUIRE(std::holds_alternative<Provider_Menu>(controller.interact().current_state()));
+    }
+    SECTION("Confrim transaction transitions back to Add Transaction if transaction is not confirmed")
+    {
+        // This input sequence will change if we make changes to the transaction builder
+        mocks.in_stream << "no\n";
+
+        REQUIRE(std::holds_alternative<Add_Transaction>(controller.interact().current_state()));
+    }
+    SECTION("Confirm transaction does not transition if input cannot be confirmed")
+    {
+        // This input sequence will change if we make changes to the transaction builder
+        mocks.in_stream << "unintelligible\n";
+
+        REQUIRE(std::holds_alternative<Confirm_Transaction>(controller.interact().current_state()));
+    }
+}
+
+TEST_CASE("Exit State Behavior", "[exit], [state_controller]")
+{
+    mock_dependencies mocks;
+
+    mocks.chocan->login_manager.login(1234);
+
+    State_Controller controller( mocks.chocan
+                               , mocks.state_viewer
+                               , mocks.input_controller
+                               , Exit() );
+
+    SECTION("end_state() returns true when controller is at exit state")
+    {
+        REQUIRE(controller.end_state());
+    }
+    SECTION("Exit state logs the user out of the system")
+    {
+        controller.interact();
+
+        REQUIRE(mocks.chocan->login_manager.session_owner() == nullptr);
     }
 }
