@@ -3,10 +3,11 @@
 
 Date of Service: <@service_date.month>-<@service_date.day>-<@service_date.year>
 
-Member ID:       <@member.id>
 Provider ID:     <@provider.id>
+Member ID:       <@member.id>
 
-Service: <@service.code> : <@service.name>
+Service: <@service.name> | <@service.code>
+
 Comments:
 <@comments>
 
