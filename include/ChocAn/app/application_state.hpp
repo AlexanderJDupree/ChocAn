@@ -21,12 +21,16 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_APPLICATION_STATE_H
 
 #include <variant>
+#include <ChocAn/core/entities/transaction.hpp>
+#include <ChocAn/core/utils/transaction_builder.hpp>
 
 class Login
 {
 public:
     std::string login_status = "Welcome";
 };
+
+class Exit { };
 
 class Provider_Menu
 {
@@ -40,13 +44,26 @@ public:
     std::string status;
 };
 
-class Exit { };
+class Add_Transaction 
+{ 
+public:
+    Transaction_Builder* builder;
+};
 
+class Confirm_Transaction 
+{
+public: 
+    Transaction transaction;
+};
 
 using Application_State = std::variant< Login
                                       , Exit
                                       , Provider_Menu
                                       , Manager_Menu
+                                      , Add_Transaction
+                                      , Confirm_Transaction
                                       >;
+
+using State_Ptr = std::unique_ptr<Application_State>;
 
 #endif // CHOCAN_APPLICATION_STATE

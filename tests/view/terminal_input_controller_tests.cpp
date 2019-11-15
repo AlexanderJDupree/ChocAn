@@ -35,29 +35,26 @@ TEST_CASE("Retrieving input from the Input Controller", "[input_controller]")
     {
         auto callback = [](const std::string&){ };
 
-        Input_Controller::Form_Data expected_data 
-        {
-            { "Name",    "John Doe" },
-            { "Address", "1234 Cool St."},
-            { "Age",     "30" }
-        };
+        std::vector<std::string> expected_data { "John Doe"
+                                               , "1234 Cool St."
+                                               , "30" };
 
-        Input_Controller::Form_Data test_form 
+        Input_Controller::Form_Data expected_form
         {
-            { "Name",    "" },
-            { "Address", "" },
-            { "Age",     "" }
+            { "Name"   , "John Doe" },
+            { "Address", "1234 Cool St." },
+            { "Age"    , "30"}
         };
 
         // Populate the stream with expected data
         std::for_each(expected_data.begin(), expected_data.end(),
-                     [&](Input_Controller::Field_Data field)
+                     [&](const std::string&  data)
                      {
-                         test_stream << field.second << "\n";
+                         test_stream << data << "\n";
                      } );
 
         Terminal_Input_Controller input_controller(test_stream);
 
-        REQUIRE(input_controller.read_form(test_form, callback) == expected_data);
+        REQUIRE(input_controller.read_form({ "Name", "Address", "Age" }, callback) == expected_form);
     }
 }

@@ -18,15 +18,15 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/entities/account.hpp>
 
 Account::Account(Name name, Address address, Account_Type type, const ID_Generator& id_gen)
-    : name    ( std::move(name)    )
-    , address ( std::move(address) )
-    , type    ( std::move(type)    )
-    , id      ( id_gen.yield()     )
+    : _name    ( name    )
+    , _address ( address )
+    , _type    ( type    )
+    , _id      ( id_gen.yield() )
     {}
 
 Account::Account(Name name, Address address, Account_Type type, unsigned id, Key<Data_Gateway>&)
-    : name    ( std::move(name)    )
-    , address ( std::move(address) )
-    , type    ( std::move(type)    )
-    , id      ( id )
+    : _name    ( name    )
+    , _address ( address )
+    , _type    ( type    )
+    , _id      ( id )
     {}

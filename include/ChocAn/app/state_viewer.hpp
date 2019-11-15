@@ -20,6 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_STATE_VIEWER_H
 
 #include <memory>
+#include <ChocAn/core/utils/exception.hpp>
 #include <ChocAn/app/application_state.hpp>
 
 class State_Viewer
@@ -30,7 +31,10 @@ public:
 
     virtual ~State_Viewer() {}
 
+    virtual void update() = 0;
     virtual void render_state(const Application_State& state) = 0;
+    virtual void render_prompt(const std::string& prompt) = 0;
+    virtual void render_user_error(const chocan_user_exception& error) = 0;
 };
 
 #endif // CHOCAN_STATE_VIEWER_H

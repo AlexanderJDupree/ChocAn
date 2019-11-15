@@ -39,7 +39,7 @@ public:
     State_Controller( ChocAn_Ptr        chocan
                     , State_Viewer_Ptr  state_viewer
                     , Input_Control_Ptr input_controller
-                    , Application_State initial_state = Login() );
+                    , Application_State initial_state = Login());
 
     // Renders state view, and calls transition
     State_Controller& interact();
@@ -56,6 +56,8 @@ public:
     Application_State operator()(const Exit&);
     Application_State operator()(const Provider_Menu&);
     Application_State operator()(const Manager_Menu&);
+    Application_State operator()(Add_Transaction&);
+    Application_State operator()(const Confirm_Transaction&);
 
 private:
 

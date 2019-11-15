@@ -43,17 +43,18 @@ public:
         return input;
     }
 
-    Form_Data& read_form(Form_Data& fields, Form_Prompt prompt) override
+    Form_Data read_form(const Fields& fields, Field_Callback prompt) const override
     {
+        Form_Data form;
+
         // Read input into each field
         std::for_each( fields.begin(), fields.end(),
-                       [&](Field_Data& field)
+                       [&](const std::string& field)
                        {
-                           prompt(field.first);
-                           field.second = read_input();
+                           prompt(field);
+                           form[field] = read_input();
                        } );
-
-        return fields;
+        return form;
     }
 
 private:

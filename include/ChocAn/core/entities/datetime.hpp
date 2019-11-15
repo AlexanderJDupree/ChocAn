@@ -20,7 +20,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_DATETIME_HPP
 #define CHOCAN_DATETIME_HPP
 
-
 #include <ctime>
 #include <chrono>
 #include <ChocAn/core/utils/exception.hpp>
@@ -95,22 +94,9 @@ class invalid_datetime : public chocan_user_exception
 {
 public:
 
-    const char* error;
-    const Info exception_info;
-
     invalid_datetime(const char* error, Info exception_info)
-        : error(error), exception_info(std::move(exception_info)) {};
-
-    const char* what() const noexcept
-    {
-        return error;
-    }
-
-    const Info& info() const noexcept
-    {
-        return exception_info;
-    }
-
+        : chocan_user_exception(error, exception_info)
+        { }
 };
 
 #endif // CHOCAN_DATETIME_HPP

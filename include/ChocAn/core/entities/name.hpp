@@ -30,30 +30,20 @@ public:
     bool operator==(const Name& rhs) const;
     bool operator!=(const Name& rhs) const;
 
-    const std::string first;
-    const std::string last;
+    const std::string& first() const { return _first; }
+    const std::string& last() const  { return _last;  }
+
+private:
+
+    std::string _first;
+    std::string _last;
 };
 
 struct invalid_name : public chocan_user_exception
 {
     explicit invalid_name(const char* err, Info info) 
-        : error_info ( std::move(info) )
-        , error_msg  ( err ) 
+        : chocan_user_exception(err, info)
         { }
-
-    const char* what() const noexcept
-    {
-        return error_msg;
-    }
-
-    const Info& info() const noexcept
-    {
-        return error_info;
-    }
-
-    const Info error_info;
-    const char* error_msg;
 };
-
 
 #endif // CHOCAN_NAME_HPP

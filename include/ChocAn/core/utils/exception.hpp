@@ -35,10 +35,23 @@ class chocan_user_exception : public std::exception
 public:
     typedef std::vector<std::string> Info;
 
-    virtual const char* what() const noexcept = 0;
+    const Info error_info;
+    const char* error_msg;
 
-    virtual const Info& info() const noexcept = 0;
+    chocan_user_exception(const char* err, Info info)
+        : error_info ( std::move(info) )
+        , error_msg  ( err )
+        {}
 
+    virtual const char* what() const noexcept
+    {
+        return error_msg;
+    };
+
+    virtual const Info& info() const noexcept
+    {
+        return error_info;
+    };
 };
 
 

@@ -20,6 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_INPUT_CONTROLLER_H
 
 #include <map>
+#include <vector>
 #include <string>
 #include <functional>
 
@@ -27,10 +28,9 @@ class Input_Controller
 {
 public:
 
-
-    using Form_Data   = std::map<std::string, std::string>;
-    using Field_Data  = std::pair<const std::string, std::string>;
-    using Form_Prompt = std::function<void(const std::string&)>;
+    using Fields         = std::vector<std::string>;
+    using Form_Data      = std::map<std::string, std::string>;
+    using Field_Callback = std::function<void(const std::string&)>;
 
     using Input_Control_Ptr = std::shared_ptr<Input_Controller>;
 
@@ -38,7 +38,7 @@ public:
     virtual std::string read_input() const = 0;
 
     // Read a line of input for each field in fields
-    virtual Form_Data& read_form(Form_Data& fields, Form_Prompt prompt) = 0;
+    virtual Form_Data read_form(const Fields& fields, Field_Callback prompt) const = 0;
 
 };
 

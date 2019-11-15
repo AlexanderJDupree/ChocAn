@@ -94,7 +94,7 @@ bool DateTime::operator <  (const DateTime& rhs) const
 }
 bool DateTime::operator >  (const DateTime& rhs) const
 {
-    return !(*this < rhs);
+    return _year > rhs._year || _month > rhs._month || _day > rhs._day;
 }
 bool DateTime::operator >= (const DateTime& rhs) const
 {
