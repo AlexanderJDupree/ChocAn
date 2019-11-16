@@ -18,7 +18,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <catch.hpp>
 #include <ChocAn/view/terminal_state_viewer.hpp>
 
-/*
 TEST_CASE("Terminal State Viewer Construction", "[constructors], [terminal_state_viewer]")
 {
     std::stringstream test_stream;
@@ -60,7 +59,6 @@ TEST_CASE("Render State Views with viewer commands", "[views], [terminal_state_v
         // No manager_menu-test.txt in tests/view/
         viewer.render_state( Manager_Menu() );
 
-        REQUIRE(test_stream.str() == "Error: Unable to open view: tests/view/manager_menu-test.txt\n");
+        REQUIRE(test_stream.str() == "Error: Unable to open view: tests/view/Manager Menu-test.txt\n");
     }
 }
-*/

@@ -1,4 +1,4 @@
 <header>
-<state_info>
+<@login_status>
 <footer>
 <prompt>
