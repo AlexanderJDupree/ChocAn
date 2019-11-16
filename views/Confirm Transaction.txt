@@ -2,6 +2,7 @@
 <header>
 
 Date of Service: <@service_date.month>-<@service_date.day>-<@service_date.year>
+Current Date:    <@filed_date.month>-<@filed_date.day>-<@filed_date.year>
 
 Provider ID:     <@provider.id>
 Member ID:       <@member.id>
