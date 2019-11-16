@@ -4,13 +4,11 @@
 
 1) View Provider/Member Profile
 
-2) Create Provider Account
+2) Create Provider/Member Account
 
-3) Create Member Account
+3) Delete Provider/Member Account
 
-4) Delete Provider/Member Account
-
-5) Generate Summary Reports
+4) Generate Summary Reports
 
 <footer>
 

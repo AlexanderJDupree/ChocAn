@@ -23,6 +23,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <variant>
 #include <ChocAn/core/entities/transaction.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
+#include <ChocAn/core/utils/account_builder.hpp>
 
 class Login
 {
@@ -56,12 +57,20 @@ public:
     Transaction transaction;
 };
 
+class Create_Account
+{
+public:
+    Account_Builder* builder; 
+};
+
 using Application_State = std::variant< Login
                                       , Exit
                                       , Provider_Menu
                                       , Manager_Menu
                                       , Add_Transaction
                                       , Confirm_Transaction
+                                      //TODO uncomment below when creat account class state is complete
+                                      //, Create_Account
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;
