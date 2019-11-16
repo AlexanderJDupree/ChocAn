@@ -48,7 +48,7 @@ public:
     Transaction build() const;
 
     // Resets builder to initial state
-    void reset();
+    Transaction_Builder& reset();
 
     std::string get_current_field() const;
     void set_current_field(const std::string& input);

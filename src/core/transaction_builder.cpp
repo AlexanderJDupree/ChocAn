@@ -35,7 +35,7 @@ Transaction Transaction_Builder::build() const
                        , comments.value() );
 }
 
-void Transaction_Builder::reset()
+Transaction_Builder& Transaction_Builder::reset()
 {
 
     fields = { "Comments"
@@ -50,7 +50,7 @@ void Transaction_Builder::reset()
     member_acct.reset();
     comments.reset();
     error.reset();
-    return;
+    return *this;
 }
 
 std::string Transaction_Builder::get_current_field() const
