@@ -15,6 +15,7 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
+#include <tuple>
 #include <ChocAn/core/utils/validators.hpp>
 #include <ChocAn/core/entities/datetime.hpp>
 
@@ -90,11 +91,11 @@ const Year&  DateTime::year() const
 
 bool DateTime::operator <  (const DateTime& rhs) const
 {
-    return _year < rhs._year || _month < rhs._month || _day < rhs._day;
+    return std::tie(_year, _month, _day) < std::tie(rhs._year, rhs._month, rhs._day);
 }
 bool DateTime::operator >  (const DateTime& rhs) const
 {
-    return _year > rhs._year || _month > rhs._month || _day > rhs._day;
+    return !(*this < rhs);
 }
 bool DateTime::operator >= (const DateTime& rhs) const
 {
