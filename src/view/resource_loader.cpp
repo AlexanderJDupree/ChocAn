@@ -75,8 +75,11 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Confirm_Transa
         { "member.id",    [&](){ return std::to_string(state.transaction.member().id());    } },
         { "provider.id",  [&](){ return std::to_string(state.transaction.provider().id());  } },
         { "service_date.day",   [&](){ return std::to_string(state.transaction.service_date().day().count()); } },
-        { "service_date.year",  [&](){ return std::to_string(state.transaction.service_date().month().count()); } },
-        { "service_date.month", [&](){ return std::to_string(state.transaction.service_date().year().count()); } }
+        { "service_date.year",  [&](){ return std::to_string(state.transaction.service_date().year().count()); } },
+        { "service_date.month", [&](){ return std::to_string(state.transaction.service_date().month().count()); } },
+        { "filed_date.day",   [&](){ return std::to_string(state.transaction.filed_date().day().count()); } },
+        { "filed_date.year",  [&](){ return std::to_string(state.transaction.filed_date().year().count()); } },
+        { "filed_date.month", [&](){ return std::to_string(state.transaction.filed_date().month().count()); } }
     };
 }
 

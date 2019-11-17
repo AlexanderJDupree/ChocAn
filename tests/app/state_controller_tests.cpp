@@ -199,14 +199,20 @@ TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controlle
     State_Controller controller( mocks.chocan
                                , mocks.state_viewer
                                , mocks.input_controller
-                               , Add_Transaction{ &mocks.chocan->transaction_builder } );
+                               , Add_Transaction{ &mocks.chocan->transaction_builder.reset() } );
 
     SECTION("Add transaction transitions to Confrim Transaction when a transaction is built")
     {
         // This input sequence will change if we make changes to the transaction builder
-        mocks.in_stream << "1234\n6789\n10-10-2019\n123456\ncomments\n";
+        mocks.in_stream << "1234\n6789\n10-13-2019\n123456\ncomments\n";
 
-        REQUIRE(std::holds_alternative<Confirm_Transaction>(controller.interact().current_state()));
+        // Controller must eat all the input from the stream
+        for (int i = 0; i < 5; ++i)
+        {
+            controller.interact();
+        }
+
+        REQUIRE(std::holds_alternative<Confirm_Transaction>(controller.current_state()));
     }
     SECTION("Add transaction transitions back to provider menu on input 'cancel'")
     {
@@ -228,14 +234,18 @@ TEST_CASE("Confirm Transaction State Behavior", "[confirm_transaction], [state_c
 {
     mock_dependencies mocks;
 
+    Transaction transaction(
+        mocks.db->get_provider_account("1234").value(),
+        mocks.db->get_member_account("6789").value(),
+        DateTime(Month(9), Day(1), Year(2019)),
+        mocks.db->lookup_service("123456").value(),
+        "comments"
+    );
+
     State_Controller controller( mocks.chocan
                                , mocks.state_viewer
                                , mocks.input_controller
-                               , Add_Transaction{ &mocks.chocan->transaction_builder } );
-
-    mocks.in_stream << "1234\n6789\n10-10-2019\n123456\ncomments\n";
-
-    controller.interact();
+                               , Confirm_Transaction { transaction } );
 
     SECTION("Confrim transaction transitions to provider menu when transaction is confirmed")
     {

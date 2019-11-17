@@ -90,7 +90,7 @@ Application_State State_Controller::operator()(const Provider_Menu&)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-        { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder }; } }
+        { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
     };
 
     try
@@ -122,22 +122,20 @@ Application_State State_Controller::operator()(const Manager_Menu&)
     }
 }
 
-Application_State State_Controller::operator()(Add_Transaction&)
+Application_State State_Controller::operator()(Add_Transaction& state)
 {
-    chocan->transaction_builder.reset();
+    std::string input = input_controller->read_input();
 
-    do {
-        std::string input = input_controller->read_input();
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return Provider_Menu { "Transaction Request Cancelled!" }; }
+    // TODO allow user to print out provider directory
 
-        if(input == "exit")   { return Exit(); }
-        if(input == "cancel") { return Provider_Menu(); }
+    chocan->transaction_builder.set_current_field(input);
 
-        chocan->transaction_builder.set_current_field(input);
-
-        state_viewer->update();
-    } while(!chocan->transaction_builder.buildable());
-
-    return Confirm_Transaction { chocan->transaction_builder.build() };
+    // If we can build the transaction then we're finished, otherwise loop
+    return (chocan->transaction_builder.buildable()) 
+           ? Confirm_Transaction { chocan->transaction_builder.build() }
+           : Application_State   { state };
 }
 
 Application_State State_Controller::operator()(const Confirm_Transaction& state)
@@ -151,7 +149,7 @@ Application_State State_Controller::operator()(const Confirm_Transaction& state)
     }
     if (input == "n" || input == "no" || input == "N" || input == "NO")
     {
-        return Add_Transaction { &chocan->transaction_builder };
+        return Add_Transaction { &chocan->transaction_builder.reset() };
     }
     return state;
 }
