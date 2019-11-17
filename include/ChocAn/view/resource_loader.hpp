@@ -31,6 +31,7 @@ struct Resource_Loader
     Resource_Table operator()(const Manager_Menu& menu);
     Resource_Table operator()(const Add_Transaction& transaction);
     Resource_Table operator()(const Confirm_Transaction& state);
+    Resource_Table operator()(const Create_Account& state);
 
     std::string render_user_error(const chocan_user_exception& err);
 

@@ -26,14 +26,16 @@ class Account_Builder{
     public:
 
     using Database_Ptr = Data_Gateway::Database_Ptr;
+    using Account_Type = Account::Account_Type;
+    using Account_Info = std::map<std::string, std::string>;
     
     Account_Builder(Database_Ptr db) 
-            : db(db),
-              fields({"Name"
-                     ,"Address"
-                     ,"Type"
-                     ,"ID"
-                    })
+        : fields({"Type"
+                 ,"Name"
+                 ,"Address"
+                 ,"ID"
+                 })
+        , id_generator(db)
         {}
 
         bool buildable() const;
@@ -45,8 +47,12 @@ class Account_Builder{
 
     private:
             
-        Database_Ptr db;
         std::vector<std::string> fields;
+        
+        ID_Generator id_generator;
+        Account_Type account_type;
+        Account_Info account_info;
+
 };
 
 

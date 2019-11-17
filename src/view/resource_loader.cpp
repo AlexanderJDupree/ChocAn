@@ -80,6 +80,16 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Confirm_Transa
     };
 }
 
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account& state)
+{
+
+    return
+    {
+        {"state_name", [&](){return "Create Account";} }
+    };
+
+}
+
 std::string Resource_Loader::render_user_error(const chocan_user_exception& err)
 {
     std::stringstream stream;

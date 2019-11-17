@@ -108,7 +108,8 @@ Application_State State_Controller::operator()(const Manager_Menu&)
     const Transition_Table manager_menu
     {
         { "exit", [&](){ return Exit();  } },
-        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
+        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
+        { "2"   , [&](){ return Create_Account{ &chocan->account_builder}; } }
     };
 
     try

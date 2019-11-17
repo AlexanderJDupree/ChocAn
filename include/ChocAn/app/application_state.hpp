@@ -57,6 +57,7 @@ public:
     Transaction transaction;
 };
 
+//TODO create confirm account class
 class Create_Account
 {
 public:
