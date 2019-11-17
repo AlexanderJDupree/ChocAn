@@ -14,5 +14,5 @@
 
 <footer>
 
-<state_info>
+<@menu.status>
 <prompt>
