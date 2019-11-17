@@ -48,7 +48,14 @@ void Terminal_State_Viewer::render_state(const Application_State& state)
 
 void Terminal_State_Viewer::update()
 {
-    render_view(resource_table.at("state_name")());
+    try
+    {
+        render_view(resource_table.at("state_name")());
+    }
+    catch(const std::out_of_range&)
+    {
+        out_stream << "Error: 'state_name' is not defined for current state\n";
+    }
 }
 
 void Terminal_State_Viewer::render_view(const std::string& view_name)
