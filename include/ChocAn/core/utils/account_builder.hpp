@@ -47,13 +47,17 @@ class Account_Builder{
         
         bool buildable() const;
 
-        std::string set_current_field(const std::string& input);
+        void set_current_field(const std::string& input);
 
         std::string get_current_field();
+
+        std::string get_current_issues();
 
         Account_Builder& reset();
 
     private:
+
+        std::string valid_input(const std::string& field, const std::string& input);
             
         std::stack<std::string> fields;
         

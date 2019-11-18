@@ -89,6 +89,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account
     return
     {
         {"state_name", [&](){return "Create Account";} },
+        {"builder.issues", [&](){return state.builder->get_current_issues();} },
         {"builder.current_field", [&]() {return state.builder->get_current_field();}}
     };
 

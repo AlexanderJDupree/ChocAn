@@ -162,11 +162,7 @@ Application_State State_Controller::operator()(const Create_Account& state)
     if(input == "exit")   { return Exit(); }
     if(input == "cancel") { return Manager_Menu{ "Account Not Created" }; }
 
-    issues = chocan->account_builder.set_current_field(input);
-
-    if(issues != ""){
-        return Manager_Menu{issues};
-    }
+    chocan->account_builder.set_current_field(input);
 
     if(chocan->account_builder.buildable()){
 

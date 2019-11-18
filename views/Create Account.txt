@@ -3,4 +3,5 @@
 <footer>
 ( Entering 'cancel' will abort the account build )
 
-Please Enter <@builder.current_field>: 
+<@builder.issues>
+Please Enter <@builder.current_field>:
