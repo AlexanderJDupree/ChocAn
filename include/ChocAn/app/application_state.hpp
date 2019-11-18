@@ -57,7 +57,6 @@ public:
     Transaction transaction;
 };
 
-//TODO create confirm account class
 class Create_Account
 {
 public:
@@ -70,8 +69,7 @@ using Application_State = std::variant< Login
                                       , Manager_Menu
                                       , Add_Transaction
                                       , Confirm_Transaction
-                                      //TODO uncomment below when creat account class state is complete
-                                      //, Create_Account
+                                      , Create_Account
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;

@@ -109,7 +109,7 @@ Application_State State_Controller::operator()(const Manager_Menu&)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-        { "2"   , [&](){ return Create_Account{ &chocan->account_builder}; } }
+        { "2"   , [&](){ return Create_Account{ &chocan->account_builder.reset()}; } }
     };
 
     try
@@ -152,4 +152,27 @@ Application_State State_Controller::operator()(const Confirm_Transaction& state)
         return Add_Transaction { &chocan->transaction_builder.reset() };
     }
     return state;
+}
+
+Application_State State_Controller::operator()(const Create_Account& state)
+{
+    std::string input = input_controller->read_input();
+    std::string issues;
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return Manager_Menu{ "Account Not Created" }; }
+
+    issues = chocan->account_builder.set_current_field(input);
+
+    if(issues != ""){
+        return Manager_Menu{issues};
+    }
+
+    if(chocan->account_builder.buildable()){
+
+        chocan->db->create_account(chocan->account_builder.build());
+        return Manager_Menu{ "Account Successfully Created"};
+    }
+
+    return Application_State{ state };
 }

@@ -20,37 +20,44 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/account.hpp>
+#include <ChocAn/view/terminal_input_controller.hpp>
+#include <stack>
 
 class Account_Builder{
 
     public:
 
     using Database_Ptr = Data_Gateway::Database_Ptr;
-    using Account_Type = Account::Account_Type;
     using Account_Info = std::map<std::string, std::string>;
     
     Account_Builder(Database_Ptr db) 
-        : fields({"Type"
-                 ,"Name"
-                 ,"Address"
-                 ,"ID"
+        : fields({"Zip"
+                 ,"State"
+                 ,"City"
+                 ,"Street"
+                 ,"Last Name"
+                 ,"First Name"
+                 ,"Account Type"
                  })
         , id_generator(db)
         {}
 
-        bool buildable() const;
 
         Account build() const;
+        
+        bool buildable() const;
 
-        void reset();
+        std::string set_current_field(const std::string& input);
 
+        std::string get_current_field();
+
+        Account_Builder& reset();
 
     private:
             
-        std::vector<std::string> fields;
+        std::stack<std::string> fields;
         
         ID_Generator id_generator;
-        Account_Type account_type;
         Account_Info account_info;
 
 };

@@ -1,19 +1,6 @@
 <header>
 
-What type of account are you creating? 
-
-Account Type: <@state.account_type>
-
-Please enter the account holders name:
-
-First: <@state.name_first>  Last: <@state.name_last>
-
-Please enter the address associated with this account:
-
-Street: <@state.address_street>
-
-City: <@state.address_city>     State: <@state.address_state>
-
-Zip: <@state.address_zip>
-
 <footer>
+( Entering 'cancel' will abort the account build )
+
+Please Enter <@builder.current_field>: 
