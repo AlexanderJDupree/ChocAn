@@ -33,7 +33,8 @@ Account Account_Builder::build(){
     if(!buildable()) throw chocan_user_exception("Cannot create account with empty fields", {});
 
     try{
-            zip = std::stoul(account_info.at("Zip"));
+        
+        zip = std::stoul(account_info.at("Zip"));
     
     }catch(const std::invalid_argument&){
 
