@@ -33,7 +33,7 @@ https://github.com/AlexanderJDupree/ChocAn
 class chocan_user_exception : public std::exception
 {
 public:
-    typedef std::vector<std::string> Info;
+    using Info = std::vector<std::string>;
 
     const Info error_info;
     const char* error_msg;
@@ -46,16 +46,29 @@ public:
     virtual const char* what() const noexcept
     {
         return error_msg;
-    };
+    }
 
     virtual const Info& info() const noexcept
     {
         return error_info;
-    };
+    }
 };
 
+class chocan_db_exception : public std::exception
+{
+public:
 
-// TODO create a database exception?
+    const char* error_msg;
+
+    chocan_db_exception(const char* err)
+        : error_msg(err) 
+        { }
+
+   virtual const char* what() const noexcept
+   {
+       return error_msg;
+   } 
+};
 
 #endif // CHOCAN_EXCEPTION_HPP
 

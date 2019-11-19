@@ -74,6 +74,7 @@ OBJECTS := \
 	$(OBJDIR)/name_tests.o \
 	$(OBJDIR)/transaction_builder_tests.o \
 	$(OBJDIR)/transaction_tests.o \
+	$(OBJDIR)/sqlite_db_tests.o \
 	$(OBJDIR)/test_config_main.o \
 	$(OBJDIR)/terminal_input_controller_tests.o \
 	$(OBJDIR)/terminal_state_viewer_tests.o \
@@ -160,6 +161,9 @@ $(OBJDIR)/transaction_builder_tests.o: ../tests/core/transaction_builder_tests.c
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/transaction_tests.o: ../tests/core/transaction_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/sqlite_db_tests.o: ../tests/data/sqlite_db_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/test_config_main.o: ../tests/test_config_main.cpp

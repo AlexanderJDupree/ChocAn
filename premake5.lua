@@ -58,7 +58,7 @@ project "ChocAn-Core"
 
 project "ChocAn-Data"
     kind "SharedLib"
-    links "ChocAn-Core"
+    links { "ChocAn-Core", "sqlite3" }
     language "C++"
     targetdir "lib/%{cfg.buildcfg}/"
     targetname "ChocAn-Data"
