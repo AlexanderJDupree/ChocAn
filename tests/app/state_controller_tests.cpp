@@ -101,6 +101,7 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
                              , 97030 )
                     , Provider()
                     , mocks.chocan->id_generator );
+
     mocks.chocan->db->create_account(provider);
 
     Account manager( Name("Jane", "Doe")
@@ -110,6 +111,7 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
                              , 97030 )
                     , Manager()
                     , mocks.chocan->id_generator );
+
     mocks.chocan->db->create_account(manager);
 
     SECTION("Login transitions to provider menu when given a valid provider ID")

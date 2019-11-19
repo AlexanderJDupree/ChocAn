@@ -29,12 +29,12 @@ public:
 
     ~SQLite_DB();
 
-    bool setup() const
+    std::string serialize_account(const Account& account) const;
 
+    void create_account(const Account& account);
 /*
     void update_account(const Account& account);
 
-    void create_account(const Account& account);
 
     void delete_account(const unsigned ID);
 
@@ -64,6 +64,7 @@ public:
 private:
 
     sqlite3* db;
+
 };
 
 #endif // CHOCAN_SQLITE_DB_HPP
