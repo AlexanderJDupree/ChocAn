@@ -85,8 +85,7 @@ Account_Builder& Account_Builder::reset(){
     fields.push("State");
     fields.push("City");
     fields.push("Street");
-    fields.push("Last Name");
-    fields.push("First Name");
+    fields.push("Full Name");
     fields.push("Account Type");
 
     return *this;
@@ -97,7 +96,11 @@ void Account_Builder::set_current_field(const std::string& input){
 
     if(buildable()) return;
     
-    account_info[fields.top()] = input;
+    if(fields.top() == "Full Name"){
+
+        account_info["First Name"] = parseName(input,'f');
+        account_info["Last Name"] = parseName(input,'l');
+    }
     
     fields.pop();
    
@@ -115,28 +118,17 @@ const chocan_user_exception Account_Builder::get_current_issues(){
         for(std::vector<std::string>::iterator it = error_msg.begin(); it != error_msg.end(); ++it){
 
             //check for user input address errors
-            if(it->find("Zip") != std::string::npos) fields.push("Zip");
+            if(it->find("Zip")    != std::string::npos) fields.push("Zip");
             if(it->find("Street") != std::string::npos) fields.push("Street");
-            if(it->find("City") != std::string::npos) fields.push("City");
-            if(it->find("State") != std::string::npos) fields.push("State");
-            
-            //check for user input name errors
-            if(it->find("Full Name") != std::string::npos){
+            if(it->find("City")   != std::string::npos) fields.push("City");
+            if(it->find("State")  != std::string::npos) fields.push("State");
+            if(it->find("Name")   != std::string::npos) fields.push("Full Name");
 
-                fields.push("Last Name");
-                fields.push("First Name");
-            
-            }else{
-
-                if(it->find("First Name") != std::string::npos) fields.push("First Name");
-                
-                if(it->find("Last Name") != std::string::npos) fields.push("Last Name");
-            }
         }
 
         issues.reset();
     }
-
+    
     return return_msg.value_or(chocan_user_exception{"",{}});
 }
 
@@ -147,5 +139,26 @@ std::string Account_Builder::get_current_field(){
     std::string field = fields.top();
 
     return field;
+}
+
+std::string Account_Builder::parseName(const std::string& input, char name_type){
+
+    std::string temp; 
+    unsigned index;
+    
+    if(name_type == 'f') temp = input.substr(0,input.find(" "));
+
+    else if(name_type == 'l') temp = input.substr(input.find(" "), input.length());
+
+    index = temp.length() - 1;
+
+    while(!isalpha(temp[index])){
+
+        temp.pop_back();
+    }
+
+    temp[0] = toupper(temp[0]);
+
+    return temp;
 }
 

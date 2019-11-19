@@ -32,17 +32,8 @@ class Account_Builder{
     using Account_Info = std::map<std::string, std::string>;
     
     Account_Builder(Database_Ptr db) 
-        : fields({"Zip"
-                 ,"State"
-                 ,"City"
-                 ,"Street"
-                 ,"Last Name"
-                 ,"First Name"
-                 ,"Account Type"
-                 })
-        , id_generator(db)
-        {}
-
+        : id_generator(db)
+        { reset(); }
 
         Account build();
         
@@ -59,12 +50,15 @@ class Account_Builder{
     private:
 
         std::string valid_input(const std::string& field, const std::string& input);
+        std::string parseName(const std::string& input, char name_type);
             
         std::stack<std::string> fields;
         ID_Generator            id_generator;
         Account_Info            account_info;
 
         std::optional<chocan_user_exception> issues;
+        std::optional<Name> name;
+        std::optional<Address> address;
 
 };
 
