@@ -41,13 +41,11 @@ public:
     void update() override;
 
     // Stores state, looks up state in view table, renders view
-    void render_state(const Application_State& state) override;
+    void render_state(const Application_State& state, Callback handler = [](){}) override;
 
 private:
 
     void render_view(const std::string& view_name);
-
-    void render_prompt(const std::string& prompt = "> ");
 
     std::string read_resource(const std::string& resource_name);
 
@@ -61,6 +59,7 @@ private:
     std::ostream&       out_stream;
     Command_Table       command_table;
     Resource_Table      resource_table;
+    Callback            event_callback;
 };
 
 #endif // CHOCAN_TERMINAL_STATE_VIEWER_H

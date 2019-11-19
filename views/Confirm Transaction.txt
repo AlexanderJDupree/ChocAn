@@ -12,4 +12,4 @@ Service: <@service.name> | <@service.code>
 Comments:
 <@comments>
 
-Is this correct? (Y/N): <empty_prompt>
+Is this correct? (Y/N): <prompt>
