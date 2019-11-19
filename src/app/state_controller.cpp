@@ -22,10 +22,10 @@ State_Controller::State_Controller( ChocAn_Ptr        chocan
                                   , State_Viewer_Ptr  state_viewer
                                   , Input_Control_Ptr input_controller
                                   , Application_State initial_state )
-    : chocan           ( chocan           )
-    , state_viewer     ( state_viewer     ) 
-    , input_controller ( input_controller )
-    , state            ( initial_state )
+    : chocan           ( chocan            )
+    , state_viewer     ( state_viewer      ) 
+    , input_controller ( input_controller  )
+    , runtime          ( { initial_state } )
     { 
         if (!(chocan && state_viewer && input_controller))
         {
@@ -36,32 +36,38 @@ State_Controller::State_Controller( ChocAn_Ptr        chocan
 
 State_Controller& State_Controller::interact()
 {
-    state_viewer->render_state(state);
-
     return transition();
 }
 
 State_Controller& State_Controller::transition()
 {
-    state = std::visit(*this, state);
+    Application_State current_state = runtime.top();
+
+    runtime.pop();
+
+    runtime.push(std::visit(*this, current_state));
 
     return *this;
 }
 
 const Application_State& State_Controller::current_state() const
 {
-    return state;
+    return runtime.top();
 }
 
 bool State_Controller::end_state() const
 {
     // Tests if current state is the exit state
-    return std::holds_alternative<Exit>(state);
+    return std::holds_alternative<Exit>(runtime.top());
 }
 
-Application_State State_Controller::operator()(const Login&)
+Application_State State_Controller::operator()(const Login& login)
 {
-    std::string input = input_controller->read_input();
+    std::string input;
+    state_viewer->render_state(login, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
 
     if(input == "exit") { return Exit(); }
 
@@ -77,15 +83,20 @@ Application_State State_Controller::operator()(const Login&)
     return Login { "Invalid Login" };
 }
 
-Application_State State_Controller::operator()(const Exit&)
+Application_State State_Controller::operator()(const Exit& exit)
 {
+    state_viewer->render_state(exit);
+
     // logout is idempotent
     chocan->login_manager.logout();
+
     return Exit();
 }
 
-Application_State State_Controller::operator()(const Provider_Menu&)
+Application_State State_Controller::operator()(const Provider_Menu& menu)
 {
+    state_viewer->render_state(menu) ;
+
     const Transition_Table provider_menu
     {
         { "exit", [&](){ return Exit();  } },
@@ -103,8 +114,10 @@ Application_State State_Controller::operator()(const Provider_Menu&)
     }
 }
 
-Application_State State_Controller::operator()(const Manager_Menu&)
+Application_State State_Controller::operator()(const Manager_Menu& menu)
 {
+    state_viewer->render_state(menu) ;
+
     const Transition_Table manager_menu
     {
         { "exit", [&](){ return Exit();  } },
@@ -123,7 +136,12 @@ Application_State State_Controller::operator()(const Manager_Menu&)
 
 Application_State State_Controller::operator()(Add_Transaction& state)
 {
-    std::string input = input_controller->read_input();
+
+    std::string input;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
 
     if(input == "exit")   { return Exit(); }
     if(input == "cancel") { return Provider_Menu { "Transaction Request Cancelled!" }; }
@@ -139,7 +157,11 @@ Application_State State_Controller::operator()(Add_Transaction& state)
 
 Application_State State_Controller::operator()(const Confirm_Transaction& state)
 {
-    std::string input = input_controller->read_input();
+    std::string input;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
 
     if (input == "y" || input == "yes"  || input == "Y" || input == "YES" )
     {

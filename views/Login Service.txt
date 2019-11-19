@@ -6,4 +6,4 @@ Please enter your ChocAn Provider or Manager ID.
 
 <footer>
 
-<prompt>
+> <prompt>

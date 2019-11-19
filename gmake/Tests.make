@@ -76,7 +76,6 @@ OBJECTS := \
 	$(OBJDIR)/transaction_tests.o \
 	$(OBJDIR)/test_config_main.o \
 	$(OBJDIR)/terminal_input_controller_tests.o \
-	$(OBJDIR)/terminal_state_viewer_tests.o \
 
 RESOURCES := \
 
@@ -166,9 +165,6 @@ $(OBJDIR)/test_config_main.o: ../tests/test_config_main.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/terminal_input_controller_tests.o: ../tests/view/terminal_input_controller_tests.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/terminal_state_viewer_tests.o: ../tests/view/terminal_state_viewer_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

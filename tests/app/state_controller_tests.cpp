@@ -20,26 +20,40 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <sstream>
 #include <ChocAn/core/chocan.hpp>
 #include <ChocAn/data/mock_db.hpp>
-#include <ChocAn/view/terminal_input_controller.hpp>
+#include <ChocAn/app/state_viewer.hpp>
 #include <ChocAn/app/state_controller.hpp>
-#include <ChocAn/view/terminal_state_viewer.hpp>
+#include <ChocAn/view/terminal_input_controller.hpp>
+
+class mock_state_viewer : public State_Viewer
+{
+public:
+
+    void update()
+    {
+        handler();
+    }
+
+    void render_state(const Application_State&, Callback event)
+    {
+        handler = event;
+
+        update();
+    }
+
+    Callback handler;
+};
 
 class mock_dependencies
 {
 public:
     std::stringstream in_stream;
-    std::stringstream out_stream;
 
     Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
     ChocAn::ChocAn_Ptr chocan     = std::make_unique<ChocAn>(db);
 
-    State_Viewer::State_Viewer_Ptr state_viewer = 
-        std::make_unique<Terminal_State_Viewer>( "tests/view"
-                                               , "-test.txt"
-                                               , out_stream );
+    State_Viewer::State_Viewer_Ptr state_viewer = std::make_unique<mock_state_viewer>();
 
-    Input_Controller::Input_Control_Ptr input_controller = 
-        std::make_unique<Terminal_Input_Controller>(in_stream);
+    Input_Controller::Input_Control_Ptr input_controller = std::make_unique<Terminal_Input_Controller>(in_stream);
 };
 
 TEST_CASE("State Controller construction", "[constructors], [state_controller]")

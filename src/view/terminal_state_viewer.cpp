@@ -28,20 +28,16 @@ Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
     , command_table  ( {
           { "header",       [&](){ return render_view("header");  } }
         , { "footer",       [&](){ return render_view("footer");  } }
-        , { "prompt",       [&](){ return render_prompt();        } }
-        , { "empty_prompt", [&](){ return render_prompt("");      } }
+        , { "prompt",       [&](){ event_callback(); } }
     } )
     , resource_table ( { }     )
     {}
 
-void Terminal_State_Viewer::render_prompt(const std::string& prompt)
-{
-    out_stream << prompt;
-}
-
-void Terminal_State_Viewer::render_state(const Application_State& state)
+void Terminal_State_Viewer::render_state(const Application_State& state, Callback handler)
 {
     resource_table = std::visit(Resource_Loader(), state);
+
+    event_callback = handler;
 
     return this->update();
 }

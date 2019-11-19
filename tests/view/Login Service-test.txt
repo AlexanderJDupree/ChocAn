@@ -1,4 +1,0 @@
-<header>
-<@login_status>
-<footer>
-<prompt>

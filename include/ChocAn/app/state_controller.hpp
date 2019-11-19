@@ -20,6 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define  CHOCAN_STATE_CONTROLLER_H
 
 #include <map>
+#include <stack>
 #include <functional>
 #include <ChocAn/core/chocan.hpp>
 #include <ChocAn/app/state_viewer.hpp>
@@ -34,6 +35,7 @@ public:
     using Input_Control_Ptr = Input_Controller::Input_Control_Ptr;
     using State_Viewer_Ptr  = State_Viewer::State_Viewer_Ptr;
     using Transition_Table  = std::map<std::string, std::function<Application_State()>>;
+    using Runtime_Stack     = std::stack<Application_State>;
 
     // TODO set default instances
     State_Controller( ChocAn_Ptr        chocan
@@ -64,7 +66,7 @@ private:
     ChocAn_Ptr         chocan;
     State_Viewer_Ptr   state_viewer;
     Input_Control_Ptr  input_controller;
-    Application_State  state;
+    Runtime_Stack      runtime;
 
 };
 
