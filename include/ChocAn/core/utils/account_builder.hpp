@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/entities/account.hpp>
 #include <ChocAn/view/terminal_input_controller.hpp>
 #include <stack>
+#include <optional>
 
 class Account_Builder{
 
@@ -43,7 +44,7 @@ class Account_Builder{
         {}
 
 
-        Account build() const;
+        Account build();
         
         bool buildable() const;
 
@@ -51,7 +52,7 @@ class Account_Builder{
 
         std::string get_current_field();
 
-        std::string get_current_issues();
+        const chocan_user_exception get_current_issues();
 
         Account_Builder& reset();
 
@@ -60,12 +61,12 @@ class Account_Builder{
         std::string valid_input(const std::string& field, const std::string& input);
             
         std::stack<std::string> fields;
-        
-        ID_Generator id_generator;
-        Account_Info account_info;
+        ID_Generator            id_generator;
+        Account_Info            account_info;
+
+        std::optional<chocan_user_exception> issues;
 
 };
-
 
 #endif  //CHOCAN_ACCOUNT_BUILDER_HPP
 

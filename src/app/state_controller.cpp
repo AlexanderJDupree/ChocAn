@@ -163,10 +163,18 @@ Application_State State_Controller::operator()(const Create_Account& state)
     if(input == "cancel") { return Manager_Menu{ "Account Not Created" }; }
 
     chocan->account_builder.set_current_field(input);
-
+    
     if(chocan->account_builder.buildable()){
 
-        chocan->db->create_account(chocan->account_builder.build());
+        try{
+ 
+            chocan->db->create_account(chocan->account_builder.build());
+        
+        }catch(...){//const chocan_user_exception& err){
+
+            return Application_State{ state };
+        }
+        
         return Manager_Menu{ "Account Successfully Created"};
     }
 

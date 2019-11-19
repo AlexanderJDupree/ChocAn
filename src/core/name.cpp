@@ -23,19 +23,19 @@ Name::Name(const std::string& first, const std::string& last)
 {
     chocan_user_exception::Info errors;
 
-    ( !Validators::length(first, 1, 25) ) 
-        ? errors.push_back("First name cannot be empty")
-        : void();
-    ( !Validators::length(last, 1, 25) ) 
-        ? errors.push_back("Last name cannot be empty")
-        : void();
-    ( !Validators::length(first + last, 1, 25) ) 
-        ? errors.push_back("Full name must be less than 25 characters")
-        : void();
+    if(!Validators::length(first + last, 1, 25) || !Validators::length(first,1,24) || !Validators::length(last,1,24)) {
 
-    ( !errors.empty() ) 
-        ? throw invalid_name("Invalid name length", errors)
-        : void();
+        if(!Validators::length(first, 1, 24) && Validators::length(last, 1, 24)) 
+            errors.push_back("First Name must be 1 to 24 characters long");
+        
+        else if(!Validators::length(last, 1, 24) && Validators::length(first, 1, 24) ) 
+            errors.push_back("Last Name must be 1 to 24 characters long");
+
+        else errors.push_back("Full Name must be 1 to 25 characters long");
+
+    }
+
+    if(!errors.empty() ) throw invalid_name("Invalid name length", errors);
 }
 
 bool Name::operator==(const Name& rhs) const

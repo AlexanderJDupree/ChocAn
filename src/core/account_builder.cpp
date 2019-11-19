@@ -17,45 +17,63 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/core/utils/account_builder.hpp>
 #include <ChocAn/core/utils/validators.hpp>
+#include <ChocAn/core/utils/exception.hpp>
 
 bool Account_Builder::buildable() const{
 
     return fields.empty();
 }
 
-Account Account_Builder::build() const{
+Account Account_Builder::build(){
                    
     unsigned zip = 0;
+    std::shared_ptr<Name> name_ptr;
+    std::shared_ptr<Address> address_ptr;
 
-    if(!buildable()) throw chocan_user_exception("Error: Cannot create account with empty fields", {});
+    if(!buildable()) throw chocan_user_exception("Cannot create account with empty fields", {});
 
     try{
             zip = std::stoul(account_info.at("Zip"));
     
-    }catch(std::invalid_argument){
+    }catch(const std::invalid_argument&){
 
-        throw chocan_user_exception("Error: invalid argument given for Zip", {});
+        issues.emplace(chocan_user_exception("Zip must be 5 digit number", {}));
 
-    }catch(std::out_of_range){
+    }catch(const std::out_of_range&){
 
-        throw chocan_user_exception("Error: Zip value was out of range", {});
+        issues.emplace(chocan_user_exception("Zip value was out of range", {}));
     }
 
-    Name name(account_info.at("First Name")
-             ,account_info.at("Last Name"));
+    try{
 
-    Address address(account_info.at("Street")
-                   ,account_info.at("City")
-                   ,account_info.at("State")
-                   ,zip);
+        name_ptr = std::make_unique<Name>(account_info.at("First Name")
+                                         ,account_info.at("Last Name"));
+    
+    }catch(const chocan_user_exception& err){
+        
+        issues.emplace(err);
+    }
+    
+    try{
+        
+        address_ptr = std::make_unique<Address>(account_info.at("Street")
+                                               ,account_info.at("City")
+                                               ,account_info.at("State")
+                                               ,zip);
+    }catch(const chocan_user_exception& err){
+        
+        issues.emplace(err);
+    }
+
+    if(issues) throw issues;
 
     if(account_info.at("Account Type") == "Member") 
-        return Account(name, address, Member(), id_generator);
+        return Account(*name_ptr, *address_ptr, Member(), id_generator);
     
     if(account_info.at("Account Type") == "Manager") 
-        return Account(name, address, Manager(), id_generator);
+        return Account(*name_ptr, *address_ptr, Manager(), id_generator);
             
-    return Account(name, address, Provider(), id_generator);
+    return Account(*name_ptr, *address_ptr, Provider(), id_generator);
 }
 
 Account_Builder& Account_Builder::reset(){
@@ -76,38 +94,49 @@ Account_Builder& Account_Builder::reset(){
 
 void Account_Builder::set_current_field(const std::string& input){
 
-    std::string issues;
-
     if(buildable()) return;
     
-    issues = valid_input(fields.top(),input);
-
-    if(issues == ""){
-
-        account_info[fields.top()] = input;
-        fields.pop();
-
-    }else{
-
-        fields.push(issues);
-    }
+    account_info[fields.top()] = input;
+    
+    fields.pop();
    
     return;
 }
 
-std::string Account_Builder::get_current_issues(){
+const chocan_user_exception Account_Builder::get_current_issues(){
 
-    if(fields.empty()) return "";
-    
-    std::string field = fields.top();
+    std::optional<chocan_user_exception> return_msg = issues;
 
-    if(field.find("ERROR:") != std::string::npos){
+    if(issues){
 
-        fields.pop();
-        return field;
+        std::vector<std::string> error_msg(issues.value().info());
+
+        for(std::vector<std::string>::iterator it = error_msg.begin(); it != error_msg.end(); ++it){
+
+            //check for user input address errors
+            if(it->find("Zip") != std::string::npos) fields.push("Zip");
+            if(it->find("Street") != std::string::npos) fields.push("Street");
+            if(it->find("City") != std::string::npos) fields.push("City");
+            if(it->find("State") != std::string::npos) fields.push("State");
+            
+            //check for user input name errors
+            if(it->find("Full Name") != std::string::npos){
+
+                fields.push("Last Name");
+                fields.push("First Name");
+            
+            }else{
+
+                if(it->find("First Name") != std::string::npos) fields.push("First Name");
+                
+                if(it->find("Last Name") != std::string::npos) fields.push("Last Name");
+            }
+        }
+
+        issues.reset();
     }
-    
-    return "";
+
+    return return_msg.value_or(chocan_user_exception{"",{}});
 }
 
 std::string Account_Builder::get_current_field(){
@@ -119,44 +148,3 @@ std::string Account_Builder::get_current_field(){
     return field;
 }
 
-std::string Account_Builder::valid_input(const std::string& field, const std::string& input){
-
-    std::string issues = "ERROR: ";
-
-    if(field == "First Name" && !Validators::length(input,1,24)) {
-
-        issues += " first name must be 1 to 24 characters long.";
-    }
-    
-    if(field == "Last Name" && !Validators::length(input,1,24)) {
-
-        issues += " last name must be 1 to 24 characters long.";
-    
-    }else if(field == "Last Name" && !Validators::length(input + account_info.at("First Name"),1,25)) {
-
-        issues += " full name must be 1 to 25 characters long.";
-        fields.push("First Name");
-    }
-    
-    if(field == "Zip" && !Validators::length(input,5,5)) {
-
-        issues += " zip must be 5 digits.";
-    }
-    
-    if(field == "State" && !Validators::length(input,2,2)) {
-
-        issues += " state must be abbreviated 2 character format.";
-    }
-    
-    if(field == "City" && !Validators::length(input,1,14)) {
-
-        issues += " city must be 1 to 14 characters long.";
-    }
-    
-    if(field == "Street" && !Validators::length(input,1,25)) {
-
-        issues += " street must be 1 to 25 characters long.";
-    }
-
-    return (issues == "ERROR: ") ? "" : issues;
-}
