@@ -142,7 +142,6 @@ Application_State State_Controller::operator()(const Manager_Menu& menu)
 
 Application_State State_Controller::operator()(Add_Transaction& state)
 {
-
     std::string input;
     state_viewer->render_state(state, [&]()
     {
