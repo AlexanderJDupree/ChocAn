@@ -82,6 +82,36 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Confirm_Transa
         { "filed_date.month", [&](){ return std::to_string(state.transaction.filed_date().month().count()); } }
     };
 }
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Find_Account& state)
+{
+  return
+  {
+        { "state_name", [&](){ return "Find Account"; } }
+  }
+}
+Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& state)
+{  
+  return
+    {
+        { "state_name",   [&](){ return "View Account"; } },
+        { "account.id",   [&](){ return std::to_string(state.account.id()); } },
+        { "account.type", [&]()
+            { 
+                return std::visit( overloaded {
+                    [](const Member&)   { return  "Member"; },
+                    [](const Manager&)  { return "Manager"; },
+                    [](const Provider&) { return  "Provider"; }
+                }, state.account.type() );
+            } },
+        { "account.name.last",  [&](){ return state.account.name().last();  } },
+        { "account.name.first", [&](){ return state.account.name().first(); } },
+
+        { "account.address.street", [&](){ return state.account.address().street(); } },
+        { "account.address.city",   [&](){ return state.account.address().city();   } },
+        { "account.address.state",  [&](){ return state.account.address().state();  } },
+        { "account.address.zip",    [&](){ return std::to_string(state.account.address().zip()); } }
+    };
+}
 
 std::string Resource_Loader::render_user_error(const chocan_user_exception& err)
 {

@@ -174,3 +174,26 @@ Application_State State_Controller::operator()(const Confirm_Transaction& state)
     }
     return state;
 }
+
+Application_State State_Controller::operator()(Find_Account& state)
+{
+  std::string id_num = input_controller->read_input();
+  //std::optional<Account> state.account = chocan->db->get_account(id_num);
+  state.account = chocan->db->get_account(id_num);
+  if(!state.account)
+  {
+    Application_State temp = runtime.top();
+    runtime.pop();
+    return runtime.top() { "Invalid Account ID "};  //returns to prev. state?
+  }
+  return View_Account{ state.account };
+}
+Application_State State_Conroller::operator()(const View_Account& state)
+{
+  std::string input = input_controller->read_input();
+  account = runtime.pop;
+  account = runtime.pop;
+  return account;
+}
+
+
