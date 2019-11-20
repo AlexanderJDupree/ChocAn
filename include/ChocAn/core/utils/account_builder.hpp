@@ -33,6 +33,7 @@ class Account_Builder{
     
     Account_Builder(Database_Ptr db) 
         : id_generator(db)
+        , valid_types({"Manager","manager","Member","member","Provider","provider"})
         { reset(); }
 
         Account build();
@@ -41,7 +42,9 @@ class Account_Builder{
 
         void set_current_field(const std::string& input);
 
-        std::string get_current_field();
+        const std::string get_current_field() const;
+        
+        const std::string get_formating() const;
 
         const chocan_user_exception get_current_issues();
 
@@ -49,16 +52,18 @@ class Account_Builder{
 
     private:
 
-        std::string valid_input(const std::string& field, const std::string& input);
-        std::string parseName(const std::string& input, char name_type);
+        bool valid_account_type(const std::string& input);
+        void parseName(const std::string& input);
+        void parseAddress(const std::string& input);
             
         std::stack<std::string> fields;
+        std::vector<std::string> valid_types;
         ID_Generator            id_generator;
         Account_Info            account_info;
+        std::optional<Name>     name;
+        std::optional<Address>  address;
 
         std::optional<chocan_user_exception> issues;
-        std::optional<Name> name;
-        std::optional<Address> address;
 
 };
 

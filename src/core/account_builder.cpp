@@ -17,18 +17,20 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/core/utils/account_builder.hpp>
 #include <ChocAn/core/utils/validators.hpp>
-#include <ChocAn/core/utils/exception.hpp>
+#include <algorithm>
+
+const std::string account_type = "Account Type";
+const std::string full_Name = "Full Name";
+const std::string street_address = "Address";
 
 bool Account_Builder::buildable() const{
 
-    return fields.empty();
+    return fields.empty() && !issues;
 }
 
 Account Account_Builder::build(){
                    
     unsigned zip = 0;
-    std::shared_ptr<Name> name_ptr;
-    std::shared_ptr<Address> address_ptr;
 
     if(!buildable()) throw chocan_user_exception("Cannot create account with empty fields", {});
 
@@ -43,27 +45,6 @@ Account Account_Builder::build(){
     }catch(const std::out_of_range&){
 
         issues.emplace(chocan_user_exception("Zip value was out of range", {}));
-    }
-
-    try{
-
-        name_ptr = std::make_unique<Name>(account_info.at("First Name")
-                                         ,account_info.at("Last Name"));
-    
-    }catch(const chocan_user_exception& err){
-        
-        issues.emplace(err);
-    }
-    
-    try{
-        
-        address_ptr = std::make_unique<Address>(account_info.at("Street")
-                                               ,account_info.at("City")
-                                               ,account_info.at("State")
-                                               ,zip);
-    }catch(const chocan_user_exception& err){
-        
-        issues.emplace(err);
     }
 
     if(issues) throw issues;
@@ -81,12 +62,9 @@ Account_Builder& Account_Builder::reset(){
     
     while(!fields.empty()) fields.pop();
 
-    fields.push("Zip");
-    fields.push("State");
-    fields.push("City");
-    fields.push("Street");
-    fields.push("Full Name");
-    fields.push("Account Type");
+    fields.push(Address);
+    fields.push(Full_Name);
+    fields.push(Account_Type);
 
     return *this;
 
@@ -95,14 +73,45 @@ Account_Builder& Account_Builder::reset(){
 void Account_Builder::set_current_field(const std::string& input){
 
     if(buildable()) return;
-    
-    if(fields.top() == "Full Name"){
 
-        account_info["First Name"] = parseName(input,'f');
-        account_info["Last Name"] = parseName(input,'l');
-    }
+    std::string current_field = fields.top();
     
-    fields.pop();
+    if(current_field == account_type){
+
+        std::string type = valid_account_type(input);
+
+        if(type != "")  account_info[account_type] = input;
+
+        else issues.emplace(chocan_user_exception("Invalid account type request", {}));
+
+    }else if(current_field == full_Name){
+
+        parseName(input);
+
+        try{
+
+            name = Name(account_info.at("First Name"), account_info.at("Last Name"));
+
+        }catch(const chocan_user_exception& err){
+
+            issues.emplace(err);
+        }
+
+    }else if(current_field == street_address){
+
+        parseAddress(input);
+
+        try{
+
+            address = Address(account_info.at("Street"),account_info.at("City"),account_info.at("State"),account_info.at("Zip"));
+
+        }catch(const chocan_user_exception& err){
+
+            issues.emplace(err);
+        }
+    }
+            
+    if(!issues) fields.pop();
    
     return;
 }
@@ -123,7 +132,6 @@ const chocan_user_exception Account_Builder::get_current_issues(){
             if(it->find("City")   != std::string::npos) fields.push("City");
             if(it->find("State")  != std::string::npos) fields.push("State");
             if(it->find("Name")   != std::string::npos) fields.push("Full Name");
-
         }
 
         issues.reset();
@@ -132,33 +140,64 @@ const chocan_user_exception Account_Builder::get_current_issues(){
     return return_msg.value_or(chocan_user_exception{"",{}});
 }
 
-std::string Account_Builder::get_current_field(){
+const std::string Account_Builder::get_formating() const{
+
+}
+
+const std::string Account_Builder::get_current_field() const{
 
     if(fields.empty()) return "";
 
-    std::string field = fields.top();
-
-    return field;
+    return fields.top();
 }
 
-std::string Account_Builder::parseName(const std::string& input, char name_type){
-
-    std::string temp; 
-    unsigned index;
+void Account_Builder::parseName(const std::string& input){
     
-    if(name_type == 'f') temp = input.substr(0,input.find(" "));
+    account_info["First Name"] = input.substr(0,input.find(" "));
+    account_info["Last Name" ] = input.substr(input.find(" "), input.length());
+}
 
-    else if(name_type == 'l') temp = input.substr(input.find(" "), input.length());
+void Account_Builder::parseAddress(const std::string& input){
 
-    index = temp.length() - 1;
+    std::string temp;
+    std::stack<std::string> current_field({"Zip","State","City","Street"});
 
-    while(!isalpha(temp[index])){
+    for(std::string::const_iterator it = input.begin(); it != input.end() && !current_field.empty(); ++it){
 
-        temp.pop_back();
+        switch(*it){
+
+            case ',' : {
+
+                account_info[current_field.top()] = temp;
+                current_field.pop();
+                temp.clear();
+
+            }break;
+
+            case ' ': break;
+
+            default: temp += *it;
+
+        }
     }
 
-    temp[0] = toupper(temp[0]);
+    if(!current_field.empty()) account_info[current_field.top()] = temp;
+}
+
+
+std::string Account_Builder::valid_account_type(const std::string& input){
+
+    std::string temp("");
+
+    for(std::vector<std::string>::iterator it = valid_types.begin(); it != valid_types.end(); ++it){
+
+        if(input == *it){
+
+            temp = *it;
+            temp[0] = toupper(temp[0]);
+            return temp;
+        } 
+    }
 
     return temp;
 }
-

@@ -4,4 +4,5 @@
 ( Entering 'cancel' will abort the account build )
 
 <@builder.issues>
+<@builder.formating>
 Please Enter <@builder.current_field>:
