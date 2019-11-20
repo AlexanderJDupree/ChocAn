@@ -22,7 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <functional>
 #include <ChocAn/core/data_gateway.hpp>
 
-class SQLite_DB // : public Data_Gateway
+class SQLite_DB  : public Data_Gateway
 {
 public:
 
@@ -36,40 +36,36 @@ public:
 
     bool load_schema(const char* schema_file);
 
-    bool create_account(const Account& account);
+    bool create_account(const Account& account) override;
 
     // Will overwrite previous row data with account info
-    bool update_account(const Account& account);
+    bool update_account(const Account& account) override;
 
-    bool delete_account(const unsigned ID);
+    bool delete_account(const unsigned ID) override;
 
-    bool id_exists(const unsigned ID) const;
+    bool id_exists(const unsigned ID) const override;
 
-    std::string serialize_account(const Account& account) const;
-
-/*
-
-    void add_transaction(const Transaction& transaction);
+    bool add_transaction(const Transaction& transaction) override;
 
     // DB retrieval may fail, wrap in Maybe type
-    std::optional<Account> get_account(const unsigned ID);
-    std::optional<Account> get_account(const std::string& ID);
+    std::optional<Account> get_account(const unsigned ID) override;
+    std::optional<Account> get_account(const std::string& ID) override;
 
-    std::optional<Account> get_member_account(const unsigned ID)      const;
-    std::optional<Account> get_member_account(const std::string& ID)  const;
+    std::optional<Account> get_member_account(const unsigned ID) override;
+    std::optional<Account> get_member_account(const std::string& ID) override;
 
-    std::optional<Account> get_provider_account(const unsigned ID)      const;
-    std::optional<Account> get_provider_account(const std::string& ID)  const;
+    std::optional<Account> get_provider_account(const unsigned ID) override;
+    std::optional<Account> get_provider_account(const std::string& ID) override;
 
-    std::optional<Account> get_manager_account(const unsigned ID)      const;
-    std::optional<Account> get_manager_account(const std::string& ID)  const;
+    std::optional<Account> get_manager_account(const unsigned ID) override;
+    std::optional<Account> get_manager_account(const std::string& ID) override;
 
-    std::optional<Service> lookup_service(const unsigned code)     const;
-    std::optional<Service> lookup_service(const std::string& code) const;
+    std::optional<Service> lookup_service(const unsigned code) override;
+    std::optional<Service> lookup_service(const std::string& code) override;
 
-    const Service_Directory& service_directory() const;
+    Service_Directory service_directory() override;
 
-*/
+    std::string serialize_account(const Account& account) const;
 
 private:
 

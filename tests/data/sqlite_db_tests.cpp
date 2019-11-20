@@ -122,3 +122,22 @@ TEST_CASE("Check if ID exists", "[id_exists], [sqlite_db]")
         REQUIRE_FALSE(db.id_exists(0));
     }
 }
+
+TEST_CASE("Looking up services in service directory", "[lookup_service], [sqlite_db]")
+{
+    SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
+
+    SECTION("Returns de-serialized service object when given a valid service code")
+    {
+        // Chocan schema provides default data for service 123456
+        Service service = db.lookup_service(123456).value();
+
+        REQUIRE(service.code() == 123456);
+        REQUIRE(service.cost().value == 39.99);
+        REQUIRE(service.name() == "Back Rub");
+    }
+    SECTION("Returns None when given an invalid_service code")
+    {
+        REQUIRE_FALSE(db.lookup_service(0));
+    }
+}

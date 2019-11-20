@@ -32,30 +32,30 @@ public:
 
     Mock_DB();
 
-    void update_account(const Account& account) override;
+    bool update_account(const Account& account) override;
 
-    void create_account(const Account& account) override;
+    bool create_account(const Account& account) override;
 
-    void delete_account(const unsigned ID) override;
+    bool delete_account(const unsigned ID) override;
 
-    void add_transaction(const Transaction& transaction) override;
+    bool add_transaction(const Transaction& transaction) override;
 
-    std::optional<Account> get_account(const unsigned ID)     const override;
-    std::optional<Account> get_account(const std::string& ID) const override;
+    std::optional<Account> get_account(const unsigned ID) override;
+    std::optional<Account> get_account(const std::string& ID) override;
 
-    std::optional<Account> get_member_account(const unsigned ID)      const;
-    std::optional<Account> get_member_account(const std::string& ID)  const;
+    std::optional<Account> get_member_account(const unsigned ID) override;
+    std::optional<Account> get_member_account(const std::string& ID) override;
 
-    std::optional<Account> get_provider_account(const unsigned ID)      const;
-    std::optional<Account> get_provider_account(const std::string& ID)  const;
+    std::optional<Account> get_provider_account(const unsigned ID) override;
+    std::optional<Account> get_provider_account(const std::string& ID) override;
 
-    std::optional<Account> get_manager_account(const unsigned ID)      const;
-    std::optional<Account> get_manager_account(const std::string& ID)  const;
+    std::optional<Account> get_manager_account(const unsigned ID) override;
+    std::optional<Account> get_manager_account(const std::string& ID) override;
 
-    std::optional<Service> lookup_service(const unsigned code)      const override;
-    std::optional<Service> lookup_service(const std::string& code)  const override;
+    std::optional<Service> lookup_service(const unsigned code) override;
+    std::optional<Service> lookup_service(const std::string& code) override;
 
-    const Service_Directory& service_directory() const override;
+    Service_Directory service_directory() override;
 
     bool id_exists(const unsigned ID) const override;
 
@@ -68,7 +68,6 @@ public:
     std::map<unsigned, Account&> _manager_table;
 
     Service_Directory _service_directory;
-
 };
 
 #endif // CHOCAN_MOCK_DB_HPP

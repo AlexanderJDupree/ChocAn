@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/utils/exception.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 #include <ChocAn/core/entities/account.hpp>
+#include <ChocAn/core/entities/service.hpp>
 
 SQLite_DB::SQLite_DB(const char* db_name)
 {
@@ -57,6 +58,18 @@ bool SQLite_DB::load_schema(const char* schema_file)
         return execute_statement(buffer.str(), no_callback);
     }
     return false;
+}
+
+bool SQLite_DB::execute_statement(const std::string& sql, SQL_Callback callback, void* data)
+{
+    int rc = sqlite3_exec(db, sql.c_str(), callback, data, &err_msg);
+
+    if(rc != SQLITE_OK)
+    {
+        sqlite3_free(err_msg);
+        return false;
+    }
+    return true;
 }
 
 bool SQLite_DB::create_account(const Account& account)
@@ -104,7 +117,7 @@ bool SQLite_DB::id_exists(const unsigned ID) const
         if(argc != 1) { return 1; }
 
         // If query returned 1, set flag to true
-        *reinterpret_cast<bool*>(flag) = (strcmp(argv[0], "1") == 0);
+        *static_cast<bool*>(flag) = (strcmp(argv[0], "1") == 0);
         return 0;
     };
 
@@ -112,6 +125,98 @@ bool SQLite_DB::id_exists(const unsigned ID) const
 
     const_cast<SQLite_DB&>(*this).execute_statement(sql, callback, &flag);
     return flag;
+}
+
+bool SQLite_DB::add_transaction(const Transaction&)
+{
+    return true;
+}
+
+std::optional<Service> SQLite_DB::lookup_service(const unsigned code)
+{
+    using Data_Table = std::map<std::string, std::string>;
+
+    Data_Table data;
+    auto callback = [](void* table, int argc, char** argv, char** col_name) -> int
+    {
+        if(argc != 3) { return 1; }
+
+        Data_Table* data = static_cast<Data_Table*>(table);
+
+        for(int i = 0; i < argc; ++i)
+        {
+            data->insert( { col_name[i], argv[i] } );
+        }
+        return 0;
+    };
+
+    std::string sql = "SELECT * FROM services WHERE code=" + std::to_string(code) + ';';
+
+    if(execute_statement(sql, callback, &data) && !data.empty())
+    {
+        try
+        {
+            return Service( std::stoi(data["code"])
+                          , USD { std::stod(data["cost"]) }
+                          , data["name"]
+                          , db_key );
+        }
+        catch(const std::exception&) 
+        { 
+            throw chocan_db_exception("DB Error: Service fields not convertible to int");
+        }
+    }
+    return { };
+}
+
+std::optional<Service> SQLite_DB::lookup_service(const std::string& code)
+{
+    try
+    {
+        return lookup_service(std::stoi(code));
+    }
+    catch(const std::exception&)
+    {
+        return { };
+    }
+}
+
+std::optional<Account> SQLite_DB::get_account(const unsigned)
+{
+    return { };
+}
+std::optional<Account> SQLite_DB::get_account(const std::string&)
+{
+    return { };
+}
+std::optional<Account> SQLite_DB::get_member_account(const unsigned)
+{
+    return { };
+}
+std::optional<Account> SQLite_DB::get_member_account(const std::string&)
+{
+    return { };
+}
+std::optional<Account> SQLite_DB::get_provider_account(const unsigned)
+{
+    return { };
+}
+std::optional<Account> SQLite_DB::get_provider_account(const std::string&)
+{
+    return { };
+}
+std::optional<Account> SQLite_DB::get_manager_account(const unsigned)
+{
+    return { };
+}
+std::optional<Account> SQLite_DB::get_manager_account(const std::string&)
+{
+    return { };
+}
+
+Data_Gateway::Service_Directory SQLite_DB::service_directory()
+{
+    return {};
 }
 
 std::string SQLite_DB::serialize_account(const Account& account) const
@@ -142,16 +247,4 @@ std::string SQLite_DB::sqlquote(const std::string& str) const
 {
     // TODO should double quote any unescaped quotes within the string as well
     return "'" + str + "'";
-}
-
-bool SQLite_DB::execute_statement(const std::string& sql, SQL_Callback callback, void* data)
-{
-    int rc = sqlite3_exec(db, sql.c_str(), callback, data, &err_msg);
-
-    if(rc != SQLITE_OK)
-    {
-        sqlite3_free(err_msg);
-        return false;
-    }
-    return true;
 }

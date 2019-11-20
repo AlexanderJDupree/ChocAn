@@ -79,7 +79,7 @@ Mock_DB::Mock_DB()
     })
 { }
 
-void Mock_DB::update_account(const Account& account)
+bool Mock_DB::update_account(const Account& account)
 {
     unsigned id = account.id();
 
@@ -92,23 +92,23 @@ void Mock_DB::update_account(const Account& account)
         [&](const Provider&){ _member_table.insert   ( { id, _account_table.at(id)} ); },
         [&](const Member&)  { _provider_table.insert ( { id, _account_table.at(id)} ); }
     }, account.type() );
-    return;
+    return true;
 }
 
-void Mock_DB::create_account(const Account& account)
+bool Mock_DB::create_account(const Account& account)
 {
     return update_account(account);
 }
 
-void Mock_DB::delete_account(const unsigned ID)
+bool Mock_DB::delete_account(const unsigned ID)
 {
     _account_table.erase(ID);
-    return;
+    return true;
 }
 
-void Mock_DB::add_transaction(const Transaction&)
+bool Mock_DB::add_transaction(const Transaction&)
 {
-    return;
+    return true;
 }
 
 std::optional<Account> Mock_DB::account_table_lookup(const unsigned ID, const Account_Table& table) const
@@ -137,12 +137,12 @@ std::optional<Account> Mock_DB::account_table_lookup(const unsigned ID, const Re
         return { };
     }
 }
-std::optional<Account> Mock_DB::get_account(const unsigned ID) const
+std::optional<Account> Mock_DB::get_account(const unsigned ID)
 {
     return account_table_lookup(ID, _account_table);
 }
 
-std::optional<Account> Mock_DB::get_account(const std::string& ID) const
+std::optional<Account> Mock_DB::get_account(const std::string& ID)
 {
     try
     {
@@ -153,11 +153,11 @@ std::optional<Account> Mock_DB::get_account(const std::string& ID) const
         return { };
     }
 }
-std::optional<Account> Mock_DB::get_member_account(const unsigned ID) const
+std::optional<Account> Mock_DB::get_member_account(const unsigned ID)
 {
     return account_table_lookup(ID, _member_table);
 }
-std::optional<Account> Mock_DB::get_member_account(const std::string& ID)  const
+std::optional<Account> Mock_DB::get_member_account(const std::string& ID)
 {
     try
     {
@@ -168,11 +168,11 @@ std::optional<Account> Mock_DB::get_member_account(const std::string& ID)  const
         return { };
     }
 }
-std::optional<Account> Mock_DB::get_provider_account(const unsigned ID) const
+std::optional<Account> Mock_DB::get_provider_account(const unsigned ID)
 {
     return account_table_lookup(ID, _provider_table);
 }
-std::optional<Account> Mock_DB::get_provider_account(const std::string& ID) const
+std::optional<Account> Mock_DB::get_provider_account(const std::string& ID)
 {
     try
     {
@@ -183,11 +183,11 @@ std::optional<Account> Mock_DB::get_provider_account(const std::string& ID) cons
         return { };
     }
 }
-std::optional<Account> Mock_DB::get_manager_account(const unsigned ID) const
+std::optional<Account> Mock_DB::get_manager_account(const unsigned ID)
 {
     return account_table_lookup(ID, _manager_table);
 }
-std::optional<Account> Mock_DB::get_manager_account(const std::string& ID) const
+std::optional<Account> Mock_DB::get_manager_account(const std::string& ID)
 {
     try
     {
@@ -199,7 +199,7 @@ std::optional<Account> Mock_DB::get_manager_account(const std::string& ID) const
     }
 }
 
-std::optional<Service> Mock_DB::lookup_service(const unsigned code) const
+std::optional<Service> Mock_DB::lookup_service(const unsigned code)
 {
     try
     {
@@ -211,7 +211,7 @@ std::optional<Service> Mock_DB::lookup_service(const unsigned code) const
     }
 }
 
-std::optional<Service> Mock_DB::lookup_service(const std::string& code) const
+std::optional<Service> Mock_DB::lookup_service(const std::string& code)
 {
     try
     {
@@ -223,7 +223,7 @@ std::optional<Service> Mock_DB::lookup_service(const std::string& code) const
     }
 }
 
-const Data_Gateway::Service_Directory& Mock_DB::service_directory() const
+Data_Gateway::Service_Directory Mock_DB::service_directory()
 {
     return _service_directory;
 }
