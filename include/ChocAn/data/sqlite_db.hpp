@@ -19,24 +19,35 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_SQLITE_DB_HPP
 
 #include <sqlite3.h>
+#include <functional>
 #include <ChocAn/core/data_gateway.hpp>
 
 class SQLite_DB // : public Data_Gateway
 {
 public:
 
+    using SQL_Callback = int (*) (void*,int,char**,char**);
+
     SQLite_DB(const char* db_name);
+
+    SQLite_DB(const char* db_name, const char* schema_file);
 
     ~SQLite_DB();
 
+    bool load_schema(const char* schema_file);
+
+    bool create_account(const Account& account);
+
+    // Will overwrite previous row data with account info
+    bool update_account(const Account& account);
+
+    bool delete_account(const unsigned ID);
+
+    bool id_exists(const unsigned ID) const;
+
     std::string serialize_account(const Account& account) const;
 
-    void create_account(const Account& account);
 /*
-    void update_account(const Account& account);
-
-
-    void delete_account(const unsigned ID);
 
     void add_transaction(const Transaction& transaction);
 
@@ -58,13 +69,17 @@ public:
 
     const Service_Directory& service_directory() const;
 
-    bool id_exists(const unsigned ID) const;
 */
 
 private:
 
-    sqlite3* db;
+    std::string sqlquote(const std::string& str) const;
 
+    bool execute_statement(const std::string& sql, SQL_Callback, void* data=nullptr);
+
+    sqlite3* db;
+    char* err_msg = 0;
+    SQL_Callback no_callback = [](void*, int, char**, char**) -> int { return 0; };
 };
 
 #endif // CHOCAN_SQLITE_DB_HPP
