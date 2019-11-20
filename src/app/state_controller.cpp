@@ -41,11 +41,8 @@ State_Controller& State_Controller::interact()
 
 State_Controller& State_Controller::transition()
 {
-    Application_State current_state = runtime.top();
-
-    runtime.pop();
-
-    runtime.push(std::visit(*this, current_state));
+    // TODO implement runtime as ring buffer
+    runtime.push(std::visit(*this, runtime.top()));
 
     return *this;
 }
@@ -59,6 +56,15 @@ bool State_Controller::end_state() const
 {
     // Tests if current state is the exit state
     return std::holds_alternative<Exit>(runtime.top());
+}
+
+Application_State State_Controller::pop_runtime()
+{
+    Application_State temp = runtime.top();
+
+    runtime.pop();
+
+    return temp;
 }
 
 Application_State State_Controller::operator()(const Login& login)
@@ -174,7 +180,8 @@ Application_State State_Controller::operator()(const Confirm_Transaction& state)
     }
     return state;
 }
-
+/*
+<<<<<<< HEAD
 Application_State State_Controller::operator()(Find_Account& state)
 {
   std::string id_num = input_controller->read_input();
@@ -196,4 +203,7 @@ Application_State State_Conroller::operator()(const View_Account& state)
   return account;
 }
 
+=======
+>>>>>>> origin/state_controller_runtime
+*/
 

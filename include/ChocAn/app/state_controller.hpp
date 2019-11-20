@@ -65,6 +65,8 @@ public:
 
 private:
 
+    Application_State pop_runtime();
+
     ChocAn_Ptr         chocan;
     State_Viewer_Ptr   state_viewer;
     Input_Control_Ptr  input_controller;
