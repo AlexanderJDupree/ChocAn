@@ -46,4 +46,25 @@ TEST_CASE("ID_Generator use case", "[id_generator], [service]")
 
     }
 
+    SECTION("Generator generates a random 9 digit number with minimum 1e8")
+    {
+        int results[1024];
+
+        // Generate 1024 random id's
+        std::transform(results, results + 1024, results,
+        [&](int)
+        {
+            return generator.yield();
+        });
+
+        // Require that the id's fit within the required range
+        REQUIRE_FALSE(std::any_of(results, results + 1024,
+                        [](int result)
+                        {
+                            return (result < 100000000 || result > 999999999);
+                        }));
+
+
+    }
+
 }
