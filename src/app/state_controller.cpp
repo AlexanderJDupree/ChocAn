@@ -170,7 +170,7 @@ Application_State State_Controller::operator()(const Create_Account& state)
  
             chocan->db->create_account(chocan->account_builder.build());
         
-        }catch(...){//const chocan_user_exception& err){
+        }catch(const chocan_user_exception& err){
 
             return Application_State{ state };
         }
