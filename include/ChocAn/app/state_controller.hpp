@@ -61,7 +61,7 @@ public:
     Application_State operator()(Add_Transaction&);
     Application_State operator()(const Confirm_Transaction&);
     Application_State operator()(View_Account&);
-    Application_State Find_Account(Menu&);
+    Application_State find_account(Provider_Menu&);
 
 private:
 

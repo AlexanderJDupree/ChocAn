@@ -16,6 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <sstream>
 #include <ChocAn/view/resource_loader.hpp>
+#include <ChocAn/core/utils/overloaded.hpp>
 
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Exit&)
 {
@@ -82,7 +83,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Confirm_Transa
         { "filed_date.month", [&](){ return std::to_string(state.transaction.filed_date().month().count()); } }
     };
 }
-Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& state)
+Resource_Loader::Resource_Table Resource_Loader::operator()(View_Account& state)
 {  
   return
     {

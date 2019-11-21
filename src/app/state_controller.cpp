@@ -99,7 +99,7 @@ Application_State State_Controller::operator()(const Exit& exit)
     return Exit();
 }
 
-Application_State State_Controller::operator()(Provider_Menu& menu)
+Application_State State_Controller::operator()(const Provider_Menu& menu)
 {
     state_viewer->render_state(menu) ;
 
@@ -107,7 +107,7 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-        { "4"   , [&](){ return Find_Account(menu); } },
+       // { "4"   , [&](){ return find_account(menu); } },
         { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
     };
 
@@ -181,7 +181,7 @@ Application_State State_Controller::operator()(const Confirm_Transaction& state)
     }
     return state;
 }
-Application_State Find_Account(Menu& menu)
+Application_State State_Controller::find_account(Provider_Menu& menu)
 {
   menu.status = "Enter ID Numnber of account you want to view:";
   std::string input;
