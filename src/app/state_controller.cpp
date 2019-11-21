@@ -99,7 +99,7 @@ Application_State State_Controller::operator()(const Exit& exit)
     return Exit();
 }
 
-Application_State State_Controller::operator()(const Provider_Menu& menu)
+Application_State State_Controller::operator()(Provider_Menu& menu)
 {
     state_viewer->render_state(menu) ;
 
@@ -107,6 +107,7 @@ Application_State State_Controller::operator()(const Provider_Menu& menu)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
+        { "4"   , [&](){ return Find_Account(menu); } },
         { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
     };
 
@@ -180,30 +181,39 @@ Application_State State_Controller::operator()(const Confirm_Transaction& state)
     }
     return state;
 }
+Application_State Find_Account(Menu& menu)
+{
+  menu.status = "Enter ID Numnber of account you want to view:";
+  std::string input;
+  state_viewer->render_state(menu, [&](){
+    input = input_controller->read_input();
+    });
+  if(auto maybe_account = chocan->db->get_account(input))
+    return View_Account { maybe_account.value() };
+  else 
+    return menu;
+}
 /*
-<<<<<<< HEAD
-Application_State State_Controller::operator()(Find_Account& state)
+Application_State State_Controller::operator()(Find_Account&)
 {
   std::string id_num = input_controller->read_input();
-  //std::optional<Account> state.account = chocan->db->get_account(id_num);
-  state.account = chocan->db->get_account(id_num);
-  if(!state.account)
+  std::optional<Account> maybe_account = chocan->db->get_account(id_num);
+  if(!maybe_account)
   {
-    Application_State temp = runtime.top();
-    runtime.pop();
-    return runtime.top() { "Invalid Account ID "};  //returns to prev. state?
+
+    return pop_runtime().status = "Invalid Account ID";  
   }
-  return View_Account{ state.account };
+  return View_Account{ maybe_account.value() };
 }
-Application_State State_Conroller::operator()(const View_Account& state)
+*/
+
+Application_State State_Controller::operator()(View_Account&)
 {
   std::string input = input_controller->read_input();
-  account = runtime.pop;
-  account = runtime.pop;
-  return account;
+  Application_State temp = runtime.top();
+  runtime.pop();
+  return pop_runtime();
 }
 
-=======
->>>>>>> origin/state_controller_runtime
-*/
+
 

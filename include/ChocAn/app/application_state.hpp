@@ -23,7 +23,12 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <variant>
 #include <ChocAn/core/entities/transaction.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
-
+class Application_State;    //for declared at the bottom
+class Menu
+{
+  public:
+  virtual Application_State one()= 0;
+};
 class Login
 {
 public:
@@ -32,13 +37,13 @@ public:
 
 class Exit { };
 
-class Provider_Menu
+class Provider_Menu: public Menu
 {
 public:
     std::string status;
 };
 
-class Manager_Menu
+class Manager_Menu: public Menu
 {
 public:
     std::string status;
@@ -55,11 +60,6 @@ class Confirm_Transaction
 public: 
     Transaction transaction;
 };
-class Find_Account
-{
-public:
-    Account account;
-};
 class View_Account
 {
   public:
@@ -72,7 +72,6 @@ using Application_State = std::variant< Login
                                       , Manager_Menu
                                       , Add_Transaction
                                       , Confirm_Transaction
-                                      , Find_Account
                                       , View_Account
                                       >;
 

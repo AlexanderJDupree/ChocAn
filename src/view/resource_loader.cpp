@@ -82,13 +82,6 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Confirm_Transa
         { "filed_date.month", [&](){ return std::to_string(state.transaction.filed_date().month().count()); } }
     };
 }
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Find_Account& state)
-{
-  return
-  {
-        { "state_name", [&](){ return "Find Account"; } }
-  }
-}
 Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& state)
 {  
   return
