@@ -1,9 +1,8 @@
 /* 
+ 
+File: sqlite_db.hpp
 
-File: mock_db.cpp
-
-Brief: Provides a Data_Gateway implementation for use in testing. 
-       Mock DB simply creates a tree in memory with a dummy account data.
+Brief: Implements Data Gateway interface with sqlite3 API
 
 Authors: Daniel Mendez 
          Alex Salazar
@@ -16,30 +15,39 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
-#ifndef CHOCAN_MOCK_DB_HPP
-#define CHOCAN_MOCK_DB_HPP
+#ifndef CHOCAN_SQLITE_DB_HPP
+#define CHOCAN_SQLITE_DB_HPP
 
+#include <sqlite3.h>
+#include <functional>
 #include <ChocAn/core/data_gateway.hpp>
-#include <ChocAn/core/entities/account.hpp>
-#include <ChocAn/core/entities/service.hpp>
 
-class Mock_DB : public Data_Gateway
+class SQLite_DB  : public Data_Gateway
 {
 public:
 
-    using Account_Table   = std::map<unsigned, Account>;
-    using Reference_Table = std::map<unsigned, Account&>;
+    using SQL_Callback = int (*) (void*,int,char**,char**);
 
-    Mock_DB();
+    SQLite_DB(const char* db_name);
 
-    bool update_account(const Account& account) override;
+    SQLite_DB(const char* db_name, const char* schema_file);
+
+    ~SQLite_DB();
+
+    bool load_schema(const char* schema_file);
 
     bool create_account(const Account& account) override;
 
+    // Will overwrite previous row data with account info
+    bool update_account(const Account& account) override;
+
     bool delete_account(const unsigned ID) override;
+
+    bool id_exists(const unsigned ID) const override;
 
     bool add_transaction(const Transaction& transaction) override;
 
+    // DB retrieval may fail, wrap in Maybe type
     std::optional<Account> get_account(const unsigned ID) override;
     std::optional<Account> get_account(const std::string& ID) override;
 
@@ -57,17 +65,19 @@ public:
 
     Service_Directory service_directory() override;
 
-    bool id_exists(const unsigned ID) const override;
+    std::string serialize_account(const Account& account) const;
 
-    std::optional<Account> account_table_lookup(const unsigned ID, const Account_Table& table) const;
-    std::optional<Account> account_table_lookup(const unsigned ID, const Reference_Table& table) const;
+private:
 
-    std::map<unsigned, Account> _account_table;
-    std::map<unsigned, Account&> _member_table;
-    std::map<unsigned, Account&> _provider_table;
-    std::map<unsigned, Account&> _manager_table;
+    std::string sqlquote(const std::string& str) const;
 
-    Service_Directory _service_directory;
+    bool execute_statement(const std::string& sql, SQL_Callback, void* data=nullptr);
+
+    sqlite3* db;
+    char* err_msg = 0;
+    SQL_Callback no_callback = [](void*, int, char**, char**) -> int { return 0; };
 };
 
-#endif // CHOCAN_MOCK_DB_HPP
+#endif // CHOCAN_SQLITE_DB_HPP
+
+

@@ -19,21 +19,15 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_EXCEPTION_HPP
 #define CHOCAN_EXCEPTION_HPP
 
+#include <map>
 #include <vector>
 #include <string>
 #include <exception>
 
-/* 
- * chocan_user_exception is reserved for invalid IO action on behalf of the user. 
- * When creating and throwing the user exception it is important to populate
- * exception_info vector to provide feedback on what correct values are
- *
- */
-
 class chocan_user_exception : public std::exception
 {
 public:
-    typedef std::vector<std::string> Info;
+    using Info = std::vector<std::string>;
 
     const Info error_info;
     const char* error_msg;
@@ -46,16 +40,38 @@ public:
     virtual const char* what() const noexcept
     {
         return error_msg;
-    };
+    }
 
     virtual const Info& info() const noexcept
     {
         return error_info;
-    };
+    }
 };
 
+class chocan_db_exception : public std::exception
+{
+public:
 
-// TODO create a database exception?
+    using Row_Info = std::map<std::string, std::string>;
+
+    const Row_Info error_info; // Holds the specific DB row that caused the error
+    const char* error_msg;
+
+    chocan_db_exception(const char* err, Row_Info info)
+        : error_info ( std::move(info) ) 
+        , error_msg  ( err )
+        { }
+
+   virtual const char* what() const noexcept
+   {
+       return error_msg;
+   } 
+
+    virtual const Row_Info& info() const noexcept
+    {
+        return error_info;
+    }
+};
 
 #endif // CHOCAN_EXCEPTION_HPP
 

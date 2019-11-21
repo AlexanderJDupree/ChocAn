@@ -38,31 +38,31 @@ public:
     virtual ~Data_Gateway() {}
 
     // Updates fields of specific accounts, creates account if account DNE
-    virtual void update_account(const Account& account) = 0;
+    virtual bool update_account(const Account& account) = 0;
 
-    virtual void create_account(const Account& account) = 0;
+    virtual bool create_account(const Account& account) = 0;
 
-    virtual void delete_account(const unsigned ID) = 0;
+    virtual bool delete_account(const unsigned ID) = 0;
 
-    virtual void add_transaction(const Transaction& transaction) = 0;
+    virtual bool add_transaction(const Transaction& transaction) = 0;
 
     // DB retrieval may fail, wrap in Maybe type
-    virtual std::optional<Account> get_account(const unsigned ID)      const = 0;
-    virtual std::optional<Account> get_account(const std::string& ID)  const = 0;
+    virtual std::optional<Account> get_account(const unsigned ID) = 0;
+    virtual std::optional<Account> get_account(const std::string& ID) = 0;
 
-    virtual std::optional<Account> get_member_account(const unsigned ID)      const = 0;
-    virtual std::optional<Account> get_member_account(const std::string& ID)  const = 0;
+    virtual std::optional<Account> get_member_account(const unsigned ID) = 0;
+    virtual std::optional<Account> get_member_account(const std::string& ID) = 0;
 
-    virtual std::optional<Account> get_provider_account(const unsigned ID)      const = 0;
-    virtual std::optional<Account> get_provider_account(const std::string& ID)  const = 0;
+    virtual std::optional<Account> get_provider_account(const unsigned ID) = 0;
+    virtual std::optional<Account> get_provider_account(const std::string& ID) = 0;
 
-    virtual std::optional<Account> get_manager_account(const unsigned ID)      const = 0;
-    virtual std::optional<Account> get_manager_account(const std::string& ID)  const = 0;
+    virtual std::optional<Account> get_manager_account(const unsigned ID) = 0;
+    virtual std::optional<Account> get_manager_account(const std::string& ID) = 0;
 
-    virtual std::optional<Service> lookup_service(const unsigned code)     const = 0;
-    virtual std::optional<Service> lookup_service(const std::string& code) const = 0;
+    virtual std::optional<Service> lookup_service(const unsigned code) = 0;
+    virtual std::optional<Service> lookup_service(const std::string& code) = 0;
 
-    virtual const Service_Directory& service_directory() const = 0;
+    virtual Service_Directory service_directory() = 0;
 
     virtual bool id_exists(const unsigned ID) const = 0;
 

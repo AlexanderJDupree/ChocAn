@@ -18,6 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_ADDRESS_HPP
 #define CHOCAN_ADDRESS_HPP
 
+#include <set>
 #include <ChocAn/core/utils/exception.hpp>
 
 class Address
@@ -43,6 +44,8 @@ private:
     std::string _city;
     std::string _state;
     unsigned _zip;
+
+    static const std::set<std::string> US_states;
 };
 
 struct invalid_address : public chocan_user_exception

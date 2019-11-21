@@ -15,4 +15,4 @@
 <footer>
 
 <@menu.status>
-<prompt>
+> <prompt>

@@ -20,6 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define  CHOCAN_STATE_CONTROLLER_H
 
 #include <map>
+#include <stack>
 #include <functional>
 #include <ChocAn/core/chocan.hpp>
 #include <ChocAn/app/state_viewer.hpp>
@@ -31,8 +32,9 @@ class State_Controller
 public:
 
     using ChocAn_Ptr        = ChocAn::ChocAn_Ptr;
-    using Input_Control_Ptr = Input_Controller::Input_Control_Ptr;
+    using Runtime_Stack     = std::stack<Application_State>;
     using State_Viewer_Ptr  = State_Viewer::State_Viewer_Ptr;
+    using Input_Control_Ptr = Input_Controller::Input_Control_Ptr;
     using Transition_Table  = std::map<std::string, std::function<Application_State()>>;
 
     // TODO set default instances
@@ -41,30 +43,29 @@ public:
                     , Input_Control_Ptr input_controller
                     , Application_State initial_state = Login());
 
-    // Renders state view, and calls transition
     State_Controller& interact();
-
-    // Transition to next state through visitor pattern
-    State_Controller& transition();
 
     const Application_State& current_state() const;
 
     bool end_state() const;
 
     /** Visitor Methods **/
-    Application_State operator()(const Login&);
-    Application_State operator()(const Exit&);
-    Application_State operator()(const Provider_Menu&);
-    Application_State operator()(const Manager_Menu&);
+    Application_State operator()(Exit&);
+    Application_State operator()(Login&);
+    Application_State operator()(Manager_Menu&);
+    Application_State operator()(Provider_Menu&);
     Application_State operator()(Add_Transaction&);
-    Application_State operator()(const Confirm_Transaction&);
+    Application_State operator()(Confirm_Transaction&);
 
 private:
+
+    Application_State pop_runtime();
 
     ChocAn_Ptr         chocan;
     State_Viewer_Ptr   state_viewer;
     Input_Control_Ptr  input_controller;
-    Application_State  state;
+    Runtime_Stack      runtime;
+    bool               is_end_state = false;
 
 };
 

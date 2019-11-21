@@ -5,4 +5,4 @@
 ( Entering 'cancel' will cancel the transaction )
 
 <@builder.user_error>
-Enter <@builder.current_field>: <empty_prompt>
+Enter <@builder.current_field>: <prompt>
