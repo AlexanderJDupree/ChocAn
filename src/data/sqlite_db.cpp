@@ -18,6 +18,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <cstring>
 #include <sstream>
 #include <fstream>
+#include <functional>
 #include <ChocAn/data/sqlite_db.hpp>
 #include <ChocAn/core/utils/exception.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
@@ -28,7 +29,7 @@ SQLite_DB::SQLite_DB(const char* db_name)
 {
     if(sqlite3_open(db_name, &db) != SQLITE_OK)
     {
-        throw chocan_db_exception("Fatal: Unable to connect to DB");
+        throw chocan_db_exception("Fatal: Unable to connect to DB", {});
     }
 }
 SQLite_DB::SQLite_DB(const char* db_name, const char* schema_file)
@@ -36,7 +37,7 @@ SQLite_DB::SQLite_DB(const char* db_name, const char* schema_file)
 {
     if(!load_schema(schema_file))
     {
-        throw chocan_db_exception("Fatal: Unable to load schema file");
+        throw chocan_db_exception("Fatal: Unable to load schema file", {});
     }
 }
 
@@ -163,7 +164,7 @@ std::optional<Service> SQLite_DB::lookup_service(const unsigned code)
         }
         catch(const std::exception&) 
         { 
-            throw chocan_db_exception("DB Error: Service fields not convertible to int");
+            throw chocan_db_exception("DB Error: Failed to deserialize Service", {});
         }
     }
     return { };
@@ -181,13 +182,67 @@ std::optional<Service> SQLite_DB::lookup_service(const std::string& code)
     }
 }
 
-std::optional<Account> SQLite_DB::get_account(const unsigned)
+std::optional<Account> SQLite_DB::get_account(const unsigned ID)
 {
+    using Data_Table = std::map<std::string, std::string>;
+
+    Data_Table data;
+    auto callback = [](void* table, int argc, char** argv, char** col_name) -> int
+    {
+        if(argc != 9) { return 1; }
+
+        Data_Table* data = static_cast<Data_Table*>(table);
+
+        for(int i = 0; i < argc; ++i)
+        {
+            data->insert( { col_name[i], argv[i] } );
+        }
+        return 0;
+    };
+
+    std::string sql = "SELECT * FROM accounts WHERE chocan_id=" + std::to_string(ID) + ";";
+
+    std::map<std::string, std::function<Account::Account_Type()>> type_constructor
+    {
+        { "Manager",  [&](){ return Manager();  } },
+        { "Provider", [&](){ return Provider(); } },
+        { "Member",   [&]()
+        { 
+            return Member(data["status"] == "Suspended" ? Account_Status::Suspended 
+                                                        : Account_Status::Valid); 
+        } }
+    };
+
+    if(execute_statement(sql, callback, &data) && !data.empty())
+    {
+        try
+        {
+            return Account( Name(data["f_name"], data["l_name"])
+                          , Address( data["street"]
+                                   , data["city"]
+                                   , data["state"]
+                                   , std::stoi(data["zip"]) )
+                          , type_constructor.at(data["type"])()
+                          , std::stoi(data["chocan_id"])
+                          , db_key );
+        }
+        catch(const std::exception&)
+        {
+            throw chocan_db_exception("DB: Error Failed to deserialize Account", data);
+        }
+    }
     return { };
 }
-std::optional<Account> SQLite_DB::get_account(const std::string&)
+std::optional<Account> SQLite_DB::get_account(const std::string& ID)
 {
-    return { };
+    try
+    {
+        return get_account(std::stoi(ID));
+    }
+    catch(const std::exception&)
+    {
+        return { };
+    }
 }
 std::optional<Account> SQLite_DB::get_member_account(const unsigned)
 {

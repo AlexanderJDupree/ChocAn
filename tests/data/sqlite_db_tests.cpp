@@ -21,6 +21,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/data/mock_db.hpp>
 #include <ChocAn/data/sqlite_db.hpp>
 
+// Will instruct sqltie3 to construct temp DB in memory only
 const char* TEST_DB = ":memory:";
 const char* CHOCAN_SCHEMA = "chocan_schema.sql";
 
@@ -139,5 +140,20 @@ TEST_CASE("Looking up services in service directory", "[lookup_service], [sqlite
     SECTION("Returns None when given an invalid_service code")
     {
         REQUIRE_FALSE(db.lookup_service(0));
+    }
+}
+
+TEST_CASE("Retrieving accounts from the database")
+{
+    SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
+
+
+    SECTION("Retrieving an account will not modify the data")
+    {
+//        Account test = db.get_account(123456789).value();
+
+//        INFO("Account name: " + test.name().first());
+
+        REQUIRE(db.get_account(123456789));
     }
 }
