@@ -52,7 +52,7 @@ Mock_DB::Mock_DB()
         { 9876, Account( Name ("Jane", "Member")
                         , Address ( "1234 awesome st."
                                     , "Portland"
-                                    , "OR"
+                                    , "ME"
                                     , 97030 )
                         , Member { Account_Status::Suspended }
                         , 9876

@@ -24,6 +24,12 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/entities/transaction.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
 
+class Menu 
+{
+public:
+    std::string status;
+};
+
 class Login
 {
 public:
@@ -32,17 +38,9 @@ public:
 
 class Exit { };
 
-class Provider_Menu
-{
-public:
-    std::string status;
-};
+class Provider_Menu : public Menu { };
 
-class Manager_Menu
-{
-public:
-    std::string status;
-};
+class Manager_Menu : public Menu { };
 
 class Add_Transaction 
 { 

@@ -69,7 +69,7 @@ TEST_CASE("Serializing Accounts into a values statement", "[serialize_account], 
     }
     SECTION("Serializing a suspended member account")
     {
-        std::string expected = "9876, 'Jane', 'Member', '1234 awesome st.', 'Portland', 'OR', '97030', 'Member', 'Suspended'";
+        std::string expected = "9876, 'Jane', 'Member', '1234 awesome st.', 'Portland', 'ME', '97030', 'Member', 'Suspended'";
         std::string val = db.serialize_account(mock_db.get_account("9876").value());
 
         REQUIRE(val == expected);

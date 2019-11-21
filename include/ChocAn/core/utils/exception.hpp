@@ -24,13 +24,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <string>
 #include <exception>
 
-/* 
- * chocan_user_exception is reserved for invalid IO action on behalf of the user. 
- * When creating and throwing the user exception it is important to populate
- * exception_info vector to provide feedback on what correct values are
- *
- */
-
 class chocan_user_exception : public std::exception
 {
 public:
