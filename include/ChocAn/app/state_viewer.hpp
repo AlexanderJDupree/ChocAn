@@ -32,7 +32,9 @@ public:
 
     virtual ~State_Viewer() {}
 
+    // re-render the current state
     virtual void update() = 0;
+    // Store callback handler, render current state
     virtual void render_state(const Application_State& state, Callback event = [](){}) = 0;
 };
 

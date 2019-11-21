@@ -17,11 +17,13 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <map>
 #include <sstream>
 #include <functional>
+#include <iostream>
+#include <ChocAn/core/utils/overloaded.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
 
 bool Transaction_Builder::buildable() const
 {
-    return fields.empty();
+    return service && service_date && provider_acct && member_acct && comments;
 }
 
 Transaction Transaction_Builder::build() const
@@ -37,13 +39,7 @@ Transaction Transaction_Builder::build() const
 
 Transaction_Builder& Transaction_Builder::reset()
 {
-
-    fields = { "Comments"
-             , "Service Code"
-             , "Date of Provided Service (MM-DD-YYYY)"
-             , "Member ID"
-             , "Provider ID" };
-
+    state = Set_Provider_Acct();
     service.reset();
     service_date.reset();
     provider_acct.reset();
@@ -55,32 +51,50 @@ Transaction_Builder& Transaction_Builder::reset()
 
 std::string Transaction_Builder::get_current_field() const
 {
-    if(fields.empty()) { return ""; }
-
-    return fields.back();
+    return std::visit( overloaded {
+        [](const Set_Service_Date&){ return "Service Date (MM-DD-YYYY)"; },
+        [](const Set_Provider_Acct&){ return "Provider ID"; },
+        [](const Set_Member_Acct&){ return "Member ID"; },
+        [](const Set_Service&){ return "Service Code"; },
+        [](const Set_Comments&){ return "Comments"; }
+    }, state);
 }
 
 void Transaction_Builder::set_current_field(const std::string& input)
 {
-    using Field_Table = std::map<std::string, std::function<void()>>;
-
-    if ( fields.empty() ) { return; }
-
     error.reset();
 
-    const Field_Table set_field 
-    {
-        { "Provider ID"  , [&](){ return set_provider_acct_field(input); } },
-        { "Member ID"    , [&](){ return set_member_acct_field(input);   } },
-        { "Service Code" , [&](){ return set_service_field(input);       } },
-        { "Comments"     , [&](){ return set_comments_field(input);      } },
-        { "Date of Provided Service (MM-DD-YYYY)", 
-                           [&](){ return set_service_date_field(input);  } }
-    };
+    std::visit( overloaded {
+        [&](const Set_Provider_Acct&)
+        { 
+            set_provider_acct_field(input);
 
-    set_field.at(fields.back())();
+            if(!error) { state = Set_Member_Acct(); }
+        },
+        [&](const Set_Member_Acct&)
+        { 
+            set_member_acct_field(input);
 
-    if (!error) { fields.pop_back(); }
+            if(!error) { state = Set_Service_Date(); }
+        },
+        [&](const Set_Service_Date&)
+        { 
+            set_service_date_field(input);
+
+            if(!error) { state = Set_Service(); }
+        },
+        [&](const Set_Service&)
+        { 
+            set_service_field(input);
+
+            if(!error) { state = Set_Comments(); }
+        },
+        [&](const Set_Comments&)
+        { 
+            set_comments_field(input);
+        }
+    }, state);
+
 }
 
 const std::optional<chocan_user_exception>& Transaction_Builder::get_last_error() const
