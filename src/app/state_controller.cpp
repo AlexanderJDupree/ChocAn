@@ -194,15 +194,17 @@ Application_State State_Controller::operator()(View_Account&)
   return pop_runtime();
 }
 
-Application_State State_Controller::find_account(Provider_Menu& menu)
+Application_State State_Controller::find_account(Menu& menu)
 {
-  menu.status = "Enter ID Numnber of account you want to view:";
-  std::string input;
-  state_viewer->render_state(menu, [&](){
-    input = input_controller->read_input();
-    });
-  if(auto maybe_account = chocan->db->get_account(input))
-    return View_Account { maybe_account.value() };
-  else 
-    return menu;
+
+    menu.status = "Enter ID Numnber of account you want to view: ";
+
+    state_viewer->update();
+
+    std::string input = input_controller->read_input();
+
+    if(auto maybe_account = chocan->db->get_account(input))
+        return View_Account { maybe_account.value() };
+
+    return Provider_Menu();
 }

@@ -58,7 +58,7 @@ public:
     Application_State operator()(Add_Transaction&);
     Application_State operator()(Confirm_Transaction&);
 
-    Application_State find_account(Provider_Menu& menu);
+    Application_State find_account(Menu& menu);
 
 private:
 
