@@ -66,6 +66,7 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/state_controller_tests.o \
+	$(OBJDIR)/account_builder_tests.o \
 	$(OBJDIR)/account_tests.o \
 	$(OBJDIR)/address_tests.o \
 	$(OBJDIR)/datetime_tests.o \
@@ -136,6 +137,9 @@ $(OBJECTS): | $(OBJDIR)
 endif
 
 $(OBJDIR)/state_controller_tests.o: ../tests/app/state_controller_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/account_builder_tests.o: ../tests/core/account_builder_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/account_tests.o: ../tests/core/account_tests.cpp

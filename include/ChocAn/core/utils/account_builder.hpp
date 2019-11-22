@@ -26,16 +26,29 @@ https://github.com/AlexanderJDupree/ChocAn
 
 enum field_types{current_type,current_first,current_last,current_street,current_city,current_state,current_zip};
 
+struct Building_Phases{
+
+    Building_Phases(){};
+    
+    const std::string account_type   
+        = "Account Type : Manager OR Provider OR Member\nMUST TYPE EXACTLY ONE OF THESE OPTIONS";
+    const std::string full_name      
+        = "Full Name As : First[1-24], Last[1-24]\nTOTAL CHARACTER LIMIT [2-25]";
+    const std::string street_address 
+        = "Address As   : Street[1-25], City[1-14], State[2], Zip[5]\nTOTAL CHARACTER LIMIT [9-46]";
+
+};
+
 class Account_Builder{
 
     public:
 
     using Database_Ptr = Data_Gateway::Database_Ptr;
-    using Account_Info = std::map<field_types, std::string>;
+    using Account_field = std::map<field_types, std::string>;
     
     Account_Builder(Database_Ptr db) 
         : id_generator(db)
-        , account_info({})
+        , account_field({})
         , valid_types({"Manager","manager","Member","member","Provider","provider"})
         { reset(); }
 
@@ -61,10 +74,10 @@ class Account_Builder{
         bool confirm_account(const std::string& input)const;
             
         ID_Generator             id_generator;
-        Account_Info             account_info;
+        Account_field            account_field;
         
         std::vector<std::string> valid_types;
-        std::stack<std::string>  fields;
+        std::stack<std::string>  build_phase;
         
         bool account_accepted;
        
