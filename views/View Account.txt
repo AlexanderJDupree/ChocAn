@@ -7,5 +7,4 @@ Name: <@account.name.last>, <@account.name.first>
 Address: <@account.address.street>
          <@account.address.city> <@account.address.state>, <@account.address.zip>
 
-Press 'Enter' to return to the main menu:
-<prompt>
+Press 'Enter' to return to the main menu: <prompt>

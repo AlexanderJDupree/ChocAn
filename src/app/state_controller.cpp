@@ -189,53 +189,51 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 
 Application_State State_Controller::operator()(View_Account& state)
 {
-  state_viewer->render_state(state) ;
-  std::string input = input_controller->read_input();
-  runtime.pop();
-  return pop_runtime();
+    state_viewer->render_state(state, [&](){
+        input_controller->read_input();
+    });
+
+    runtime.pop();
+
+    return pop_runtime();
 }
 
-Application_State State_Controller::find_account(Menu& menu)
+Application_State State_Controller::find_account(Provider_Menu& menu)
 {
-<<<<<<< HEAD
+    menu.status = "Enter ID Number of account you want to view:";
 
-    menu.status = "Enter ID Numnber of account you want to view: ";
-
-    state_viewer->update();
-
-    std::string input = input_controller->read_input();
-
-    if(auto maybe_account = chocan->db->get_account(input))
-        return View_Account { maybe_account.value() };
-
-    return Provider_Menu();
-=======
-  menu.status = "Enter ID Numnber of account you want to view:";
-  std::string input;
-  state_viewer->render_state(menu, [&](){
-    input = input_controller->read_input();
+    std::string input;
+    state_viewer->render_state(menu, [&](){
+            input = input_controller->read_input();
     });
-  menu.status = "";
-  if(auto maybe_account = chocan->db->get_account(input))
-    return View_Account { maybe_account.value() };
-  else 
-  {
-    menu.status = "Invalid ID";
-    return menu;
-  }
->>>>>>> bcd7fbe4d8f24b35de3d6305a9b1a0e210f8e13a
+
+    menu.status = "";
+    if(auto maybe_account = chocan->db->get_member_account(input))
+    {
+        return View_Account { maybe_account.value() };
+    }
+    else 
+    {
+        return Provider_Menu { "Invalid ID" };
+    }
 }
 
 Application_State State_Controller::find_account(Manager_Menu& menu)
 {
-  menu.status = "Enter ID Numnber of account you want to view:";
-  std::string input;
-  state_viewer->render_state(menu, [&](){
-    input = input_controller->read_input();
+    menu.status = "Enter ID Number of account you want to view:";
+
+    std::string input;
+    state_viewer->render_state(menu, [&](){
+        input = input_controller->read_input();
     });
-  menu.status = "";
-  if(auto maybe_account = chocan->db->get_account(input))
-    return View_Account { maybe_account.value() };
-  else 
-    return menu;
+
+    menu.status = "";
+    if(auto maybe_account = chocan->db->get_account(input))
+    {
+        return View_Account { maybe_account.value() };
+    }
+    else 
+    {
+        return Manager_Menu { "Invalid ID" };
+    }
 }
