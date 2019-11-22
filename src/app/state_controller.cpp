@@ -112,7 +112,7 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-       // { "4"   , [&](){ return find_account(menu); } },
+        { "4"   , [&](){ return find_account(menu); } },
         { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
     };
 
@@ -133,6 +133,7 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
     const Transition_Table manager_menu
     {
         { "exit", [&](){ return Exit();  } },
+        { "1"   , [&](){ return find_account(menu); } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
     };
 
@@ -189,8 +190,6 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 Application_State State_Controller::operator()(View_Account&)
 {
   std::string input = input_controller->read_input();
-  Application_State temp = runtime.top();
-  runtime.pop();
   return pop_runtime();
 }
 
@@ -207,4 +206,17 @@ Application_State State_Controller::find_account(Menu& menu)
         return View_Account { maybe_account.value() };
 
     return Provider_Menu();
+}
+
+Application_State State_Controller::find_account(Manager_Menu& menu)
+{
+  menu.status = "Enter ID Numnber of account you want to view:";
+  std::string input;
+  state_viewer->render_state(menu, [&](){
+    input = input_controller->read_input();
+    });
+  if(auto maybe_account = chocan->db->get_account(input))
+    return View_Account { maybe_account.value() };
+  else 
+    return menu;
 }

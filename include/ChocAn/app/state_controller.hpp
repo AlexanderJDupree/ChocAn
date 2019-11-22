@@ -58,11 +58,7 @@ public:
     Application_State operator()(Add_Transaction&);
     Application_State operator()(Confirm_Transaction&);
 
-    Application_State find_account(Menu& menu);
-
 private:
-
-    Application_State pop_runtime();
 
     ChocAn_Ptr         chocan;
     State_Viewer_Ptr   state_viewer;
