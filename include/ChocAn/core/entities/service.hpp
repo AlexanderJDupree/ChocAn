@@ -29,7 +29,7 @@ class Service
 {
 public:
 
-    Service(unsigned code, USD cost, const std::string& service_name, Key<Data_Gateway>&)
+    Service(unsigned code, USD cost, const std::string& service_name, const Key<Data_Gateway>&)
         : _cost(cost)
         , _code(code)
         , _name(service_name)

@@ -113,10 +113,8 @@ bool SQLite_DB::delete_account(const unsigned ID)
 bool SQLite_DB::id_exists(const unsigned ID) const
 {
     bool flag = false;
-    auto callback = [](void* flag, int argc, char** argv, char**) -> int 
+    auto callback = [](void* flag, int, char** argv, char**) -> int 
     { 
-        if(argc != 1) { return 1; }
-
         // If query returned 1, set flag to true
         *static_cast<bool*>(flag) = (strcmp(argv[0], "1") == 0);
         return 0;
@@ -135,14 +133,10 @@ bool SQLite_DB::add_transaction(const Transaction&)
 
 std::optional<Service> SQLite_DB::lookup_service(const unsigned code)
 {
-    using Data_Table = std::map<std::string, std::string>;
-
-    Data_Table data;
+    SQL_Row data;
     auto callback = [](void* table, int argc, char** argv, char** col_name) -> int
     {
-        if(argc != 3) { return 1; }
-
-        Data_Table* data = static_cast<Data_Table*>(table);
+        SQL_Row* data = static_cast<SQL_Row*>(table);
 
         for(int i = 0; i < argc; ++i)
         {
@@ -155,17 +149,7 @@ std::optional<Service> SQLite_DB::lookup_service(const unsigned code)
 
     if(execute_statement(sql, callback, &data) && !data.empty())
     {
-        try
-        {
-            return Service( std::stoi(data["code"])
-                          , USD { std::stod(data["cost"]) }
-                          , data["name"]
-                          , db_key );
-        }
-        catch(const std::exception&) 
-        { 
-            throw chocan_db_exception("DB Error: Failed to deserialize Service", {});
-        }
+        return deserialize_service(data);
     }
     return { };
 }
@@ -184,14 +168,10 @@ std::optional<Service> SQLite_DB::lookup_service(const std::string& code)
 
 std::optional<Account> SQLite_DB::get_account(const unsigned ID)
 {
-    using Data_Table = std::map<std::string, std::string>;
-
-    Data_Table data;
+    SQL_Row data;
     auto callback = [](void* table, int argc, char** argv, char** col_name) -> int
     {
-        if(argc != 9) { return 1; }
-
-        Data_Table* data = static_cast<Data_Table*>(table);
+        SQL_Row* data = static_cast<SQL_Row*>(table);
 
         for(int i = 0; i < argc; ++i)
         {
@@ -202,34 +182,10 @@ std::optional<Account> SQLite_DB::get_account(const unsigned ID)
 
     std::string sql = "SELECT * FROM accounts WHERE chocan_id=" + std::to_string(ID) + ";";
 
-    std::map<std::string, std::function<Account::Account_Type()>> type_constructor
-    {
-        { "Manager",  [&](){ return Manager();  } },
-        { "Provider", [&](){ return Provider(); } },
-        { "Member",   [&]()
-        { 
-            return Member(data["status"] == "Suspended" ? Account_Status::Suspended 
-                                                        : Account_Status::Valid); 
-        } }
-    };
 
     if(execute_statement(sql, callback, &data) && !data.empty())
     {
-        try
-        {
-            return Account( Name(data["f_name"], data["l_name"])
-                          , Address( data["street"]
-                                   , data["city"]
-                                   , data["state"]
-                                   , std::stoi(data["zip"]) )
-                          , type_constructor.at(data["type"])()
-                          , std::stoi(data["chocan_id"])
-                          , db_key );
-        }
-        catch(const std::exception&)
-        {
-            throw chocan_db_exception("DB: Error Failed to deserialize Account", data);
-        }
+        return deserialize_account(data);
     }
     return { };
 }
@@ -296,6 +252,51 @@ std::string SQLite_DB::serialize_account(const Account& account) const
          }, account.type());
 
     return data.str();
+}
+
+Account SQLite_DB::deserialize_account(const SQL_Row& data) const
+{
+    std::map<std::string, std::function<Account::Account_Type()>> type_constructor
+    {
+        { "Manager",  [&](){ return Manager();  } },
+        { "Provider", [&](){ return Provider(); } },
+        { "Member",   [&]()
+        { 
+            return Member(data.at("status") == "Suspended" ? Account_Status::Suspended 
+                                                           : Account_Status::Valid); 
+        } }
+    };
+
+    try
+    {
+        return Account( Name(data.at("f_name"), data.at("l_name"))
+                      , Address( data.at("street")
+                               , data.at("city")
+                               , data.at("state")
+                               , std::stoi(data.at("zip")) )
+                      , type_constructor.at(data.at("type"))()
+                      , std::stoi(data.at("chocan_id"))
+                      , db_key );
+    }
+    catch(const std::exception&)
+    {
+        throw chocan_db_exception("DB: Error Failed to deserialize Account", data);
+    }
+}
+
+Service SQLite_DB::deserialize_service(const SQL_Row& data) const
+{
+    try
+    {
+        return Service( std::stoi(data.at("code"))
+                        , USD { std::stod(data.at("cost")) }
+                        , data.at("name")
+                        , db_key );
+    }
+    catch(const std::exception&) 
+    { 
+        throw chocan_db_exception("DB Error: Failed to deserialize Service", {});
+    }
 }
 
 std::string SQLite_DB::sqlquote(const std::string& str) const

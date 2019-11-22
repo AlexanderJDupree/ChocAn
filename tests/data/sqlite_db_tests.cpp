@@ -73,6 +73,16 @@ TEST_CASE("Serializing Accounts into a values statement", "[serialize_account], 
         std::string val = db.serialize_account(mock_db.get_account("9876").value());
 
         REQUIRE(val == expected);
+    } 
+ }
+
+TEST_CASE("Deserializing SQL row data into account objects", "[deserialize_account], [sqlite_db]")
+{
+    SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
+
+    SECTION("When given a row with valid data in all fields, an Account object is returned with the data")
+    {
+
     }
 }
 
@@ -143,17 +153,21 @@ TEST_CASE("Looking up services in service directory", "[lookup_service], [sqlite
     }
 }
 
-TEST_CASE("Retrieving accounts from the database")
+TEST_CASE("Retrieving accounts from the database", "[get_account], [sqlite_db]")
 {
     SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
 
 
-    SECTION("Retrieving an account will not modify the data")
+    SECTION("Retrieve accounts returns a filled optional object on success")
     {
-//        Account test = db.get_account(123456789).value();
-
-//        INFO("Account name: " + test.name().first());
-
         REQUIRE(db.get_account(123456789));
+    }
+    SECTION("Retrieival fails if account does not exist")
+    {
+        REQUIRE_FALSE(db.get_account("000"));
+    }
+    SECTION("Retrieval fails if the ID string is not convertible to int")
+    {
+        REQUIRE_FALSE(db.get_account("garbage"));
     }
 }

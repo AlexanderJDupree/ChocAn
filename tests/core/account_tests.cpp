@@ -37,3 +37,16 @@ TEST_CASE("Constructors for account class", "[constructors], [account]")
                                 , chocan.id_generator ) );
     }
 }    
+
+TEST_CASE("Serializing Accounts into data tables", "[serialize], [account]")
+{
+    Account::Data_Table
+    {
+        { "f_name", "Dan" }, { "l_name"}
+    };
+    SECTION("Account serializaition returns a string table of the accounts data")
+    {
+
+    }
+}
+

@@ -26,6 +26,7 @@ class SQLite_DB  : public Data_Gateway
 {
 public:
 
+    using SQL_Row      = std::map<std::string, std::string>;
     using SQL_Callback = int (*) (void*,int,char**,char**);
 
     SQLite_DB(const char* db_name);
@@ -67,11 +68,15 @@ public:
 
     std::string serialize_account(const Account& account) const;
 
+    Account deserialize_account(const SQL_Row& data) const;
+    Service deserialize_service(const SQL_Row& data) const;
+
 private:
 
     std::string sqlquote(const std::string& str) const;
 
     bool execute_statement(const std::string& sql, SQL_Callback, void* data=nullptr);
+
 
     sqlite3* db;
     char* err_msg = 0;
