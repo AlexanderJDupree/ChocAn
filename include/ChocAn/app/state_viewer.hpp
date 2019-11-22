@@ -20,19 +20,22 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_STATE_VIEWER_H
 
 #include <memory>
-#include <ChocAn/core/utils/exception.hpp>
+#include <functional>
 #include <ChocAn/app/application_state.hpp>
 
 class State_Viewer
 {
 public:
 
+    using Callback         = std::function<void()>;
     using State_Viewer_Ptr = std::shared_ptr<State_Viewer>;
 
     virtual ~State_Viewer() {}
 
+    // re-render the current state
     virtual void update() = 0;
-    virtual void render_state(const Application_State& state) = 0;
+    // Store callback handler, render current state
+    virtual void render_state(const Application_State& state, Callback event = [](){}) = 0;
 };
 
 #endif // CHOCAN_STATE_VIEWER_H

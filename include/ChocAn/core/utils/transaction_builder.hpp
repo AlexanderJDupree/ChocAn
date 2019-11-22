@@ -18,7 +18,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_TRANSACTION_BUILDER_HPP
 #define CHOCAN_TRANSACTION_BUILDER_HPP
 
-#include <vector>
 #include <optional>
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/service.hpp>
@@ -30,15 +29,23 @@ class Transaction_Builder
 {
 public:
 
+    struct Set_Service_Date  {};
+    struct Set_Provider_Acct {};
+    struct Set_Member_Acct   {};
+    struct Set_Comments      {};
+    struct Set_Service       {};
+
     using Database_Ptr = Data_Gateway::Database_Ptr;
+    using Builder_State = std::variant< Set_Service_Date
+                                      , Set_Provider_Acct
+                                      , Set_Member_Acct
+                                      , Set_Comments
+                                      , Set_Service
+                                      >;
 
     Transaction_Builder(Database_Ptr db)
         : db(db)
-        , fields( { "Comments"
-                  , "Service Code"
-                  , "Date of Provided Service (MM-DD-YYYY)"
-                  , "Member ID"
-                  , "Provider ID" } )
+        , state( Set_Provider_Acct() )
         { }
 
     // Returns True if every field contains a created object
@@ -64,8 +71,7 @@ public:
 private:
 
     Database_Ptr db;
-
-    std::vector<std::string> fields;
+    Builder_State state;
 
     std::optional<Service>  service;
     std::optional<DateTime> service_date;

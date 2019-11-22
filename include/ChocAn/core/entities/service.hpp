@@ -29,6 +29,7 @@ class Service
 {
 public:
 
+    // Only DB can construct Service objects
     Service(unsigned code, USD cost, const std::string& service_name, Key<Data_Gateway>&)
         : _cost(cost)
         , _code(code)

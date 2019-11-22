@@ -39,7 +39,6 @@ public:
 
     // Read a line of input for each field in fields
     virtual Form_Data read_form(const Fields& fields, Field_Callback prompt) const = 0;
-
 };
 
 #endif // CHOCAN_INPUT_CONTROLLER_H

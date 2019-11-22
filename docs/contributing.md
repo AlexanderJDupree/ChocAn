@@ -11,374 +11,398 @@ Firstly, the ChocAn application is designed with a layered system architecture.
 
 On the bottom we have the **Data Access Layer** which is responsible for communicating with the databse to retrieve/update ChocAn records.
 Next is the **Domain Layer**, this layer describes all the business logic for the application, and defines how entities interact with each other.
-You'll find the Member/Provider classes and reporting managers all in this layer. Connected to the **Domain Layer** is the **Application Layer**. 
+You'll find the Member/Provider classes and other entities in this layer. Connected to the **Domain Layer** is the **Application Layer**. 
 The **Application Layer** manages the control flow of the actual application, and communicates with the **Domain Layer** to validate input and 
 perform other actions. Lastly is the **Presentation Layer**, this layer is where all the IO actually happens. Reading input from the user, printing and 
 formatting state representation, all occurs here. In fact, the only place where *iostream* should be included in a source file is within the **Presentation Layer**. This guide will deal mostly with the **Application** and **Presentation** layer.
 
 ## Application Layer
 
-The **Application Layer** uses a [finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine) to model user interaction with the application. Essentially, as we interact with the application the behavior of the application changes. For example, when I start up the application I am greeted with a login screen, if I enter the correct login I can transition to a provider menu screen. However, the set of actions I can take are different at the menu screen than the login screen. Using a state machine and implementing the [state pattern](https://en.wikipedia.org/wiki/State_pattern) allows our application to exhibit different behavior depending on the internal state. In terms of the code, the two main files for the state machine are the `State` abstract base class, and the `State_Controller`. 
+The **Application Layer** uses a [finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine) to model user interaction with the application. Essentially, as we interact with the application the behavior of the application changes. For example, when I start up the application I am greeted with a login screen, if I enter the correct login I can transition to a provider menu screen. However, the set of actions I can take are different at the menu screen than the login screen. Using a state machine and implementing the [state pattern](https://en.wikipedia.org/wiki/State_pattern) allows our application to exhibit different behavior depending on the internal state. We accomplish in code by leveraging a variant and the visitor pattern. Lets look first at the `State_Controller`
 
-Lets first look at the `State` abstract base class. 
-
-(include/ChocAn/app/state.hpp)
 ```c++
-class State
+// File: include/ChocAn/app/state_controller.hpp
+
+class State_Controller
 {
 public:
 
-    typedef std::shared_ptr<State>      State_Ptr;
-    typedef std::vector<std::string>    Input_Vector;
+    State_Controller( ChocAn_Ptr        chocan
+                    , State_Viewer_Ptr  state_viewer
+                    , Input_Control_Ptr input_controller
+                    , Application_State initial_state = Login());
 
-    virtual ~State() {};
+    // Renders state view, and calls transition
+    State_Controller& interact();
 
-    virtual State_Ptr evaluate(const Input_Vector& input) = 0;
+    // Transition to next state through visitor pattern
+    State_Controller& transition();
 
-    virtual State_Info info() const = 0;
+    const Application_State& current_state() const;
 
-    size_t id() const { return typeid(*this).hash_code(); }
+    bool end_state() const;
 
-    bool operator == (const State& rhs) const { return this->id() == rhs.id(); }
+    /** Visitor Methods **/
+    Application_State operator()(const Login&);
+    Application_State operator()(const Exit&);
+    Application_State operator()(const Provider_Menu&);
+    Application_State operator()(const Manager_Menu&);
+    Application_State operator()(Add_Transaction&);
+    Application_State operator()(const Confirm_Transaction&);
+
+private:
+
+    /* Member Variables */
 };
 
 ```
 
-First, we typedef the `std::shared_ptr` to `State_Ptr`, and `std::vector` to `Input_Vector`. Typedefs help relieve us of the tedious C++ standard library typenames and allow us to reference an object's type in a uniform way. The `State` class also has two pure virtual methods that derived classes must implement. The first is the *evaluate* function. *evaluate* takes in an `Input_Vector` and returns a `State_Ptr`. You can think of this as a function that maps *inputs* to *states*. How it maps these inputs is up to you, but generally invalid or unrecognizable input should map back to itself. The second virtual method is *info*, which returns a `State_Info` object that holds optional data about the state.
+The `State Controller` is the main workhorse of the application. It uses the `chocan` API, a `state_viewer`, and `input_controller` to create an interactive experience for the user. If you notice, the function call operator() is overloaded to accept different kinds of `Application_State`. Let's look at the definition of `Application_State`.
 
-The `State_Controller` just manages what the current state is and feeds input into the current state to evaluate. So in the main module we continue to loop until the `State_Controller` reaches an *end* state and with each iteration we display the states **view** and have the `State_Controller` transition state to the evaluation of the states input.
-
-(src/main.cpp)
 ```c++
-int main () {
 
-    State_Controller controller;
-    Terminal_State_Viewer viewer;
+// File: include/ChocAn/app/application_state.hpp
 
-    // Loop until we hit an end state
-    while(!controller.end_state())
-    {
-        // render the view of the current state
-        viewer.render_state(controller.current_state());
-
-        // transition into a new state depending on the evaluation of the input collected from the viewer
-        controller.transition(viewer.interact());
-    }
-
-    return 0;
-}
+using Application_State = std::variant< Login
+                                      , Exit
+                                      , Provider_Menu
+                                      , Manager_Menu
+                                      , Add_Transaction
+                                      , Confirm_Transaction
+                                      >;
 
 ```
-## Making New States
 
-Now that we understand the basic design of the application layer, lets add a new state! As per the requirements, we need to simulate the providers terminal and the managers terminal. As such, we will need a `Provider_Menu_State` and a `Manager_Menu_State`. The roles of these states will be to transition us into one of the activities that a provider or manager will perform. I already wrote a `Provider_Menu_State` so lets implement the `Manager_Menu_State`. 
+That's the entire definition! A variant, sometimes called a [tagged_union](https://en.wikipedia.org/wiki/Tagged_union), is a sum type that allows this structure to hold a value that can only be one of any of the tagged types. 
+
+## Making New States and State Views
+
+Now that we understand the basic design of the application layer, lets add a new state! As per the requirement [use cases](https://github.com/AlexanderJDupree/ChocAn/projects/12) we want the provider and manager to be able to view member and provider accounts. As such, we will need a `View_Account` Application state to model this activity in the application. 
 
 First, lets create a new branch where our work will go. 
 
 ```bash
-git checkout -b manager_menu
+git checkout -b view_account
 ```
 
-Then lets create the required source and header files:
+Then, we need to create the `View_Account` class and add it to the `Application_State` variant. I will also add an `Account` object as a member variable for the `View_Account` class, because we will need that resource to display the `Account` information. In the file `include/ChocAn/app/application_state.hpp` add the following:
 
-```bash
-touch include/ChocAn/app/states/manager_menu_state.hpp
-touch src/app/manager_menu_state.cpp
-```
-
-To implement the `State` interface we need to include the header file, inherit from `State` and define the two interface methods. It will look like this when it's done:
-
-
-(include/ChocAn/app/states/manager_menu_state.hpp)
 ```c++
-#ifndef CHOCAN_MANAGER_MENU_STATE_H
-#define CHOCAN_MANAGER_MENU_STATE_H
 
-#include <ChocAn/app/state.hpp>
+// File: include/ChocAn/app/application_state.hpp
 
-class Manager_Menu_State : public State
+// Need this include for the Account definition
+#include <ChocAn/core/entities/account.hpp>
+
+/** Other Classes **/
+
+class View_Account
 {
 public:
-
-    State_Ptr evaluate(const Input_Vector& input) ;
-
-    State_Info info() const;+
+    Account account;
 };
 
-#endif  // CHOCAN_MANAGER_MENU_STATE_H
+using Application_State = std::variant< Login
+                                      , Exit
+                                      , Provider_Menu
+                                      , Manager_Menu
+                                      , Add_Transaction
+                                      , Confirm_Transaction
+                                      , View_Account // <-- Add this line to the variant
+                                      >;
+
 ```
 
-Now in the `.cpp` file we can define the behavior for this state. For now we will keep it simple, we will say `"exit"` leaves the application, `"0"` goes back to the login screen and everything else loops back on itself. To do this we need to include the header files for those states and return the correct `State_Ptr` from the `evaluate` function. It should look like this:
+Basically what we've done as created a new class with an `Account` dependency and said that the `Application_State` can now be of this type as well. Now we need to define the logic for this activity in the `State_Controller`. In the file `include/ChocAn/app/state_controller.hpp`  we will need to add the function signature for the `View_Account` overload
 
-(src/app/manager_menu_state.cpp)
+```c++
+// File: include/ChocAn/app/state_controller.hpp
+
+    /** Visitor Methods **/
+    Application_State operator()(const Login&);
+    Application_State operator()(const Exit&);
+    Application_State operator()(const Provider_Menu&);
+    Application_State operator()(const Manager_Menu&);
+    Application_State operator()(const Add_Transaction&);
+    Application_State operator()(const Confirm_Transaction&);
+    Application_State operator()(const View_Account&); //<-- Add this overloaded function
+
+```
+
+Now in the `src/app/state_controller.cpp` file we can define the behavior for this state. For now we will keep it simple, and just wait for the user to press 'Enter' before returning back to the `Provider_Menu`. In the future, we want to have the `View_Account` state to return to the previous state, which could either be a `Provider_Menu` or the `Manager_Menu`, however we will keep it simple for now. To do this we add the following to the `.cpp` file:
+
 ```c++
 
-#include <ChocAn/app/states/exit_state.hpp>
-#include <ChocAn/app/states/login_state.hpp>
-#include <ChocAn/app/states/manager_menu_state.hpp>
-
-State::State_Ptr Manager_Menu_State::evaluate(const Input_Vector& input)
+Application_State State_Controller::operator()(const View_Account& state)
 {
-    if(input.at(0) == "exit")
-    {
-        return std::make_unique<Exit_State>();
-    }
-    if(input.at(0) == "0")
-    {
-        return std::make_unique<Login_State>();
-    }
-    return std::make_unique<Manager_Menu_State>();
+    input_controller->read_input();
+    return Provider_Menu();
 }
 
-State_Info Manager_Menu_State::info() const
+```
+
+Next lets define a view for this state! We want the view to format the `Account` information and present it in a uniform way. To accomplish this we need to first create the view:
+
+```bash
+touch views/'View Account.txt'
+```
+
+The name of the view file is also very important. It MUST match the `state_name` field that we define in the resource loader. I'll get to that in a bit. First, lets populate the view file with the `Account` information and viewer commands. You can do it like this:
+
+```
+<header>
+
+ChocAn ID: <@account.id> | <@account.type>
+
+Name: <@account.name.last>, <@account.name.first>
+
+Address: <@account.address.street>
+         <@account.address.city> <@account.address.state>, <@account.address.zip>
+
+Press 'Enter' to continue:
+<prompt>
+```
+
+There's a few things going on here. First, text within the '<>' characters are viewer commands. They tell the `Terminal_State_Viewer` to perform text substitution. The commands with the '@' references a resource in memory, like the `Account` object. This design allows our views to be dynamic, and highly customizable. However, if we tried to build and run the application right now, this wouldn't work. First, we haven't created a path to get to the `View_Account` state;  and second we haven't defined yet how the `Resource_Loader` serializes the data into a resource table for the `Terminal_State_Viewer`. Lets handle the serialization first. 
+
+## Data Serialization with the Resource_Loader
+
+Right now we have to manually describe how to serialize the data into a format that the `Terminal_State_Viewer` can utilize. However, I plan on automating this process in the future by adding metadata to each object such that a Serializer class can automatically access required information by examining the components of an object. But, for now we need to do it manually. First lets take a look at the `include/ChocAn/view/resource_loader.hpp` header file. 
+
+```c++
+struct Resource_Loader
 {
-    return State_Info();
+    using Resource_Table = Terminal_State_Viewer::Resource_Table;
+
+    Resource_Table operator()(const Exit&);
+    Resource_Table operator()(const Login& login);
+    Resource_Table operator()(const Provider_Menu& menu);
+    Resource_Table operator()(const Manager_Menu& menu);
+    Resource_Table operator()(const Add_Transaction& transaction);
+    Resource_Table operator()(const Confirm_Transaction& state);
+};
+```
+The `Resource Loader` is a functor just like the `State_Controller` and needs to overload the function call operator for each state. So, just like the `State_Controller` lets add our state and define what we do. Add this line to the `.hpp` file:
+
+```c++
+Resource_Table operator()(const View_Account& state);
+```
+
+The `Resource_Table` is a tree that maps strings to functions that returns strings. I.E. the `key` is a string like `@account.id` and it returns an anonymous function that retrieves that data for us. So we need to define a key-value pair for each resource we want to include in the table. To do this, open the file `src/view/resource_loader.cpp` and add the following lines:
+
+```c++
+// File: src/view/resource_loader.cpp
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& state)
+{
+    return
+    {
+        { "state_name",   [&](){ return "View Account"; } },
+        { "account.id",   [&](){ return std::to_string(state.account.id()); } },
+        { "account.type", [&]()
+            { 
+                return std::visit( overloaded {
+                    [](const Member&)   { return  "Member"; },
+                    [](const Manager&)  { return "Manager"; },
+                    [](const Provider&) { return  "Provider"; }
+                }, state.account.type() );
+            } },
+        { "account.name.last",  [&](){ return state.account.name().last();  } },
+        { "account.name.first", [&](){ return state.account.name().first(); } },
+
+        { "account.address.street", [&](){ return state.account.address().street(); } },
+        { "account.address.city",   [&](){ return state.account.address().city();   } },
+        { "account.address.state",  [&](){ return state.account.address().state();  } },
+        { "account.address.zip",    [&](){ return std::to_string(state.account.address().zip()); } }
+    };
+}
+
+```
+
+The syntax for the table might be a little confusing, but it is really powerful. Basically, we use [aggregate_initialization](https://en.cppreference.com/w/cpp/language/aggregate_initialization) to create the key-value pair mappings for us. The keys are the strings we defined in the `View Account.txt` view, and the values are lambdas that extract the data from the state object for. The "account.type" field might be a little confusing, but essentially it returns a different string depending on the type of account we're looking at. Again, hopefully in the near future this whole process will be unnecessary, as serialization should come automatically. 
+
+## Connecting Our New State
+
+In the future, the `View_Account` state should be reachable from multiple activities within the application. I.E. Both manager and provider can view accounts. But, for right now we're just gonna define the logic for when a Provider wants to view their own account. This means we have to create a path from the `Provider_Menu` to the `View_Account` state. Lets look at the `Provider Menu` view file:
+
+```
+<header> 
+
+0) Return to Login Screen
+
+1) View Your Provider Profile // <-- Need to connect this option to View Account
+
+2) Update Your Provider Profile
+
+3) Update Member Profile
+
+4) View Member Record
+
+5) Add Transaction
+
+<footer>
+
+<@menu.status>
+<prompt>
+```
+
+As we can see, option '1' should allow the user to view their own provider account. So, lets add the logic for that in the `src/app/state_controller.cpp` file. Look for the `Provider_Menu` overload and add the following line:
+
+```c++
+Application_State State_Controller::operator()(const Provider_Menu&)
+{
+    const Transition_Table provider_menu
+    {
+        { "exit", [&](){ return Exit();  } },
+        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
+        // Add the line below to the provider menu
+        { "1"   , [&](){ return View_Account{ *chocan->login_manager.session_owner() };} },
+        { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset()};} }
+    };
+
+    try
+    {
+        return provider_menu.at(input_controller->read_input())();
+    }
+    catch(const std::out_of_range& err)
+    {
+        return Provider_Menu { "Unrecognized Input" };
+    }
 }
 ```
 
-First notice we use the templated `std::make_unique` function to return the `State_Ptr`. This is because we are using smart pointers (pointers that deallocate the object when the pointer goes out of scope) and `std::make_unique` is the recommended way of creating these pointers. Also, the `info()` function just returns a default `State_Info` object, since there is no information we want to communicate yet. 
+The `Provider Menu` is similar to the resource loader, in that it uses a mapping of strings to functions to determine what to do. The line we added says a string of value '1' maps to a function that returns the `View_Account` state for the current session owner. The session owner is whoever is logged into the application, so in the case of the Provider, it is himself.
 
 ## Testing Our New State
 
-Now that we created the new state, we should test it! There isn't much to test right now, but we do know that invalid input should return the same state, `"exit"` should return an `Exit_State`, and `"0"` should return a `Login_State`. I already wrote tests for this behavior for previous states, so we will only need to include our new state in the test case.
+Now that we created the new state, we should test it! There isn't much to test right now, but we do know that `Provider_Menu` should transition to `View_Account` on input '1' and the `View_Account` should return to the `Provider_Menu` on any input.
 
-Open `tests/app/state_tests.cpp` and look for the `"State Behavior"` test case. At the top level we defined the states and added them to a vector for testing. Lets add a couple lines to include the new state.
+Open `tests/app/state_controller_tests.cpp` and look for the `"Provider Menu State behavavior test case"` test case. At the top level of the Test Case you'll see a `State_Controller` constructed with mock dependencies with the `Provider_Menu` set as the initial state. The `mock_dependencies` class just instanstiates a `input_controller` and a `state_viewer` connected to a `std::stringstream` object, which allows us to mock input and output, as well as a `ChocAn` api connected to a `Mock_DB` instance.
 
-(tests/app/state_tests.cpp)
 ```c++
-
-// Add this include 
-#include <ChocAn/app/states/manager_menu_state.hpp>
-
-TEST_CASE("State Behavior", "[state]")
+TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 {
-    Login_State login_state;
-    Exit_State  exit_state;
-    Manager_Menu_State manager_menu_state; // <-- Add this line
-    Provider_Menu_State provider_menu_state;
+    mock_dependencies mocks; 
 
-    std::vector<State*> states { &login_state
-                               , &exit_state
-                               , &manager_menu_state // <-- Add this line
-                               , &provider_menu_state
-                               }; 
+    State_Controller controller( mocks.chocan
+                               , mocks.state_viewer
+                               , mocks.input_controller
+                               , Provider_Menu() );
 
-    /* Test Section */
-}
+    // Log in to a Provider Account
+    mocks.chocan->login_manager.login("1234");
+
+    /** Test Section **/
+
 ```
 
-Then in the test section `"States do not transition on evaluation of invalid input"` copy add this assertion:
+To add our tests we will add a new `SECTION` and perform our assertion like this:
 
 ```c++
-    SECTION("States do not transition on evaluation of invalid input")
+    SECTION("Provider menu transitions to View Account for the user on input '1'")
     {
-        REQUIRE(*(Login_State().evaluate({ "Bad Input" })) == Login_State());
-        REQUIRE(*(Exit_State().evaluate({ "Bad_Input" })) == Exit_State());
-        REQUIRE(*(Provider_Menu_State().evaluate({ "Bad_Input" })) == Provider_Menu_State());
+        mocks.in_stream << "1\n"; // <-- Populates the stream with 'user' input
 
-        // Add this assertion
-        REQUIRE(*(manager_menu_state.evaluate({ "Bad_Input" })) == Manager_Menu_State());
+        controller.interact(); // <-- Controller reads in the input and evaluates it
+
+        // Assert that the current application state IS a View_Account state
+        REQUIRE(std::holds_alternative<View_Account>(controller.current_state()));
     }
-```
-
-Also, lets test to make sure the state returns to the login on input `"0"`. To do this add a new test section within the test case and use the `REQUIRE` macro. Like this:
-
-```c++
-SECTION("Manager Menu State returns to login on input '0'")
-{
-    REQUIRE(*(manager_menu_state.evaluate({ "0" })) == Login_State());
-}
 ```
 
 ## Building and Running the tests
 
-Now that we added the tests, lets build and run the test target to make sure everything works as expected.
-
-Since we added new files to the project we need to update the Makefiles to include these files in our build targets. We can do this by manually editing the Makefiles, or by using the **Premake5** build system to generate the makefiles for us. If you don't have **Premake5** you can [download the binary here](https://premake.github.io/download.html).
-
-With **Premake5** installed and included in our *PATH* we can run the following command to update the Makefiles:
-
-```bash
-premake5 gmake
-```
-
-Now to build the project and run the unit tests simply run:
+Now that we added the tests, lets build and run the test target to make sure everything works as expected. To do this, simply run the build script:
 
 ```bash
 ./build.sh
 ```
 
-If all goes well you will see this output:
+You'll see a long list of compilation commands and then, if everything goes well, a printout of the unit tests:
 
 ```bash
-  « Debug Configuration Tests »                                                                                         
+« Debug Configuration Tests »                                                                                                                 
 
          ❯ echo && bin/tests/debug_tests 
 ===============================================================================
-All tests passed (53 assertions in 12 test cases)
+All tests passed (100 assertions in 32 test cases)
 
  ✔︎  0.0s 
 
-  « Release Configuration Tests »                                                                                       
+  « Release Configuration Tests »                                                                                                               
 
          ❯ echo && bin/tests/release_tests 
 ===============================================================================
-All tests passed (53 assertions in 12 test cases)
-
- ✔︎  0.0s 
+All tests passed (100 assertions in 32 test cases)
 ```
+
 If we want to make sure our tests were actually run we can re-run the test binary with the following command:
 
 ```bash
-./bin/tests/debug_tests '[state]' -s 
+./bin/tests/debug_tests '[provider_menu]' -s 
 ```
+This command runs only the tests with the `[provider_menu]` tag and `-s` prints out a test summary. 
 
-This command runs only the tests with the `[state]` tag and `-s` prints out a test summary. 
-
-## Creating a View for the State
-
-Now we have implemented and tested the behavior for our `Manger_Menu_State`, we need a way to represent that state to the user. This is where the **Presentation Layer** comes into play. The workhorse of the **Presentation Layer** is the `Terminal_State_Viewer` class which implements the `State_Viewer` interface defined in the `Application Layer`. The `Terminal_State_Viewer` presents `State` viewing as console output. This is done by storing the `views` as plain text files and printing out a specific file when we receive a `State`.
-
-Lets take an abbreviated look at the `Terminal_State_Viewer` definition:
-
-(include/ChocAn/view/terminal_state_viewer.hpp) 
-```c++
-#ifndef CHOCAN_TERMINAL_STATE_VIEWER_H
-#define CHOCAN_TERMINAL_STATE_VIEWER_H
-
-#include <map>
-#include <functional>
-#include <ChocAn/app/state_viewer.hpp>
-
-class Terminal_State_Viewer : public State_Viewer
-{
-public:
-
-    typedef std::map<size_t, std::string>                View_Table;
-    typedef std::map<std::string, std::function<void()>> Command_Table;
-
-    // Returns the input vector used for the current state
-    const State::Input_Vector& interact();
-
-    // Looks up state view in view_table, renders the view.
-    void render_state(const State& state);
-
-private:
-
-    /* Other Utility Methods */
-
-    const Command_Table     command_table;
-    static const View_Table view_table;
-
-};
-
-#endif // CHOCAN_TERMINAL_STATE_VIEWER_H
-```
-
-Here we have some handy typedefs again, the first of which defines a `View_Table`. A `View_Table` is an associative data structure that maps `State` ids to file names. This is used in the `render_state` function which lookups the `State` ID in the `view_table` and prints out the file associated with that state. The other typedef defines a `Command_Table`. The `Command_Table` maps strings to specific viewer functions, I'll show you how it works in a bit. 
-
-First, we need to create a view for the state:
+Now if we want to see our state in action we can run the actual ChocAn application with the following:
 
 ```bash
-touch views/manager_menu.txt
+./bin/debug/ChocAn_debug
 ```
-Now we can design the UI for the state. I'm going to populate the menu with all the options the application will eventually have, even though they don't go anywhere yet. 
 
-We want the menu to look something like this at runtime. 
+Then we can login and view our account, and it should look something like this: (Note: the password for the Provider is '1234' for right now)
 
-```bash
-======================== ChocAn Services =========================
+```
+======================== Login Service =========================
 
-0) Return to Login Screen
+Welcome, 
 
-1) View Provider/Member Profile
-
-2) Create Provider Account
-
-3) Create Member Account
-
-4) Delete Provider/Member Account
-
-5) Generate Summary Reports
+Please enter your ChocAn Provider or Manager ID. 
 
 ( Entering 'exit' will close the application )
 
-> 
-```
-
-This menu looks good. However, there are lot of UI elements that are shared from view to view. For example, the `ChocAn Services` header should be reused, as well as the footer message. Also, how do we indicate when and where to prompt the user for input? We need some way to communicate to the viewer to render a specific UI element or to catch user input. This is where the `Command_Table` is leveraged. As of right now the `Command_Table` only has a few basic commands which can be found in the `Terminal_State_Viewer` source file. We will use the `header`, `footer`, and `prompt` command for our menu.
-
-To create a menu that will look like the one we wanted we just need to edit the view file to contain the following lines:
-
-(views/manager_menu.txt)
-```bash
-<header>
+> 1234
+======================== Provider Menu ========================= 
 
 0) Return to Login Screen
 
-1) View Provider/Member Profile
+1) View Your Provider Profile
 
-2) Create Provider Account
+2) Update Your Provider Profile
 
-3) Create Member Account
+3) Update Member Profile
 
-4) Delete Provider/Member Account
+4) View Member Record
 
-5) Generate Summary Reports
+5) Add Transaction
 
-<footer>
+( Entering 'exit' will close the application )
 
-<prompt>
+Welcome, Arman
+> 1
+======================== View Account =========================
+
+ChocAn ID: 1234 | Provider
+
+Name: Provider, Arman
+
+Address: 1234 lame st.
+         Portland OR, 97030
+
+Press 'Enter' to continue:
+> 
 ```
 
-The last thing we need to do is add the view to the `View_Table`. We can do this in the `Terminal_State_Viewer` source file.
+Everything looks good! What's also great about the current design is that we can change the UI of any view by simply editing text file. This can be done AT runtime without even having to recompile the application. Go ahead, with the application running edit the `View Account.txt` file and see your changes in real time. 
 
-(src/view/terminal_state_viewer.cpp)
-```c++
-#include <ChocAn/app/states/manager_menu_state.hpp> // <-- Add this include
-
-const Terminal_State_Viewer::View_Table Terminal_State_Viewer::view_table 
-{
-    { Login_State().id(),         "login"         },
-    { Exit_State().id(),          "exit"          },
-    { Provider_Menu_State().id(), "provider_menu" },
-    { Manager_Menu_State().id(),  "manager_menu"  } // <-- Add this line
-};
-```
-
-And finally we can build and run the application. 
-
-```bash
-./build.sh && ./bin/debug/ChocAn_debug  
-```
-
-Note: The password to get to the Manager Menu is '5678' for right now. 
+## Wrapping Up
 
 If we can build the application, all tests pass, and we're satisfied with our work we should push our code up to the remote repository like this:
 
 
 ```bash
 git add .
-git commit -m "Implemented Manager_Menu_State"
-git push --set-upstream origin manager_menu
+git commit -m "Implemented View Account state"
+git push --set-upstream origin view_account
 ```
-
-## Wrapping Up
 
 This is only a basic introduction to the capabilities provided through this architecture. Having the representation removed from the state behavior allows us to develop the UI independently of the application logic. Furthermore, this architecture scales easily to accomodate more application states and associted views. Also, this architecture naturally supports features like nested menus, batch form input, and view composition. This framework however, is not finished and is in need of more tests and refactoring. 
-
-As a final example, if you wanted to create a form for a Member profile or something here's how you would do it:
-
-```bash
-<header>
-
-<status_msg>
-
-Enter Name: <prompt>
-
-Enter City: <prompt>
-Enter State: <prompt>
-Enter Street Address: <prompt>
-```
-
-This view would collect all user input into the `Input_Vector` and have the associated state unpack and evaluate that input. The state can also provide a status message via the `State_Info` object, which can be displayed via the `<status_msg>` viewer command. Also, we can always add more commands for the viewer to use in order to handle different types of interaction with the user. 
