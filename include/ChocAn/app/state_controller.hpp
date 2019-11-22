@@ -55,12 +55,8 @@ public:
     Application_State operator()(Manager_Menu&);
     Application_State operator()(Provider_Menu&);
     Application_State operator()(Add_Transaction&);
-<<<<<<< HEAD
-    Application_State operator()(const Confirm_Transaction&);
-=======
     Application_State operator()(const Create_Account&);
     Application_State operator()(Confirm_Transaction&);
->>>>>>> master
 
 private:
 

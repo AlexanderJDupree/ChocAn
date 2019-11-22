@@ -186,8 +186,6 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
     return state;
 }
 
-<<<<<<< HEAD
-=======
 Application_State State_Controller::operator()(const Create_Account& state)
 {
     std::string input = input_controller->read_input();
@@ -215,4 +213,3 @@ Application_State State_Controller::operator()(const Create_Account& state)
     return Application_State{ state };
 }
 
->>>>>>> master
