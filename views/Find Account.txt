@@ -1,3 +1,0 @@
-<header>
-
-Enter ID Number of account you wish to view: <empty_prompt> 

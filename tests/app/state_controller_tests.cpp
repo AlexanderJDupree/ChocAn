@@ -201,6 +201,15 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
+    SECTION("Provider menu transitions to View Account after calling find_account on input '4'")
+    {
+
+        mocks.in_stream << "4\n";
+        mocks.in_stream << "1234\n";    //provider id#
+        
+        REQUIRE(std::holds_alternative<View_Account>(controller.interact().current_state()));
+
+    }
 }
 
 TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
@@ -227,6 +236,14 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
         mocks.in_stream << "exit\n";
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
+    }
+    SECTION("Manager menu transitions to View Account after calling find_account on input '1'")
+    {
+
+        mocks.in_stream << "1\n";
+        mocks.in_stream << "5678\n";    //manager id#
+
+        REQUIRE(std::holds_alternative<View_Account>(controller.interact().current_state()));
     }
 }
 
