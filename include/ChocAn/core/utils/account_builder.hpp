@@ -26,9 +26,9 @@ https://github.com/AlexanderJDupree/ChocAn
 
 enum field_types{current_type,current_first,current_last,current_street,current_city,current_state,current_zip};
 
-struct Building_Phases{
+struct Build_Instructions{
 
-    Building_Phases(){};
+    Build_Instructions(){};
     
     const std::string account_type   
         = "Account Type : Manager OR Provider OR Member\nMUST TYPE EXACTLY ONE OF THESE OPTIONS";
@@ -36,6 +36,8 @@ struct Building_Phases{
         = "Full Name As : First[1-24], Last[1-24]\nTOTAL CHARACTER LIMIT [2-25]";
     const std::string street_address 
         = "Address As   : Street[1-25], City[1-14], State[2], Zip[5]\nTOTAL CHARACTER LIMIT [9-46]";
+
+    const char* invalid_type_msg = "Invalid Account Type Requested";
 
 };
 
@@ -60,6 +62,8 @@ class Account_Builder{
 
         const std::string get_current_field() const;
         
+        const std::string review_account() const;
+        
         const chocan_user_exception get_current_issues();
 
         Account_Builder& reset();
@@ -67,7 +71,6 @@ class Account_Builder{
     private:
 
         const std::string valid_account_type(const std::string& input);
-        const std::string review_account() const;
         void parseName(const std::string& input);
         void parseAddress(const std::string& input);
         void remove_leading_white_space(std::string& str);

@@ -49,7 +49,7 @@ Account_Builder &Account_Builder::reset()
     while (!build_phase.empty())
         build_phase.pop();
 
-    Building_Phases building_phase;
+    Build_Instructions building_phase;
     
     build_phase.push(building_phase.street_address);
     build_phase.push(building_phase.full_name);
@@ -79,7 +79,7 @@ void Account_Builder::set_current_field(const std::string &input)
         return;
     }
 
-    Building_Phases building_phase;
+    Build_Instructions building_phase;
 
     std::string current_phase = build_phase.top();
 
@@ -91,7 +91,7 @@ void Account_Builder::set_current_field(const std::string &input)
             account_field[current_type] = type;
 
         else
-            issues.emplace(chocan_user_exception("Invalid Account type requested", {}));
+            issues.emplace(chocan_user_exception(building_phase.invalid_type_msg, {}));
     }
     else if (current_phase == building_phase.full_name)
     {

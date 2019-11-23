@@ -21,6 +21,16 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <string>
 #include <ChocAn/core/utils/exception.hpp>
 
+struct invalid_name : public chocan_user_exception
+{
+    const std::string first_name_out_of_range = "First Name must be 1 to 24 characters long";
+    const std::string last_name_out_of_range = "Last Name must be 1 to 24 characters long";
+    const std::string full_name_out_of_range  = "Full Name must be 1 to 25 characters long";
+    explicit invalid_name(const char* err, Info info) 
+        : chocan_user_exception(err, info)
+        { }
+};
+
 class Name
 {
 public:
@@ -37,13 +47,6 @@ private:
 
     std::string _first;
     std::string _last;
-};
-
-struct invalid_name : public chocan_user_exception
-{
-    explicit invalid_name(const char* err, Info info) 
-        : chocan_user_exception(err, info)
-        { }
 };
 
 #endif // CHOCAN_NAME_HPP

@@ -1,6 +1,6 @@
 /* 
  
-File: name.hpp
+File: name.cpp
 
 Brief: Implementation for Name utility class
 
@@ -25,13 +25,15 @@ Name::Name(const std::string& first, const std::string& last)
 
     if(!Validators::length(first + last, 1, 25) || !Validators::length(first,1,24) || !Validators::length(last,1,24)) {
 
+        invalid_name name_errors("",{});
+
         if(!Validators::length(first, 1, 24) && Validators::length(last, 1, 24)) 
-            errors.push_back("First Name must be 1 to 24 characters long");
+            errors.push_back(name_errors.first_name_out_of_range);
         
         else if(!Validators::length(last, 1, 24) && Validators::length(first, 1, 24) ) 
-            errors.push_back("Last Name must be 1 to 24 characters long");
+            errors.push_back(name_errors.last_name_out_of_range);
 
-        else errors.push_back("Full Name must be 1 to 25 characters long");
+        else errors.push_back(name_errors.full_name_out_of_range);
 
     }
 
