@@ -209,6 +209,8 @@ void Account_Builder::parseAddress(const std::string &input)
         account_field[current_field.top()] = "";
         current_field.pop();
     }
+
+    account_field[current_zip] = account_field[current_zip].substr(0,5);
 }
 
 const std::string Account_Builder::valid_account_type(const std::string &input)

@@ -5,4 +5,4 @@
 
 <@builder.issues>
 Please Enter <@builder.current_field>
-<prompt>
+-$ <prompt>
