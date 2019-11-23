@@ -40,20 +40,22 @@ Address::Address( const std::string& street
     // Capitalize state
     for(char& c : _state) { c = std::toupper(c); }
 
+    //Grants access to class specific errors messages
+    invalid_address error_msg("",{});
     ( !Validators::length(street, 1, 25) ) 
-        ? errors.push_back("Street address must be less than 25 characters")
+        ? errors.push_back(error_msg.street_range)
         : void();
     ( !Validators::length(city, 1, 14) ) 
-        ? errors.push_back("City must be less than 14 character")
+        ? errors.push_back(error_msg.city_range)
         : void();
     ( !Validators::length(state, 2, 2) ) 
-        ? errors.push_back("State must be in abbreviated 2 character format")
+        ? errors.push_back(error_msg.state_range)
         : void();
     ( US_states.find(_state) == US_states.end() )
-        ? errors.push_back(state + " is not a U.S. state")
+        ? errors.push_back(state + error_msg.not_US_state)
         : void();
     ( !Validators::length(std::to_string(zip), 5, 5) ) 
-        ? errors.push_back("Zip code must be 5 digits")
+        ? errors.push_back(error_msg.zip_range)
         : void();
     ( !errors.empty() ) 
         ? throw invalid_address("Invalid address values", errors)

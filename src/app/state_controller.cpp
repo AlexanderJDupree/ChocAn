@@ -188,8 +188,11 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 
 Application_State State_Controller::operator()(const Create_Account& state)
 {
-    std::string input = input_controller->read_input();
-    std::string issues;
+    std::string input;
+    state_viewer->render_state(state, [&]() 
+    {
+        input = input_controller->read_input();
+    } ) ;
 
     if(input == "exit")   { return Exit(); }
     if(input == "cancel") { return Manager_Menu{ "Account Not Created" }; }

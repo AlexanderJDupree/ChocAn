@@ -27,20 +27,19 @@ bool Account_Builder::buildable() const
 
 Account Account_Builder::build()
 {
+    invalid_account_build errors("",{});
 
     if (!buildable())
-        throw chocan_user_exception("Cannot create account with empty build_phase", {});
+        throw invalid_account_build(errors.default_msg, {errors.building_unbuildable});
 
     if (account_field.at(current_type) == "Manager")
         return Account(name.value(), address.value(), Manager(), id_generator);
 
-    if (account_field.at(current_type) == "Member")
-        return Account(name.value(), address.value(), Member(), id_generator);
-
     if (account_field.at(current_type) == "Provider")
         return Account(name.value(), address.value(), Provider(), id_generator);
+    
+    return Account(name.value(), address.value(), Member(), id_generator);
 
-    throw chocan_user_exception("ERROR: account type not recognized", {});
 }
 
 Account_Builder &Account_Builder::reset()
@@ -68,18 +67,22 @@ Account_Builder &Account_Builder::reset()
 void Account_Builder::set_current_field(const std::string &input)
 {
 
+    Build_Instructions building_phase;
+   
     if (build_phase.empty())
     {
 
         account_accepted = confirm_account(input);
 
-        if (!account_accepted)
-            reset();
+        if (!account_accepted){
 
+            reset();
+            issues.emplace(invalid_account_build(building_phase.account_rejected,{ "With input value: " + input}));
+
+        }
+        
         return;
     }
-
-    Build_Instructions building_phase;
 
     std::string current_phase = build_phase.top();
 
@@ -115,19 +118,15 @@ void Account_Builder::set_current_field(const std::string &input)
 
         try
         {
-
             zip = std::stol(account_field.at(current_zip));
         }
         catch (const std::invalid_argument &err)
         {
-
-            issues.emplace(chocan_user_exception("Zip must be 5 digit number", {}));
-            zip.reset();
+            zip = 0;
         }
         catch (const std::out_of_range &err)
         {
-            issues.emplace(chocan_user_exception("Zip value was out of range", {}));
-            zip.reset();
+            zip = 0;
         }
 
         try
@@ -138,10 +137,6 @@ void Account_Builder::set_current_field(const std::string &input)
         {
             issues.emplace(err);
 
-        }catch(const std::bad_optional_access){
-            
-            issues.emplace(chocan_user_exception("Zip entered was not a number", {}));
-            zip.reset();
         }
     }
 
@@ -173,11 +168,22 @@ const std::string Account_Builder::get_current_field() const
 void Account_Builder::parseName(const std::string &input)
 {
 
-    account_field[current_first] = input.substr(0, input.find(","));
-    account_field[current_last] = input.substr(input.find(",") + 1, input.length());
+    size_t delimiter_position = input.find(",");
 
-    remove_leading_white_space(account_field[current_first]);
-    remove_leading_white_space(account_field[current_last]);
+    if(delimiter_position == std::string::npos){
+    
+        account_field[current_first] = "";
+        account_field[current_last] = "";
+
+    }else{
+
+        account_field[current_first] = input.substr(0, input.find(","));
+        account_field[current_last] = input.substr(input.find(",") + 1, input.length());
+
+        remove_leading_white_space(account_field[current_first]);
+        remove_leading_white_space(account_field[current_last]);
+    }
+
 }
 
 void Account_Builder::parseAddress(const std::string &input)
@@ -188,9 +194,8 @@ void Account_Builder::parseAddress(const std::string &input)
     std::string temp_input(input + delimiter);
     std::stack<field_types> current_field({current_zip, current_state, current_city, current_street});
 
-    while ((delimiter_position = temp_input.find(delimiter)) != std::string::npos)
+    while (!current_field.empty() && (delimiter_position = temp_input.find(delimiter)) != std::string::npos)
     {
-
         account_field[current_field.top()] = temp_input.substr(0, delimiter_position);
 
         remove_leading_white_space(account_field[current_field.top()]);
@@ -198,6 +203,11 @@ void Account_Builder::parseAddress(const std::string &input)
         current_field.pop();
 
         temp_input.erase(0, delimiter_position + delimiter.length());
+    }
+
+    while(!current_field.empty()){
+        account_field[current_field.top()] = "";
+        current_field.pop();
     }
 }
 

@@ -38,6 +38,7 @@ struct Build_Instructions{
         = "Address As   : Street[1-25], City[1-14], State[2], Zip[5]\nTOTAL CHARACTER LIMIT [9-46]";
 
     const char* invalid_type_msg = "Invalid Account Type Requested";
+    const char* account_rejected = "Account Rejected";
 
 };
 
@@ -90,6 +91,18 @@ class Account_Builder{
         std::optional<chocan_user_exception> issues;
 
 };
+
+struct invalid_account_build : public chocan_user_exception
+{
+    const std::string building_unbuildable = "Account build requested while account is not buildable";
+
+    const char* default_msg = "Invalid account build";
+
+    explicit invalid_account_build(const char* err, Info info) 
+        : chocan_user_exception(err, info)
+        { }
+};
+
 
 #endif  //CHOCAN_ACCOUNT_BUILDER_HPP
 

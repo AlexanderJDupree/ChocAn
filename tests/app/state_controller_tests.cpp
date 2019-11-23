@@ -228,6 +228,14 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
+    SECTION("Manager menu transitions to creat account on input '2'")
+    {
+        Application_State expected_state { Create_Account{ &mocks.chocan->account_builder}};
+
+        mocks.in_stream << "2\n";
+        
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
+    }
 }
 
 TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controller]")
@@ -327,5 +335,56 @@ TEST_CASE("Exit State Behavior", "[exit], [state_controller]")
         controller.interact();
 
         REQUIRE_FALSE(mocks.chocan->login_manager.logged_in());
+    }
+}
+
+TEST_CASE("Create_Account State Behavior", "[create_account], [state_controller]")
+{
+    mock_dependencies mocks;
+
+    State_Controller controller( mocks.chocan
+                               , mocks.state_viewer
+                               , mocks.input_controller
+                               , Create_Account{ &mocks.chocan->account_builder.reset() } );
+
+    SECTION("Create account does not transition if account it rejected by user"){
+
+        mocks.in_stream << "member\nfirst,last\nstreet,city,or,12345\nno";
+
+        // Controller must eat all the input from the stream
+        for (int i = 0; i < 5; ++i)
+        {
+            controller.interact();
+        }
+
+        REQUIRE(std::holds_alternative<Create_Account>(controller.current_state()));
+    }
+
+    SECTION("Create account transitions to manager menu once account is built")
+    {
+        // This input sequence will change if we make changes to the account builder
+        mocks.in_stream << "member\nfirst,last\nstreet,city,or,12345\nyes";
+
+        // Controller must eat all the input from the stream
+        for (int i = 0; i < 5; ++i)
+        {
+            controller.interact();
+        }
+
+        REQUIRE(std::holds_alternative<Manager_Menu>(controller.current_state()));
+    }
+    SECTION("Create account transitions back to manager menu on input 'cancel'")
+    {
+        // This input sequence will change if we make changes to the account builder
+        mocks.in_stream << "cancel\n";
+
+        REQUIRE(std::holds_alternative<Manager_Menu>(controller.interact().current_state()));
+    }
+    SECTION("Create account transitions to Exit on input 'exit'")
+    {
+        // This input sequence will change if we make changes to the account builder
+        mocks.in_stream << "exit\n";
+
+        REQUIRE(std::holds_alternative<Exit>(controller.interact().current_state()));
     }
 }
