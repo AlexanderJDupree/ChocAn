@@ -165,15 +165,7 @@ std::optional<Service> SQLite_DB::lookup_service(const unsigned code)
 
     if(execute_statement(sql, callback, &data) && !data.empty())
     {
-        try
-        {
-            return Service(data, db_key);
-        }
-        catch(const std::exception& e)
-        {
-            // TODO log error
-        }
-        
+        return Service(data, db_key);
     }
     return { }; // Lookup failed
 }
@@ -209,14 +201,7 @@ std::optional<Account> SQLite_DB::get_account(const unsigned ID, const std::stri
 
     if(execute_statement(sql, callback, &data) && !data.empty())
     {
-        try
-        {
-            return Account(data, db_key);
-        }
-        catch(const std::exception&)
-        {
-            // TODO record error in a logger
-        }
+        return Account(data, db_key);
     }
     return { };
 }
