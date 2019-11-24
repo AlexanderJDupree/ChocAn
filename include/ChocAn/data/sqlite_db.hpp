@@ -6,8 +6,7 @@ Brief: Implements Data Gateway interface with sqlite3 API
 
 Authors: Daniel Mendez 
          Alex Salazar
-         Arman Alauizadeh 
-         Alexander DuPree
+         Arman Alauizadeh Alexander DuPree
          Kyle Zalewski
          Dominique Moore
 
@@ -37,7 +36,7 @@ public:
 
     bool load_schema(const char* schema_file);
 
-    bool create_account(const Account& account) override;
+    unsigned create_account(const Account& account) override;
 
     // Will overwrite previous row data with account info
     bool update_account(const Account& account) override;
@@ -46,7 +45,7 @@ public:
 
     bool id_exists(const unsigned ID) const override;
 
-    bool add_transaction(const Transaction& transaction) override;
+    unsigned add_transaction(const Transaction& transaction) override;
 
     // DB retrieval may fail, wrap in Maybe type
     std::optional<Account> get_account(const unsigned ID) override;
@@ -66,12 +65,13 @@ public:
 
     Service_Directory service_directory() override;
 
-    std::string serialize_account(const Account& account) const;
-
-    Account deserialize_account(const SQL_Row& data) const;
-    Service deserialize_service(const SQL_Row& data) const;
-
 private:
+
+    std::optional<Account> get_account(const unsigned ID, const std::string& type);
+    std::optional<Account> get_account(const std::string& ID, const std::string& type);
+
+    unsigned assign_transaction_id() const;
+    bool id_exists(const unsigned ID, std::string& table);
 
     std::string sqlquote(const std::string& str) const;
 
