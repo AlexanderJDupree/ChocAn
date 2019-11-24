@@ -138,7 +138,7 @@ TEST_CASE("Retrieving accounts from the database", "[get_account], [sqlite_db]")
     }
     SECTION("Member account retrieval fails when given a non member ID")
     {
-        REQUIRE_FALSE(db.get_member_account(123456789));
+        REQUIRE_FALSE(db.get_member_account("123456789"));
     }
     SECTION("Retrieval of a provider account")
     {
@@ -146,7 +146,7 @@ TEST_CASE("Retrieving accounts from the database", "[get_account], [sqlite_db]")
     }
     SECTION("Member account retrieval fails when given a non provider ID")
     {
-        REQUIRE_FALSE(db.get_provider_account(123456789));
+        REQUIRE_FALSE(db.get_provider_account("123456789"));
     }
     SECTION("Retrieval of a manager account")
     {
@@ -154,7 +154,7 @@ TEST_CASE("Retrieving accounts from the database", "[get_account], [sqlite_db]")
     }
     SECTION("Member account retrieval fails when given a non manager ID")
     {
-        REQUIRE_FALSE(db.get_manager_account(123123123));
+        REQUIRE_FALSE(db.get_manager_account("123123123"));
     }
 }
 
@@ -165,7 +165,7 @@ TEST_CASE("Add transactions to database", "[add_transaction], [sqlite_db]")
     Transaction transaction ( db.get_provider_account(123451234).value()
                             , db.get_member_account(123123123).value()
                             , DateTime( Day(23), Month(11), Year(2019))
-                            , db.lookup_service(123456).value()
+                            , db.lookup_service("123456").value()
                             , "comments" );
 
     SECTION("add transaction returns the transaction ID on success")
