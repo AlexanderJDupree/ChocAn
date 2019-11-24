@@ -95,9 +95,10 @@ bool Mock_DB::update_account(const Account& account)
     return true;
 }
 
-bool Mock_DB::create_account(const Account& account)
+unsigned Mock_DB::create_account(const Account& account)
 {
-    return update_account(account);
+    if(update_account(account)) { return account.id(); }
+    return 0;
 }
 
 bool Mock_DB::delete_account(const unsigned ID)
@@ -106,9 +107,9 @@ bool Mock_DB::delete_account(const unsigned ID)
     return true;
 }
 
-bool Mock_DB::add_transaction(const Transaction&)
+unsigned Mock_DB::add_transaction(const Transaction&)
 {
-    return true;
+    return 1;
 }
 
 std::optional<Account> Mock_DB::account_table_lookup(const unsigned ID, const Account_Table& table) const
