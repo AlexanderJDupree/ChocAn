@@ -27,16 +27,33 @@ Account::Account(Name name, Address address, Account_Type type, const ID_Generat
     {}
 
 Account::Account(Name name, Address address, Account_Type type, unsigned id, const Key<Data_Gateway>&)
-    : Account(name, address, type, id)
-    {}
-
-Account::Account(const Name& name, const Address& address, const Account_Type& type, unsigned id)
     : _name    ( name    )
     , _address ( address )
     , _type    ( type    )
-    , _id      ( id )
+    , _id      ( id      )
     {}
 
+Account::Account(const Data_Table& data, const Key<Data_Gateway>& )
+    : _name    ( Name(data.at("f_name"), data.at("l_name")) )
+    , _address ( Address ( data.at("street")
+                         , data.at("city")
+                         , data.at("state")
+                         , std::stoi(data.at("zip")) ) )
+{
+    std::map<std::string, std::function<Account::Account_Type()>> type_constructor
+    {
+        { "Manager",  [&](){ return Manager();  } },
+        { "Provider", [&](){ return Provider(); } },
+        { "Member",   [&]()
+        { 
+            return Member(data.at("status") == "Suspended" ? Account_Status::Suspended 
+                                                           : Account_Status::Valid); 
+        } }
+    };
+
+    _type = type_constructor.at(data.at("type"))();
+    _id   = std::stoi(data.at("chocan_id"));
+}
 
 Account::Data_Table Account::serialize() const
 {
@@ -64,38 +81,14 @@ Account::Data_Table Account::serialize() const
     };
 }
 
-Account Account::deserialize(const Data_Table& data, const Key<Data_Gateway>&) const
+Account::Data_Table Account::build_key_table()
 {
-    return deserialize(data);
-}
-
-Account Account::deserialize(const Data_Table& data) const
-{
-    std::map<std::string, std::function<Account::Account_Type()>> type_constructor
+    return 
     {
-        { "Manager",  [&](){ return Manager();  } },
-        { "Provider", [&](){ return Provider(); } },
-        { "Member",   [&]()
-        { 
-            return Member(data.at("status") == "Suspended" ? Account_Status::Suspended 
-                                                           : Account_Status::Valid); 
-        } }
+        { "f_name", ""  }, { "l_name", "" }, 
+        { "street", ""  }, { "city"  , "" }, 
+        { "state" , ""  }, { "zip"   , "" }, 
+        {"chocan_id", ""}, {"type"   , "" }, 
+        { "status"  , ""}
     };
-
-    try
-    {
-        return Account( Name(data.at("f_name"), data.at("l_name"))
-                      , Address( data.at("street")
-                               , data.at("city")
-                               , data.at("state")
-                               , std::stoi(data.at("zip")) )
-                      , type_constructor.at(data.at("type"))()
-                      , std::stoi(data.at("chocan_id"))
-                      );
-    }
-    catch(const std::exception&)
-    {
-        // TODO: review what type of exception should be thrown
-        throw chocan_db_exception("DB: Error Failed to deserialize Account", data);
-    }
 }

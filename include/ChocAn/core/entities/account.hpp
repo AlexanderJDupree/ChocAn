@@ -58,7 +58,7 @@ private:
     Account_Status _status;
 };
 
-class Account : public Serializable<Account, std::string, std::string, 9>
+class Account : public Serializable<Account, std::string, std::string>
 {
 public:
 
@@ -78,9 +78,11 @@ public:
            , unsigned id
            , const Key<Data_Gateway>& );
 
+    Account( const Data_Table&, const Key<Data_Gateway>& );
+
     /* Serializable Interface */
     Data_Table serialize() const override;
-    Account deserialize(const Data_Table&, const Key<Data_Gateway>&) const;
+    static Data_Table build_key_table();
 
     /* Name and Address are Mutable */
     Name& name() { return _name; }
@@ -99,13 +101,6 @@ public:
 
 private:
 
-    Account( const Name& name
-           , const Address& address
-           , const Account_Type& type
-           , unsigned id);
-
-    Account deserialize(const Data_Table&) const override;
-
     Name         _name;
     Address      _address;
     Account_Type _type;
@@ -113,4 +108,3 @@ private:
 };
 
 #endif // CHOCAN_ACCOUNT_HPP
-
