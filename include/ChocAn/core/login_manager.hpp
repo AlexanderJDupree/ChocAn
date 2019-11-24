@@ -28,22 +28,21 @@ public:
     using Database_Ptr = Data_Gateway::Database_Ptr;
     using Account_Ptr  = Account::Account_Ptr;
 
-    Login_Manager(Database_Ptr db) 
-        :  database(db), _session_owner(nullptr) 
-        { if(!db) { throw std::exception(); } }
+    Login_Manager(Database_Ptr db);
 
     bool login(const unsigned ID);
     bool login(const std::string& ID);
+    bool logged_in() const;
 
     // logout is idempotent
     void logout(); 
 
-    const Account_Ptr session_owner() const;
+    const Account& session_owner() const;
 
 private:
 
     Database_Ptr database;
-    Account_Ptr _session_owner;
+    std::optional<Account> _session_owner;
 
 };
 

@@ -17,16 +17,18 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/core/login_manager.hpp>
 
+Login_Manager::Login_Manager(Database_Ptr db)
+    : database(db), _session_owner( { })
+{
+    if(!db) 
+    { 
+        throw std::logic_error("Login Manager: DB is null, construction failed"); 
+    } 
+}
+
 bool Login_Manager::login(const unsigned ID)
 {
-    std::optional<Account> maybe_account = database->get_account(ID);
-    
-    // If retrieval succeded and that account is not a member, then create session
-    _session_owner = (maybe_account && !std::holds_alternative<Member>(maybe_account.value().type()))
-                   ? std::make_unique<Account>(maybe_account.value())
-                   : nullptr;
-
-    return (_session_owner) ? true : false;
+    return (_session_owner = database->get_account(ID)) ? true : false;
 }
 
 bool Login_Manager::login(const std::string& ID)
@@ -41,12 +43,21 @@ bool Login_Manager::login(const std::string& ID)
     }
 }
 
-void Login_Manager::logout()
+bool Login_Manager::logged_in() const
 {
-    _session_owner = nullptr;
+    return (_session_owner) ? true : false;
 }
 
-const Account::Account_Ptr Login_Manager::session_owner() const
+void Login_Manager::logout()
 {
-    return _session_owner;
+    _session_owner.reset();
+}
+
+const Account& Login_Manager::session_owner() const
+{
+    if(!logged_in())
+    {
+        throw std::logic_error("Login Manager: Session owner does not exist.");
+    }
+    return _session_owner.value();
 }

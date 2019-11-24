@@ -93,7 +93,7 @@ TEST_CASE("Shared State Behavior", "[state], [state_controller]")
                                        , mocks.input_controller
                                        , state);
 
-            REQUIRE(controller.transition().current_state().index() == state.index());
+            REQUIRE(controller.interact().current_state().index() == state.index());
         } );
     }
 }
@@ -128,13 +128,23 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
 
     mocks.chocan->db->create_account(manager);
 
+    Account member( Name("Bob", "Doe")
+                    , Address( "1234 lame St."
+                             , "Portland"
+                             , "OR"
+                             , 97030 )
+                    , Member()
+                    , mocks.chocan->id_generator );
+
+    mocks.chocan->db->create_account(member);
+
     SECTION("Login transitions to provider menu when given a valid provider ID")
     {
         Application_State expected_state { Provider_Menu() };
 
         mocks.in_stream << provider.id() << '\n';
 
-        REQUIRE(controller.transition().current_state().index() == expected_state.index());
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
     SECTION("Login transitions to manager menu when given a valid manager ID")
     {
@@ -142,7 +152,19 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
 
         mocks.in_stream << manager.id() << '\n';
 
-        REQUIRE(controller.transition().current_state().index() == expected_state.index());
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
+    }
+    SECTION("Login does not transition state when given an invalid ID")
+    {
+        mocks.in_stream << "garbage\n";
+
+        REQUIRE(std::holds_alternative<Login>(controller.interact().current_state()));
+    }
+    SECTION("Login does not transition state when given a Member ID")
+    {
+        mocks.in_stream << member.id() << '\n';
+
+        REQUIRE(std::holds_alternative<Login>(controller.interact().current_state()));
     }
 }
 
@@ -161,7 +183,7 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 
         mocks.in_stream << "0\n";
 
-        REQUIRE(controller.transition().current_state().index() == expected_state.index());
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
     SECTION("Provider menu transitions to Add Transaction on input '5'")
     {
@@ -169,7 +191,7 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 
         mocks.in_stream << "5\n";
 
-        REQUIRE(controller.transition().current_state().index() == expected_state.index());
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
     SECTION("Provider menu transition to exit on input 'exit'")
     {
@@ -177,7 +199,7 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 
         mocks.in_stream << "exit\n";
 
-        REQUIRE(controller.transition().current_state().index() == expected_state.index());
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
 }
 
@@ -196,7 +218,7 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         mocks.in_stream << "0\n";
 
-        REQUIRE(controller.transition().current_state().index() == expected_state.index());
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
     SECTION("Manager menu transition to exit on input 'exit'")
     {
@@ -298,12 +320,12 @@ TEST_CASE("Exit State Behavior", "[exit], [state_controller]")
 
     SECTION("end_state() returns true when controller is at exit state")
     {
-        REQUIRE(controller.end_state());
+        REQUIRE(controller.interact().end_state());
     }
     SECTION("Exit state logs the user out of the system")
     {
         controller.interact();
 
-        REQUIRE(mocks.chocan->login_manager.session_owner() == nullptr);
+        REQUIRE_FALSE(mocks.chocan->login_manager.logged_in());
     }
 }
