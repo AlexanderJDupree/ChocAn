@@ -114,7 +114,7 @@ DateTime::Data_Table DateTime::serialize() const
     };
 }
 
-double DateTime::unix_timestamp() const
+int DateTime::unix_timestamp() const
 {
     std::tm time;
 

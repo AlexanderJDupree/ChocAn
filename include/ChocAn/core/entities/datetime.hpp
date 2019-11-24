@@ -61,7 +61,7 @@ public:
     const Year&  year() const;
 
     static bool is_leap_year(const Year& year);
-    double unix_timestamp() const;
+    int unix_timestamp() const;
 
     bool operator <  (const DateTime& rhs) const;
     bool operator >  (const DateTime& rhs) const;
