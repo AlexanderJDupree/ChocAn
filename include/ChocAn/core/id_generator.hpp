@@ -26,10 +26,9 @@ public:
 
     using Database_Ptr = Data_Gateway::Database_Ptr;
 
-    ID_Generator(Database_Ptr db) 
-        : database(db) 
-        { if(!db) { throw std::exception(); } }
+    ID_Generator(Database_Ptr db);
 
+    // Returns a unique 9 digit ID that does not exist in the DB
     unsigned yield() const;
 
 private:

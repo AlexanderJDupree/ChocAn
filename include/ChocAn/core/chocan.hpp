@@ -43,7 +43,8 @@ public:
     
     /* Service Objects */
 
-    Database_Ptr  db; // TODO Review whether we should wrap DB methods
+    // TODO wrap service object access behind function calls
+    Database_Ptr  db;
 
     ID_Generator  id_generator;
     Login_Manager login_manager;

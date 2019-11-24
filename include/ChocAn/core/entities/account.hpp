@@ -62,8 +62,8 @@ class Account : public Serializable<Account, std::string, std::string>
 {
 public:
 
-    typedef std::shared_ptr<Account> Account_Ptr;
-    typedef std::variant<Manager, Member, Provider> Account_Type;
+    using Account_Ptr  =  std::shared_ptr<Account>;
+    using Account_Type =  std::variant<Manager, Member, Provider>;
 
     // Client side account creation, utilizes the ChocAn Id generator
     Account( Name name

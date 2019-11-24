@@ -33,8 +33,6 @@ int main ()
     {
         controller.interact();
     }
-    // Required to render exit state, TODO refactor
-    controller.interact();
 
     return 0;
 }
