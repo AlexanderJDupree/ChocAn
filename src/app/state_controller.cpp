@@ -40,7 +40,8 @@ State_Controller::State_Controller( ChocAn_Ptr        chocan
 State_Controller& State_Controller::interact()
 {
     // TODO implement runtime as ring buffer Or dequeue
-    runtime.push(std::visit(*this, runtime.top()));
+    Application_State current_state = pop_runtime();
+    runtime.push(std::visit(*this, current_state));
 
     return *this;
 }
@@ -106,6 +107,7 @@ Application_State State_Controller::operator()(Exit& exit)
 
 Application_State State_Controller::operator()(Provider_Menu& menu)
 {
+    runtime.push(menu);
     state_viewer->render_state(menu) ;
 
     const Transition_Table provider_menu
@@ -113,7 +115,6 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "4"   , [&](){ return Find_Account_PM(); } },
-       // { "4"   , [&](){ return find_account(menu); } },
         { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
     };
 
@@ -129,13 +130,13 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
 
 Application_State State_Controller::operator()(Manager_Menu& menu)
 {
+    runtime.push(menu);
     state_viewer->render_state(menu) ;
 
     const Transition_Table manager_menu
     {
         { "exit", [&](){ return Exit();  } },
         { "1"   , [&](){ return Find_Account_MM(); } },
-        //{ "1"   , [&](){ return find_account(menu); } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
     };
 
@@ -193,8 +194,6 @@ Application_State State_Controller::operator()(View_Account& state)
 {
   state_viewer->render_state(state) ;
   std::string input = input_controller->read_input();
-  runtime.pop();
-  runtime.pop();
   return pop_runtime();
 }
 Application_State State_Controller::operator()(Find_Account_MM& state)
@@ -218,4 +217,3 @@ Application_State State_Controller::operator()(Find_Account_PM& state)
   else 
     return Provider_Menu { "Invalid ID" };
 }
-
