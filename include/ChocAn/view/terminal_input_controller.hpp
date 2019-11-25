@@ -34,6 +34,8 @@ public:
     Terminal_Input_Controller(std::istream& in_stream = std::cin)
         : in_stream(in_stream) {}
 
+    virtual ~Terminal_Input_Controller() {}
+
     std::string read_input() const override
     {
         std::string input;
