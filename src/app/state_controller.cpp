@@ -79,13 +79,13 @@ Application_State State_Controller::operator()(Login& login)
         const Account& session_owner = chocan->login_manager.session_owner();
         return std::visit(overloaded {
             [&](const Manager&) -> Application_State { 
-                return Manager_Menu { "Welcome " + session_owner.name().first() };
+                return Manager_Menu {{ "Welcome " + session_owner.name().first() }};
             },
             [&](const Provider&) -> Application_State {
-                return Provider_Menu { "Welcome " + session_owner.name().first() };
+                return Provider_Menu {{ "Welcome " + session_owner.name().first() }};
             },
             [&](const Member&) -> Application_State { 
-                return Login { "Only Providers or Managers may log in"};
+                return Login {{ "Only Providers or Managers may log in"}};
             }
         }, session_owner.type());
     }
@@ -121,7 +121,7 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
     }
     catch(const std::out_of_range& err)
     {
-        return Provider_Menu { "Unrecognized Input" };
+        return Provider_Menu {{ "Unrecognized Input" }};
     }
 }
 
@@ -141,7 +141,7 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
     }
     catch(const std::out_of_range& err)
     {
-        return Manager_Menu { "Unrecognized Input" };
+        return Manager_Menu {{ "Unrecognized Input" }};
     }
 }
 
@@ -154,7 +154,7 @@ Application_State State_Controller::operator()(Add_Transaction& state)
     } ) ;
 
     if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Provider_Menu { "Transaction Request Cancelled!" }; }
+    if(input == "cancel") { return Provider_Menu {{ "Transaction Request Cancelled!" }}; }
     // TODO allow user to print out provider directory
 
     chocan->transaction_builder.set_current_field(input);
@@ -176,7 +176,7 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
     if (input == "y" || input == "yes"  || input == "Y" || input == "YES" )
     {
         chocan->db->add_transaction(state.transaction);
-        return Provider_Menu { "Transaction Processed!" };
+        return Provider_Menu {{ "Transaction Processed!" }};
     }
     if (input == "n" || input == "no" || input == "N" || input == "NO")
     {
