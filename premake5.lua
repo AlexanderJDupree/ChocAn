@@ -27,10 +27,14 @@ workspace "CS300 Term Project"
     flags "FatalWarnings"
     warnings "Extra"
 
-    filter "configurations:debug*"   
+    filter { "configurations:debug*", "toolset:gcc" }
         buildoptions { "-fprofile-arcs", "-ftest-coverage" }
         defines { "DEBUG" }
         links "gcov"
+        symbols "On"
+
+    filter { "configurations:debug*", "toolset:clang" }
+        defines { "DEBUG" }
         symbols "On"
 
     filter "configurations:release*" 
@@ -40,6 +44,14 @@ workspace "CS300 Term Project"
     filter "toolset:gcc"
         buildoptions { 
             "-Wall", "-Wextra", "-Werror", "-std=c++17"
+        } 
+        
+    filter "toolset:clang"
+        buildoptions { 
+            "-Wall", "-Wextra", "-Werror", "-std=c++17", "-stdlib=libc++"
+        }
+        links { 
+            "c++", "c++abi"
         }
 
     filter {} -- close filter
