@@ -33,6 +33,8 @@ public:
                , const Service& service 
                , const std::string& comments );
 
+    virtual ~Transaction() = default;
+
     Data_Table serialize() const override;
 
     const DateTime& service_date() const { return _service_date; }

@@ -80,6 +80,8 @@ public:
 
     Account( const Data_Table&, const Key<Data_Gateway>& );
 
+    virtual ~Account() = default;
+
     /* Serializable Interface */
     Data_Table serialize() const override;
     static Data_Table build_key_table();

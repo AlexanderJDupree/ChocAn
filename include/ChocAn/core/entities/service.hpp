@@ -41,6 +41,8 @@ public:
         , _code( std::stoi(data.at("code")) )
         , _name( data.at("name") )
         { }
+    
+    virtual ~Service() = default;
 
     const USD&         cost() const { return _cost; }
     unsigned           code() const { return _code; }
