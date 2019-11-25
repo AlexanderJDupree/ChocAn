@@ -24,6 +24,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/utils/overloaded.hpp>
 #include <ChocAn/core/entities/account.hpp>
 #include <ChocAn/core/entities/service.hpp>
+#include <ChocAn/core/entities/transaction.hpp>
 
 SQLite_DB::SQLite_DB(const char* db_name)
 {
@@ -63,6 +64,7 @@ bool SQLite_DB::load_schema(const char* schema_file)
 
 bool SQLite_DB::execute_statement(const std::string& sql, SQL_Callback callback, void* data)
 {
+    // TODO Refactor to use the sqlite3 prepare, step, and column interface to prevent SQL injection
     int rc = sqlite3_exec(db, sql.c_str(), callback, data, &err_msg);
 
     if(rc != SQLITE_OK)
@@ -73,28 +75,25 @@ bool SQLite_DB::execute_statement(const std::string& sql, SQL_Callback callback,
     return true;
 }
 
-bool SQLite_DB::create_account(const Account& account)
+unsigned SQLite_DB::create_account(const Account& account)
 {
-    /*
-    This is the syntax I would like to use
-    Data_Tree data = account.serialize();
+    std::stringstream sql;
+    Account::Data_Table data = account.serialize();
 
-    std::string sql = "INSERT OR REPLACE INTO accounts VALUES (" 
-                    + data["id"]
-                    + data["name"]["first"]
-                    + data["name"]["last"]
-                    + data["address"]["street"]
-                    + data["address"]["city"]
-                    + data["address"]["state"]
-                    + data["address"]["zip"]
-                    + data["type"]
-                    + data["status"]
-                    + ");";
-                    */
+    sql << "INSERT OR REPLACE INTO accounts VALUES (" 
+        << data["chocan_id"] << ", "
+        << sqlquote(data["f_name"]) << ", "
+        << sqlquote(data["l_name"]) << ", "
+        << sqlquote(data["street"]) << ", "
+        << sqlquote(data["city"])   << ", "
+        << sqlquote(data["state"])  << ", "
+        << sqlquote(data["zip"])    << ", "
+        << sqlquote(data["type"])   << ", "
+        << sqlquote(data["status"]) << ");";
+    
 
-    std::string sql = "INSERT OR REPLACE INTO accounts VALUES (" + serialize_account(account) + ");";
-
-    return execute_statement(sql, no_callback);
+    if(execute_statement(sql.str(), no_callback)) { return account.id(); }
+    return 0;
 }
 
 bool SQLite_DB::update_account(const Account& account)
@@ -113,10 +112,8 @@ bool SQLite_DB::delete_account(const unsigned ID)
 bool SQLite_DB::id_exists(const unsigned ID) const
 {
     bool flag = false;
-    auto callback = [](void* flag, int argc, char** argv, char**) -> int 
+    auto callback = [](void* flag, int, char** argv, char**) -> int 
     { 
-        if(argc != 1) { return 1; }
-
         // If query returned 1, set flag to true
         *static_cast<bool*>(flag) = (strcmp(argv[0], "1") == 0);
         return 0;
@@ -128,21 +125,34 @@ bool SQLite_DB::id_exists(const unsigned ID) const
     return flag;
 }
 
-bool SQLite_DB::add_transaction(const Transaction&)
+unsigned SQLite_DB::add_transaction(const Transaction& transaction)
 {
-    return true;
+    std::stringstream sql;
+    Transaction::Data_Table data = transaction.serialize();
+
+    sql << "INSERT INTO transactions VALUES ("
+        << data["service_date"] << ','
+        << data["filed_date"]   << ','
+        << data["provider_id"]  << ','
+        << data["member_id"]    << ','
+        << data["service_code"] << ','
+        << sqlquote(data["comments"]) << ");";
+
+    if(execute_statement(sql.str(), no_callback)) 
+    { 
+        // TODO having the primary key as the filed date will cause a collision
+        // if two transations are filed within the same second
+        return transaction.filed_date().unix_timestamp();
+    }
+    return 0;
 }
 
 std::optional<Service> SQLite_DB::lookup_service(const unsigned code)
 {
-    using Data_Table = std::map<std::string, std::string>;
-
-    Data_Table data;
+    SQL_Row data;
     auto callback = [](void* table, int argc, char** argv, char** col_name) -> int
     {
-        if(argc != 3) { return 1; }
-
-        Data_Table* data = static_cast<Data_Table*>(table);
+        SQL_Row* data = static_cast<SQL_Row*>(table);
 
         for(int i = 0; i < argc; ++i)
         {
@@ -155,19 +165,9 @@ std::optional<Service> SQLite_DB::lookup_service(const unsigned code)
 
     if(execute_statement(sql, callback, &data) && !data.empty())
     {
-        try
-        {
-            return Service( std::stoi(data["code"])
-                          , USD { std::stod(data["cost"]) }
-                          , data["name"]
-                          , db_key );
-        }
-        catch(const std::exception&) 
-        { 
-            throw chocan_db_exception("DB Error: Failed to deserialize Service", {});
-        }
+        return Service(data, db_key);
     }
-    return { };
+    return { }; // Lookup failed
 }
 
 std::optional<Service> SQLite_DB::lookup_service(const std::string& code)
@@ -182,16 +182,12 @@ std::optional<Service> SQLite_DB::lookup_service(const std::string& code)
     }
 }
 
-std::optional<Account> SQLite_DB::get_account(const unsigned ID)
+std::optional<Account> SQLite_DB::get_account(const unsigned ID, const std::string& type)
 {
-    using Data_Table = std::map<std::string, std::string>;
-
-    Data_Table data;
+    SQL_Row data;
     auto callback = [](void* table, int argc, char** argv, char** col_name) -> int
     {
-        if(argc != 9) { return 1; }
-
-        Data_Table* data = static_cast<Data_Table*>(table);
+        SQL_Row* data = static_cast<SQL_Row*>(table);
 
         for(int i = 0; i < argc; ++i)
         {
@@ -200,102 +196,86 @@ std::optional<Account> SQLite_DB::get_account(const unsigned ID)
         return 0;
     };
 
-    std::string sql = "SELECT * FROM accounts WHERE chocan_id=" + std::to_string(ID) + ";";
-
-    std::map<std::string, std::function<Account::Account_Type()>> type_constructor
-    {
-        { "Manager",  [&](){ return Manager();  } },
-        { "Provider", [&](){ return Provider(); } },
-        { "Member",   [&]()
-        { 
-            return Member(data["status"] == "Suspended" ? Account_Status::Suspended 
-                                                        : Account_Status::Valid); 
-        } }
-    };
+    std::string acct_type = (type == "*") ? "" : " and type=" + sqlquote(type);
+    std::string sql = "SELECT * FROM accounts WHERE chocan_id=" + std::to_string(ID) + acct_type + ";";
 
     if(execute_statement(sql, callback, &data) && !data.empty())
     {
-        try
-        {
-            return Account( Name(data["f_name"], data["l_name"])
-                          , Address( data["street"]
-                                   , data["city"]
-                                   , data["state"]
-                                   , std::stoi(data["zip"]) )
-                          , type_constructor.at(data["type"])()
-                          , std::stoi(data["chocan_id"])
-                          , db_key );
-        }
-        catch(const std::exception&)
-        {
-            throw chocan_db_exception("DB: Error Failed to deserialize Account", data);
-        }
+        return Account(data, db_key);
     }
     return { };
 }
-std::optional<Account> SQLite_DB::get_account(const std::string& ID)
+std::optional<Account> SQLite_DB::get_account(const std::string& ID, const std::string& type)
 {
     try
     {
-        return get_account(std::stoi(ID));
+        return get_account(std::stoi(ID), type);
     }
     catch(const std::exception&)
     {
         return { };
     }
 }
-std::optional<Account> SQLite_DB::get_member_account(const unsigned)
+std::optional<Account> SQLite_DB::get_account(const unsigned ID)
 {
-    return { };
+    return get_account(ID, "*");
 }
-std::optional<Account> SQLite_DB::get_member_account(const std::string&)
+std::optional<Account> SQLite_DB::get_account(const std::string& ID)
 {
-    return { };
+    return get_account(ID, "*");
 }
-std::optional<Account> SQLite_DB::get_provider_account(const unsigned)
+std::optional<Account> SQLite_DB::get_member_account(const unsigned ID)
 {
-    return { };
+    return get_account(ID, "Member");
 }
-std::optional<Account> SQLite_DB::get_provider_account(const std::string&)
+std::optional<Account> SQLite_DB::get_member_account(const std::string& ID)
 {
-    return { };
+    return get_account(ID, "Member");
 }
-std::optional<Account> SQLite_DB::get_manager_account(const unsigned)
+std::optional<Account> SQLite_DB::get_provider_account(const unsigned ID)
 {
-    return { };
+    return get_account(ID, "Provider");
 }
-std::optional<Account> SQLite_DB::get_manager_account(const std::string&)
+std::optional<Account> SQLite_DB::get_provider_account(const std::string& ID)
 {
-    return { };
+    return get_account(ID, "Provider");
+}
+std::optional<Account> SQLite_DB::get_manager_account(const unsigned ID)
+{
+    return get_account(ID, "Manager");
+}
+std::optional<Account> SQLite_DB::get_manager_account(const std::string& ID)
+{
+    return get_account(ID, "Manager");
 }
 
 Data_Gateway::Service_Directory SQLite_DB::service_directory()
 {
-    return {};
-}
+    Service_Directory directory;
 
-std::string SQLite_DB::serialize_account(const Account& account) const
-{
-    std::stringstream data;
+    std::vector<unsigned> service_codes;
+    auto callback = [](void* codes, int, char** argv, char**) -> int
+    {
+        std::vector<unsigned>* service_codes = static_cast<std::vector<unsigned>*>(codes);
 
-    data << std::to_string(account.id())         << ", "
-         << sqlquote(account.name().first())     << ", "
-         << sqlquote(account.name().last())      << ", "
-         << sqlquote(account.address().street()) << ", "
-         << sqlquote(account.address().city())   << ", "
-         << sqlquote(account.address().state())  << ", "
-         << sqlquote(std::to_string(account.address().zip())) << ", "
-         << std::visit( overloaded {
-             [](const Manager&) -> std::string { return "'Manager', 'Valid'"; },
-             [](const Provider&)-> std::string { return "'Provider', 'Valid'"; },
-             [](const Member& m)-> std::string { 
-                 return std::string("'Member', ") += (m.status() == Account_Status::Valid) 
-                                                     ? "'Valid'" 
-                                                     : "'Suspended'";
-             }
-         }, account.type());
+        service_codes->push_back(std::stoi(argv[0]));
 
-    return data.str();
+        return 0;
+    };
+
+    std::string sql = "SELECT code FROM services;";
+
+    if (execute_statement(sql, callback, &service_codes))
+    {
+        std::for_each(service_codes.begin(), service_codes.end(), [&](unsigned code)
+        {
+            if( auto maybe_service = lookup_service(code))
+            {
+                directory.insert( { code, maybe_service.value() } );
+            }
+        } );
+    }
+    return directory;
 }
 
 std::string SQLite_DB::sqlquote(const std::string& str) const

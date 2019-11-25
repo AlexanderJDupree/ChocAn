@@ -67,6 +67,41 @@ TEST_CASE("Getting DateTime from system clock", "[clock], [datetime]")
     }
 }
 
+TEST_CASE("Converting DateTime to unix time stamps", "[unix_timestamp], [datetime]")
+{
+    DateTime date ( Day(24), Month(11), Year(2019));
+    double nov_24_2019 = 1574553600;
+
+    SECTION("unix_timestamp returns the number of seconds since the epoch")
+    {
+        REQUIRE(date.unix_timestamp() == nov_24_2019);
+    }
+    SECTION("A unix timestamp can be converted into a DateTime object")
+    {
+        REQUIRE(DateTime(nov_24_2019) == date);
+    }
+}
+
+TEST_CASE("Serializing Datetime objects", "[serialize], [datetime]")
+{
+    DateTime date ( Day(24), Month(11), Year(2019));
+    DateTime::Data_Table data { {"day", "24"}, {"month", "11"}, {"year", "2019"}, {"unix", "1574553600"}};
+    DateTime::Data_Table test = date.serialize();
+
+    SECTION("deserializing into a datetime object")
+    {
+        REQUIRE(DateTime(data) == date);
+    }
+    SECTION("serializing into a data table")
+    {
+        REQUIRE(date.serialize() == data);
+    }
+    SECTION("Attempting to construct from an empty table will construct the epoch date")
+    {
+        REQUIRE( DateTime({ }) == DateTime(Day(1), Month(1), Year(1970)));
+    }
+}
+
 TEST_CASE("Constructors for DateTime classes", "[constructors], [datetime]")
 {
     SECTION("Constructing Datetime in Day Month Year format")

@@ -58,6 +58,33 @@ DateTime::DateTime(Year year, Month month, Day day)
 DateTime::DateTime(Year year, Day day, Month month)
     : DateTime(day, month, year) {}
 
+DateTime::DateTime(const Data_Table& data)
+{
+    try
+    {
+        // Try to build from day/month/year values
+        *this = DateTime( Day(std::stoi(data.at("day")))
+                        , Month(std::stoi(data.at("month")))
+                        , Year(std::stoi(data.at("year"))) );
+    }
+    catch(const std::exception&)
+    {
+        // Try to build from unix timestamp, if this fails the exception goes uncaught
+        DateTime(std::stoi(data.at("unix")));
+    }
+}
+
+DateTime::DateTime(double unix_timestamp)
+{
+    std::time_t time = unix_timestamp;
+
+    tm utc_time = *gmtime(&time);
+
+    *this =  DateTime( Day   { utc_time.tm_mday }
+                     , Month { utc_time.tm_mon + 1 }
+                     , Year  { utc_time.tm_year + 1900 } );
+}
+
 bool DateTime::ok() const
 {
     const Day calendar[] = 
@@ -74,6 +101,31 @@ bool DateTime::ok() const
 bool DateTime::is_leap_year(const Year& year)
 {
     return year.count() % 4 == 0 && (year.count() % 100 != 0 || year.count() % 400 == 0);
+}
+
+DateTime::Data_Table DateTime::serialize() const
+{
+    return
+    {
+        { "day"  , std::to_string(_day.count())     },
+        { "month", std::to_string(_month.count())   },
+        { "year" , std::to_string(_year.count())    },
+        { "unix" , std::to_string(unix_timestamp()) }
+    };
+}
+
+int DateTime::unix_timestamp() const
+{
+    std::tm time;
+
+    time.tm_year = _year.count() - 1900;
+    time.tm_mon  = _month.count() - 1;
+    time.tm_mday = _day.count();
+    time.tm_hour = 0;
+    time.tm_min  = 0;
+    time.tm_sec  = 0;
+
+    return timegm(&time);
 }
 
 const Day&   DateTime::day() const 

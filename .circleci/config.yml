@@ -1,36 +1,71 @@
-version: 2
+version: 2.0
+
+_run:
+  - install-dependencies: &install-dependencies
+      name: Install software-properties-common
+      command: 'sudo apt-get install -y software-properties-common'
+  - update-repository-toolchain: &update-repository-toolchain
+      name: Update Repository Tool Chain
+      command: |
+        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main"
+        sudo apt update
+  - install-gcc-7: &install-gcc-7
+      name: Install GCC-7
+      command: |
+        sudo apt install g++-7 -y
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60
+  - install-clang-8: &install-clang-8
+      name: Install Clang-8
+      command: |
+        sudo apt install clang-8 libc++-8-dev libc++abi-8-dev -y
+        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-8 60
+        sudo update-alternatives --config clang++
+  - premake: &premake
+      name: Download and install Premake5
+      command: |
+        wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz
+        tar -xvf premake-5.0.0-alpha13-linux.tar.gz
 
 jobs:
-  build:
-    machine: 
+  gcc:
+    machine:
       image: ubuntu-1604:201903-01
     steps:
       - checkout
-      - run:
-          name: Install software-properties-common
-          command: 'sudo apt-get install -y software-properties-common'
-      - run:
-          name: Update Repository Tool Chain
-          command: 'sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test'
-      - run:
-          name: Install GCC-7
-          command: 'sudo apt update && sudo apt install g++-7 -y'
-      - run:
-          name: Update Alternatives
-          command: 'sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60'
-      - run:
-          name: Download Premake5
-          command: 'wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz'
-      - run:
-          name: Install Premake5
-          command: 'tar -xvf premake-5.0.0-alpha13-linux.tar.gz'
+      - run: *install-dependencies
+      - run: *update-repository-toolchain
+      - run: *install-gcc-7
+      - run: *premake
       - run:
           name: Creating Build Files
-          command: './premake5 gmake'
+          command: './premake5 --cc=gcc gmake'
       - run:
           name: Build and run
           command: './build.sh'
       - run:
           name: Upload code coverage
           command: 'bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect reports" '
+  clang:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run: *install-dependencies
+      - run: *update-repository-toolchain
+      - run: *install-clang-8
+      - run: *premake
+      - run:
+          name: Creating Build Files
+          command: './premake5 --cc=clang gmake'
+      - run:
+          name: Build and run
+          command: './build.sh'
 
+workflows:
+  version: 2
+  build:
+    jobs:
+      - gcc
+      - clang

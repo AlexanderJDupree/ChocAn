@@ -148,8 +148,6 @@ TEST_CASE("Building Transactions", "[transaction_builder]")
 
     Transaction_Builder builder(db);
 
-    Transaction_Builder builder2(db);
-
     SECTION("Builder throws if transaction is not buildable")
     {
         REQUIRE_THROWS_AS(builder.build(), chocan_user_exception);

@@ -24,6 +24,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/utils/passkey.hpp>
 #include <ChocAn/core/entities/name.hpp>
 #include <ChocAn/core/entities/address.hpp>
+#include <ChocAn/core/utils/serializable.hpp>
 
 enum class Account_Status { Valid, Suspended };
 
@@ -57,7 +58,7 @@ private:
     Account_Status _status;
 };
 
-class Account
+class Account : public Serializable<Account, std::string, std::string>
 {
 public:
 
@@ -75,7 +76,15 @@ public:
            , Address address
            , Account_Type type
            , unsigned id
-           , Key<Data_Gateway>& );
+           , const Key<Data_Gateway>& );
+
+    Account( const Data_Table&, const Key<Data_Gateway>& );
+
+    virtual ~Account() = default;
+
+    /* Serializable Interface */
+    Data_Table serialize() const override;
+    static Data_Table build_key_table();
 
     /* Name and Address are Mutable */
     Name& name() { return _name; }
@@ -87,7 +96,6 @@ public:
     /* Type and ID are immutable */
     const Account_Type& type() const { return _type; }
     unsigned id() const { return _id; }
-
 
     // Two accounts are equal iff they have the same id
     bool operator == (const Account& rhs) const { return _id == rhs._id;   }
@@ -102,4 +110,3 @@ private:
 };
 
 #endif // CHOCAN_ACCOUNT_HPP
-
