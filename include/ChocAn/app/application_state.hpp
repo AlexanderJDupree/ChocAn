@@ -55,8 +55,10 @@ public:
 };
 class View_Account
 {
-  public:
+public:
+    enum class Status { Wait, Confirm };
     Account account;
+    Status  status = Status::Wait;
 };
 
 using Application_State = std::variant< Login

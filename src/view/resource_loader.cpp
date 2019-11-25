@@ -103,7 +103,15 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
         { "account.address.street", [&](){ return state.account.address().street(); } },
         { "account.address.city",   [&](){ return state.account.address().city();   } },
         { "account.address.state",  [&](){ return state.account.address().state();  } },
-        { "account.address.zip",    [&](){ return std::to_string(state.account.address().zip()); } }
+        { "account.address.zip",    [&](){ return std::to_string(state.account.address().zip()); } },
+        { "status", [&](){ 
+            switch(state.status)
+            {
+                case View_Account::Status::Wait    : return "Press 'Enter' to continue:";
+                case View_Account::Status::Confirm : return "Is this correct? (Y/N):";
+                default : return "";
+            }
+        }}
     };
 }
 
