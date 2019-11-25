@@ -175,8 +175,9 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 
     if (input == "y" || input == "yes"  || input == "Y" || input == "YES" )
     {
-        chocan->db->add_transaction(state.transaction);
-        return Provider_Menu {{ "Transaction Processed!" }};
+        unsigned id = chocan->db->add_transaction(state.transaction);
+        std::string processed = "Transaction Processed, ID: " + std::to_string(id);
+        return Provider_Menu { processed };
     }
     if (input == "n" || input == "no" || input == "N" || input == "NO")
     {
