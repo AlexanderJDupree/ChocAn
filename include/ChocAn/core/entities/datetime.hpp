@@ -23,6 +23,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ctime>
 #include <chrono>
 #include <ChocAn/core/utils/exception.hpp>
+#include <ChocAn/core/utils/serializable.hpp>
 
 // A day is 24 hours
 using Day = std::chrono::duration
@@ -36,7 +37,7 @@ using Year = std::chrono::duration
 using Month = std::chrono::duration
     <int, std::ratio_divide<Year::period, std::ratio<12>>::type>;
 
-class DateTime
+class DateTime : public Serializable<DateTime, std::string, std::string>
 {
 public:
 
@@ -46,6 +47,10 @@ public:
     DateTime(Month, Year, Day);
     DateTime(Year, Month, Day);
     DateTime(Year, Day, Month);
+    DateTime(const Data_Table& data);
+    DateTime(double unix_timestamp);
+
+    Data_Table serialize() const override;
 
     // remove system clock dependency by templating clock type
     template <typename clock_t = std::chrono::system_clock>
@@ -56,6 +61,7 @@ public:
     const Year&  year() const;
 
     static bool is_leap_year(const Year& year);
+    int unix_timestamp() const;
 
     bool operator <  (const DateTime& rhs) const;
     bool operator >  (const DateTime& rhs) const;

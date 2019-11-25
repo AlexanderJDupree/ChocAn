@@ -34,11 +34,11 @@ public:
 
     bool update_account(const Account& account) override;
 
-    bool create_account(const Account& account) override;
+    unsigned create_account(const Account& account) override;
 
     bool delete_account(const unsigned ID) override;
 
-    bool add_transaction(const Transaction& transaction) override;
+    unsigned add_transaction(const Transaction& transaction) override;
 
     std::optional<Account> get_account(const unsigned ID) override;
     std::optional<Account> get_account(const std::string& ID) override;
@@ -61,6 +61,8 @@ public:
 
     std::optional<Account> account_table_lookup(const unsigned ID, const Account_Table& table) const;
     std::optional<Account> account_table_lookup(const unsigned ID, const Reference_Table& table) const;
+
+    const Key<Data_Gateway>& get_db_key() const { return db_key; };
 
     std::map<unsigned, Account> _account_table;
     std::map<unsigned, Account&> _member_table;

@@ -23,7 +23,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/entities/service.hpp>
 #include <ChocAn/core/entities/datetime.hpp>
 
-class Transaction
+class Transaction : public Serializable<Transaction, std::string, std::string>
 {
 public:
 
@@ -32,6 +32,10 @@ public:
                , const DateTime& service_date
                , const Service& service 
                , const std::string& comments );
+
+    virtual ~Transaction() = default;
+
+    Data_Table serialize() const override;
 
     const DateTime& service_date() const { return _service_date; }
     const DateTime& filed_date()   const { return _filed_date;   }

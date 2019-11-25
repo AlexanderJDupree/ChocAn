@@ -20,6 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <catch.hpp>
 #include <ChocAn/data/mock_db.hpp>
 #include <ChocAn/data/sqlite_db.hpp>
+#include <ChocAn/core/entities/transaction.hpp>
 
 // Will instruct sqltie3 to construct temp DB in memory only
 const char* TEST_DB = ":memory:";
@@ -38,41 +39,6 @@ TEST_CASE("Constructing SQLite_DB object", "[constructors], [sqlite_db]")
     SECTION("SQLite_DB does throw when constructed with an invalid schema file")
     {
         REQUIRE_THROWS_AS( SQLite_DB(TEST_DB, "not a file"), chocan_db_exception );
-    }
-}
-
-TEST_CASE("Serializing Accounts into a values statement", "[serialize_account], [sqlite_db]")
-{
-    Mock_DB mock_db;
-    SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
-
-    SECTION("Serializing a provider account")
-    {
-        std::string expected = "1234, 'Arman', 'Provider', '1234 lame st.', 'Portland', 'OR', '97030', 'Provider', 'Valid'";
-        std::string val = db.serialize_account(mock_db.get_account("1234").value());
-
-        REQUIRE(val == expected);
-    }
-    SECTION("Serializing a manager account")
-    {
-        std::string expected = "5678, 'Dan', 'Manager', '1234 cool st.', 'Portland', 'OR', '97030', 'Manager', 'Valid'";
-        std::string val = db.serialize_account(mock_db.get_account("5678").value());
-
-        REQUIRE(val == expected);
-    }
-    SECTION("Serializing a valid member account")
-    {
-        std::string expected = "6789, 'Alex', 'Member', '1234 Meh st.', 'Portland', 'OR', '97030', 'Member', 'Valid'";
-        std::string val = db.serialize_account(mock_db.get_account("6789").value());
-
-        REQUIRE(val == expected);
-    }
-    SECTION("Serializing a suspended member account")
-    {
-        std::string expected = "9876, 'Jane', 'Member', '1234 awesome st.', 'Portland', 'ME', '97030', 'Member', 'Suspended'";
-        std::string val = db.serialize_account(mock_db.get_account("9876").value());
-
-        REQUIRE(val == expected);
     }
 }
 
@@ -143,17 +109,88 @@ TEST_CASE("Looking up services in service directory", "[lookup_service], [sqlite
     }
 }
 
-TEST_CASE("Retrieving accounts from the database")
+TEST_CASE("Retrieving accounts from the database", "[get_account], [sqlite_db]")
+{
+    /* 
+    Note: chocan_schema.sql comes with dummy data. 
+    123456789 belongs to a manager account
+    123123123 belongs to a member account
+    123451234 belongs to a provider account
+    */
+    
+    SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
+
+    SECTION("Retrieve accounts returns a filled optional object on success")
+    {
+        REQUIRE(db.get_account(123456789));
+    }
+    SECTION("Retrieival fails if account does not exist")
+    {
+        REQUIRE_FALSE(db.get_account("000"));
+    }
+    SECTION("Retrieval fails if the ID string is not convertible to int")
+    {
+        REQUIRE_FALSE(db.get_account("garbage"));
+    }
+    SECTION("Retrieval of a member account")
+    {
+        REQUIRE(db.get_member_account(123123123));
+    }
+    SECTION("Member account retrieval fails when given a non member ID")
+    {
+        REQUIRE_FALSE(db.get_member_account("123456789"));
+    }
+    SECTION("Retrieval of a provider account")
+    {
+        REQUIRE(db.get_provider_account(123451234));
+    }
+    SECTION("Member account retrieval fails when given a non provider ID")
+    {
+        REQUIRE_FALSE(db.get_provider_account("123456789"));
+    }
+    SECTION("Retrieval of a manager account")
+    {
+        REQUIRE(db.get_manager_account(123456789));
+    }
+    SECTION("Member account retrieval fails when given a non manager ID")
+    {
+        REQUIRE_FALSE(db.get_manager_account("123123123"));
+    }
+}
+
+TEST_CASE("Add transactions to database", "[add_transaction], [sqlite_db]")
 {
     SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
 
+    Transaction transaction ( db.get_provider_account(123451234).value()
+                            , db.get_member_account(123123123).value()
+                            , DateTime( Day(23), Month(11), Year(2019))
+                            , db.lookup_service("123456").value()
+                            , "comments" );
 
-    SECTION("Retrieving an account will not modify the data")
+    SECTION("add transaction returns the transaction ID on success")
     {
-//        Account test = db.get_account(123456789).value();
+        REQUIRE(db.add_transaction(transaction) != 0);
+    }
+    SECTION("Add transaction returns 0 if the transaction ID already exists")
+    {
+        db.add_transaction(transaction);
 
-//        INFO("Account name: " + test.name().first());
+        REQUIRE(db.add_transaction(transaction) == 0);
+    }
+}
 
-        REQUIRE(db.get_account(123456789));
+TEST_CASE("Retrieving the service directory", "[service_directory], [sqlite_db]")
+{
+    SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
+    SQLite_DB no_schema_db(TEST_DB);
+
+    SECTION("service directory returns a populated table on success")
+    {
+        REQUIRE_FALSE(db.service_directory().empty());
+    }
+    SECTION("service directory returns an empty table on failure")
+    {
+        REQUIRE(no_schema_db.service_directory().empty());
     }
 }
