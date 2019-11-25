@@ -26,8 +26,8 @@ Transaction::Transaction( const Account&     provider
                 : _service_date ( service_date )
                 , _filed_date   ( DateTime::get_current_datetime() )
                 , _provider     ( provider )
-                , _member       ( member )
-                , _service      ( service )
+                , _member       ( member   )
+                , _service      ( service  )
                 , _comments     ( comments )
 {
     chocan_user_exception::Info errors;
@@ -47,4 +47,22 @@ Transaction::Transaction( const Account&     provider
     ( !errors.empty() )
         ? throw invalid_transaction("Invalid Transaction fields", errors)
         : void();
+}
+
+Transaction::Data_Table Transaction::serialize() const
+{
+    DateTime::Data_Table service_date = _service_date.serialize();
+    DateTime::Data_Table filed_date   = _filed_date.serialize();
+    return 
+    {
+        { "service_date_alt", service_date["month"] + '-' + service_date["day"] + '-' + service_date["year"] },
+        { "filed_date_alt"  , filed_date["month"] + '-' + filed_date["day"] + '-' + filed_date["year"] },
+        { "service_date",  service_date["unix"] },
+        { "filed_date"  ,  filed_date["unix"] },
+        { "provider_id" ,  std::to_string(_provider.id())  },
+        { "member_id"   ,  std::to_string(_member.id())    },
+        { "service_code", std::to_string(_service.code()) },
+        { "service", _service.name() },
+        { "comments", _comments }
+    };
 }
