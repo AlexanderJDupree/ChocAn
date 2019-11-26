@@ -1,0 +1,8 @@
+<header>
+
+
+<footer>
+( Entering 'cancel' will cancel the return to the previous menu )
+
+<@status>
+Enter ID number of account you wish to view: <prompt>

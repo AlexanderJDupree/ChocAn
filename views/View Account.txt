@@ -1,10 +1,14 @@
 <header>
 
-ChocAn ID: <@account.id> | <@account.type>
+ChocAn ID: <@chocan_id> | <@type> | <@status>
 
-Name: <@account.name.last>, <@account.name.first>
+Name: <@l_name>, <@f_name>
 
-Address: <@account.address.street>
-         <@account.address.city> <@account.address.state>, <@account.address.zip>
+Address: <@street>
+         <@city> <@state>, <@zip>
 
+<<<<<<< HEAD
 <@status> <prompt>
+=======
+<@state_status> <prompt>
+>>>>>>> view_account_merge_conflicts

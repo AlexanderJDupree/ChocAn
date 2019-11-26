@@ -16,6 +16,7 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
+#include <functional>
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
@@ -40,7 +41,8 @@ State_Controller::State_Controller( ChocAn_Ptr        chocan
 State_Controller& State_Controller::interact()
 {
     // TODO implement runtime as ring buffer Or dequeue
-    runtime.push(std::visit(*this, runtime.top()));
+    Application_State current_state = pop_runtime();
+    runtime.push(std::visit(*this, current_state));
 
     return *this;
 }
@@ -106,14 +108,19 @@ Application_State State_Controller::operator()(Exit& exit)
 
 Application_State State_Controller::operator()(Provider_Menu& menu)
 {
+    runtime.push(menu);
     state_viewer->render_state(menu) ;
 
     const Transition_Table provider_menu
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
+<<<<<<< HEAD
         { "1"   , [&](){ return View_Account{ chocan->login_manager.session_owner() }; } },
         { "4"   , [&](){ return find_account(menu); } },
+=======
+        { "4"   , [&](){ return Find_Account(); } },
+>>>>>>> view_account_merge_conflicts
         { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
     };
 
@@ -129,12 +136,13 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
 
 Application_State State_Controller::operator()(Manager_Menu& menu)
 {
+    runtime.push(menu);
     state_viewer->render_state(menu) ;
 
     const Transition_Table manager_menu
     {
         { "exit", [&](){ return Exit();  } },
-        { "1"   , [&](){ return find_account(menu); } },
+        { "1"   , [&](){ return Find_Account(); } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
     };
 
@@ -178,8 +186,9 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 
     if (input == "y" || input == "yes"  || input == "Y" || input == "YES" )
     {
-        chocan->db->add_transaction(state.transaction);
-        return Provider_Menu {{ "Transaction Processed!" }};
+        unsigned id = chocan->db->add_transaction(state.transaction);
+        std::string processed = "Transaction Processed, ID: " + std::to_string(id);
+        return Provider_Menu { processed };
     }
     if (input == "n" || input == "no" || input == "N" || input == "NO")
     {
@@ -190,17 +199,23 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 
 Application_State State_Controller::operator()(View_Account& state)
 {
+<<<<<<< HEAD
     state_viewer->render_state(state, [&](){
         input_controller->read_input();
     });
 
     runtime.pop();
 
+=======
+    state_viewer->render_state(state) ;
+    input_controller->read_input();
+>>>>>>> view_account_merge_conflicts
     return pop_runtime();
 }
 
-Application_State State_Controller::find_account(Provider_Menu& menu)
+Application_State State_Controller::operator()(Find_Account& state)
 {
+<<<<<<< HEAD
     menu.status = "Enter ID Number of account you want to view:";
 
     std::string input;
@@ -237,4 +252,30 @@ Application_State State_Controller::find_account(Manager_Menu& menu)
     {
         return Manager_Menu { "Invalid ID" };
     }
+=======
+    using Get_Account_Function = std::function<std::optional<Account>(const std::string&)>;
+
+    auto get_account = [&]() -> Get_Account_Function {
+        if(std::holds_alternative<Manager>(chocan->login_manager.session_owner().type()))
+        {
+            return [&](const std::string& id) { return chocan->db->get_account(id);};
+        }
+        return [&](const std::string& id) { return chocan->db->get_member_account(id);};
+    }();
+
+    std::string input;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return pop_runtime(); }
+
+    if( auto maybe_account = get_account(input))
+    {
+        return View_Account { maybe_account.value() };
+    }
+    return Find_Account { "Invalid ID" };
+>>>>>>> view_account_merge_conflicts
 }

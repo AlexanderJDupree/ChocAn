@@ -24,6 +24,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <iostream>
 #include <functional>
 #include <ChocAn/app/state_viewer.hpp>
+#include <ChocAn/view/resource_loader.hpp>
 
 class Terminal_State_Viewer : public State_Viewer
 {
@@ -58,7 +59,7 @@ private:
     const std::string   file_extension;
     std::ostream&       out_stream;
     Command_Table       command_table;
-    Resource_Table      resource_table;
+    Resource_Loader     resources;
     Callback            event_callback;
 };
 
