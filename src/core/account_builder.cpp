@@ -78,10 +78,10 @@ Account Account_Builder::build()
         throw invalid_account_build("Failed to build account", issues);
     
     return Account(
-            Name(std::get<First_Name>(build_phase).first_name.value_or(""),
-                 std::get<Last_Name>(build_phase).last_name.value_or("")),
-                  Address(build_phase.street.value_or(""),
-                          build_phase.city.value_or(""),
+            Name(   std::get<First_Name>(build_phase).first_name.value_or(""),
+                    std::get<Last_Name>(build_phase).last_name.value_or("")),
+           Address( std::get<Street>(build_phase.street.value_or("")),
+                    std::get<City>(build_phase.city.value_or("")),
                           build_phase.state.value_or(""),
                           build_phase.zip.value_or(0)), 
                   build_phase.account_type.value(),           
