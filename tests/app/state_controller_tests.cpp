@@ -201,11 +201,11 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
-    SECTION("Provider menu transitions to Find Account PM on input '4'")
+    SECTION("Provider menu transitions to Find Account on input '4'")
     {
         mocks.in_stream << "4\n";
         
-        REQUIRE(std::holds_alternative<Find_Account_PM>(controller.interact().current_state()));
+        REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
 }
 
@@ -234,11 +234,11 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
-    SECTION("Manager  menu transitions to Find Account PM on input '1'")
+    SECTION("Manager  menu transitions to Find Account on input '1'")
     {
         mocks.in_stream << "1\n";
         
-        REQUIRE(std::holds_alternative<Find_Account_MM>(controller.interact().current_state()));
+        REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
 }
 
@@ -341,47 +341,37 @@ TEST_CASE("Exit State Behavior", "[exit], [state_controller]")
         REQUIRE_FALSE(mocks.chocan->login_manager.logged_in());
     }
 }
-TEST_CASE("Find Account MM State behavior", "[find_account_mm], [state_controller]")
+TEST_CASE("Find Account State behavior", "[find_account], [state_controller]")
 {
     mock_dependencies mocks;
 
     State_Controller controller( mocks.chocan
                                , mocks.state_viewer
                                , mocks.input_controller
-                               , Find_Account_MM() );
+                               , Provider_Menu() );
 
-    SECTION("Find Account MM transitions to View Account on valid member id '9876'")
+    mocks.chocan->login_manager.login(1234);
+
+    mocks.in_stream << "4\n";
+
+    controller.interact(); // Transition to find_account with the provider menu on the runtime stack
+
+    SECTION("Find Account transitions to View Account on valid member id '9876'")
     {
         mocks.in_stream << "9876\n";
 
         REQUIRE(std::holds_alternative<View_Account>(controller.interact().current_state()));
     }
-    SECTION("Find Account MM transitions to Manager Menu on invalid ID number '123454'")
+    SECTION("Find Account transitions to the previous menu on input 'cancel'")
     {
-        mocks.in_stream << "123454\n";
-
-        REQUIRE(std::holds_alternative<Manager_Menu>(controller.interact().current_state()));
-    }
-}
-TEST_CASE("Find Account PM State behavior", "[find_account_pm], [state_controller]")
-{
-    mock_dependencies mocks;
-
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Find_Account_PM() );
-
-    SECTION("Find Account PM transitions to View Account on valid member id '9876'")
-    {
-        mocks.in_stream << "9876\n";
-
-        REQUIRE(std::holds_alternative<View_Account>(controller.interact().current_state()));
-    }
-    SECTION("Find Account PM transitions to Provider Menu on invalid ID number '123454'")
-    {
-        mocks.in_stream << "123454\n";
+        mocks.in_stream << "cancel\n";
 
         REQUIRE(std::holds_alternative<Provider_Menu>(controller.interact().current_state()));
+    }
+    SECTION("Find Account does not transition state on invalid input")
+    {
+        mocks.in_stream << "garbage\n";
+
+        REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
 }
