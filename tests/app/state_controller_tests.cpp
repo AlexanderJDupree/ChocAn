@@ -204,10 +204,6 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
     SECTION("Provider menu transitions to Find Account on input '4'")
     {
         mocks.in_stream << "4\n";
-<<<<<<< HEAD
-        mocks.in_stream << "6789\n";    //provider id#
-=======
->>>>>>> view_account_merge_conflicts
         
         REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }

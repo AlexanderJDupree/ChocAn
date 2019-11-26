@@ -7,8 +7,4 @@ Name: <@l_name>, <@f_name>
 Address: <@street>
          <@city> <@state>, <@zip>
 
-<<<<<<< HEAD
-<@status> <prompt>
-=======
 <@state_status> <prompt>
->>>>>>> view_account_merge_conflicts

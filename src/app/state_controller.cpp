@@ -115,12 +115,7 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-<<<<<<< HEAD
-        { "1"   , [&](){ return View_Account{ chocan->login_manager.session_owner() }; } },
-        { "4"   , [&](){ return find_account(menu); } },
-=======
         { "4"   , [&](){ return Find_Account(); } },
->>>>>>> view_account_merge_conflicts
         { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
     };
 
@@ -199,60 +194,13 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 
 Application_State State_Controller::operator()(View_Account& state)
 {
-<<<<<<< HEAD
-    state_viewer->render_state(state, [&](){
-        input_controller->read_input();
-    });
-
-    runtime.pop();
-
-=======
     state_viewer->render_state(state) ;
     input_controller->read_input();
->>>>>>> view_account_merge_conflicts
     return pop_runtime();
 }
 
 Application_State State_Controller::operator()(Find_Account& state)
 {
-<<<<<<< HEAD
-    menu.status = "Enter ID Number of account you want to view:";
-
-    std::string input;
-    state_viewer->render_state(menu, [&](){
-            input = input_controller->read_input();
-    });
-
-    menu.status = "";
-    if(auto maybe_account = chocan->db->get_member_account(input))
-    {
-        return View_Account { maybe_account.value() };
-    }
-    else 
-    {
-        return Provider_Menu { "Invalid ID" };
-    }
-}
-
-Application_State State_Controller::find_account(Manager_Menu& menu)
-{
-    menu.status = "Enter ID Number of account you want to view:";
-
-    std::string input;
-    state_viewer->render_state(menu, [&](){
-        input = input_controller->read_input();
-    });
-
-    menu.status = "";
-    if(auto maybe_account = chocan->db->get_account(input))
-    {
-        return View_Account { maybe_account.value() };
-    }
-    else 
-    {
-        return Manager_Menu { "Invalid ID" };
-    }
-=======
     using Get_Account_Function = std::function<std::optional<Account>(const std::string&)>;
 
     auto get_account = [&]() -> Get_Account_Function {
@@ -277,5 +225,4 @@ Application_State State_Controller::find_account(Manager_Menu& menu)
         return View_Account { maybe_account.value() };
     }
     return Find_Account { "Invalid ID" };
->>>>>>> view_account_merge_conflicts
 }

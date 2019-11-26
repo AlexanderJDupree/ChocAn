@@ -87,36 +87,6 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Find_Account& 
 }
 Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& state)
 {  
-<<<<<<< HEAD
-    return
-    {
-        { "state_name",   [&](){ return "View Account"; } },
-        { "account.id",   [&](){ return std::to_string(state.account.id()); } },
-        { "account.type", [&]()
-            { 
-                return std::visit( overloaded {
-                    [](const Member&)   { return  "Member"; },
-                    [](const Manager&)  { return "Manager"; },
-                    [](const Provider&) { return  "Provider"; }
-                }, state.account.type() );
-            } },
-        { "account.name.last",  [&](){ return state.account.name().last();  } },
-        { "account.name.first", [&](){ return state.account.name().first(); } },
-
-        { "account.address.street", [&](){ return state.account.address().street(); } },
-        { "account.address.city",   [&](){ return state.account.address().city();   } },
-        { "account.address.state",  [&](){ return state.account.address().state();  } },
-        { "account.address.zip",    [&](){ return std::to_string(state.account.address().zip()); } },
-        { "status", [&](){ 
-            switch(state.status)
-            {
-                case View_Account::Status::Wait    : return "Press 'Enter' to continue:";
-                case View_Account::Status::Confirm : return "Is this correct? (Y/N):";
-                default : return "";
-            }
-        }}
-    };
-=======
     Resource_Table table = state.account.serialize();
     table.insert({ "state_name", "View Account" });
     table.insert({ "state_status", [&](){
@@ -128,7 +98,6 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
         };
     }() });
     return table;
->>>>>>> view_account_merge_conflicts
 }
 
 std::string Resource_Loader::render_user_error(const chocan_user_exception& err)
