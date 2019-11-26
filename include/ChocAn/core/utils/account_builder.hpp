@@ -2,17 +2,17 @@
 File: account_builder.hpp
 
 Brief:  Account builder performs exception handling and guides the user
-        through the process of creating an account.
+through the process of creating an account.
 
 Authors: Daniel Mendez 
-         Alex Salazar
-         Arman Alauizadeh 
-         Alexander DuPree
-         Kyle Zalewski
-         Dominique Moore
+Alex Salazar
+Arman Alauizadeh 
+Alexander DuPree
+Kyle Zalewski
+Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
- 
+
 */
 
 #ifndef CHOCAN_ACCOUNT_BUILDER_HPP
@@ -24,50 +24,97 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <stack>
 #include <optional>
 
-enum class Field_Types{Account_Type,First_Name,Last_Name,Street,City,State,Zip};
+class Account_Field{
+    public:
 
-struct Build_Instructions{
+        Account_Field(std::string instructions) : instructions(instructions) {};
 
-    Build_Instructions(){};
-    
-    const std::string account_type   
-        = "Account Type : Manager OR Provider OR Member\nMUST TYPE EXACTLY ONE OF THESE OPTIONS";
-    const std::string full_name      
-        = "Full Name As : First[1-24], Last[1-24]\nTOTAL CHARACTER LIMIT [2-25]";
-    const std::string street_address 
-        = "Address As   : Street[1-25], City[1-14], State[2], Zip[5]\nTOTAL CHARACTER LIMIT [9-46]";
+        virtual ~Account_Field() {};
 
-    const char* invalid_type_msg = "Invalid Account Type Requested";
-    const char* account_rejected = "Account Rejected";
+        virtual bool parse_input(const std::string& input) = 0;
 
+        std::string instructions;
+};
+
+class Account_Type : public Account_Field{
+    public:
+        Account_Type() : Account_Field("Instructions for type") {};
+
+        std::variant<Manager,Member,Provider> account_type;
+
+        bool parse_input(const std::string& input) override;
+};
+
+class First_Name : public Account_Field{
+    public:
+        First_Name() : Account_Field("Instruction for first name") {};
+
+        std::optional<std::string> first_name;
+        
+        bool parse_input(const std::string& input) override;
+};
+
+class Last_Name : public Account_Field{
+    public:
+        Last_Name() : Account_Field("Instruction for last name") {};
+       
+        std::optional<std::string> last_name;
+        
+        bool parse_input(const std::string& input) override;
+};
+
+class Street : public Account_Field{
+    public:
+        Street() : Account_Field("Instructions for street") {};
+       
+        std::optional<std::string> street;
+        
+        bool parse_input(const std::string& input) override;
+};
+
+class City : public Account_Field{
+    public:
+        City() : Account_Field("Instructions for city") {};
+       
+        std::optional<std::string> city;
+        
+        bool parse_input(const std::string& input) override;
+};
+
+class State : public Account_Field{
+    public: 
+        State() : Account_Field("Instructions for state") {};
+       
+        std::optional<std::string> state;
+        
+        bool parse_input(const std::string& input) override;
+};
+
+class Zip : public Account_Field{
+    public:
+        Zip() : Account_Field("Instructions for zip") {};
+
+        std::optional<unsigned> zip;
+        
+        bool parse_input(const std::string& input) override;
 };
 
 class Account_Builder{
 
     public:
 
-    using Database_Ptr = Data_Gateway::Database_Ptr;
-    using Account_field = std::map<Field_Types, std::string>;
-    
-    Account_Builder(Database_Ptr db) 
-        : id_generator(db)
-        , account_field({})
-        , valid_types({"Manager","manager","Member","member","Provider","provider"})
-        { reset(); }
+        using Build_Phase = std::variant<Account_Type,First_Name,Last_Name,Street,City,State,Zip>;
+        using Database_Ptr = Data_Gateway::Database_Ptr;
+
+        Account_Builder(Database_Ptr db) : id_generator(db), build_phase(Account_Type()) {reset();}
 
         Account build();
-        
-        bool buildable() const;
-
-        void set_current_field(const std::string& input);
-
-        const std::string get_current_field() const;
-        
-        const std::string review_account() const;
-        
-        const chocan_user_exception get_current_issues();
 
         Account_Builder& reset();
+        bool buildable() const;
+        void set_current_field(const std::string& input);
+        const std::string get_current_field() const;
+        const chocan_user_exception get_current_issues();
 
     private:
 
@@ -76,31 +123,18 @@ class Account_Builder{
         void parseAddress(const std::string& input);
         void remove_leading_white_space(std::string& str);
         bool confirm_account(const std::string& input)const;
-            
+
         ID_Generator             id_generator;
-        Account_field            account_field;
-        
-        std::vector<std::string> valid_types;
-        std::stack<std::string>  build_phase;
-        
-        bool account_accepted;
-       
-        std::optional<Name>      name;
-        std::optional<Address>   address;
-        std::optional<unsigned>  zip;
-        std::optional<chocan_user_exception> issues;
+        Build_Phase build_phase;
+        std::vector<std::string> issues;
 
 };
 
 struct invalid_account_build : public chocan_user_exception
 {
-    const std::string building_unbuildable = "Account build requested while account is not buildable";
-
-    const char* default_msg = "Invalid account build";
-
     explicit invalid_account_build(const char* err, Info info) 
         : chocan_user_exception(err, info)
-        { }
+    { }
 };
 
 

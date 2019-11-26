@@ -19,26 +19,73 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/utils/validators.hpp>
 #include <algorithm>
 
+bool Account_Type::parse_input(const std::string& input){ 
+    
+    switch(input[0]){
+
+        case '1': account_type = Manager();
+                  break;
+        case '2': account_type = Member();
+                  break;
+        case '3': account_type = Provider();
+                  break;
+    
+        default: return false;
+    }
+
+    return true; 
+};
+
+bool First_Name::parse_input(const std::string& input){ 
+
+    return true; 
+};
+
+bool Last_Name::parse_input(const std::string& input){ 
+
+    return true; 
+};
+
+bool Street::parse_input(const std::string& input){ 
+
+    return true; 
+};
+
+bool City::parse_input(const std::string& input){ 
+
+    return true; 
+};
+
+bool State::parse_input(const std::string& input){ 
+
+    return true; 
+};
+
+bool Zip::parse_input(const std::string& input){ 
+
+    return true; 
+};
+
 
 bool Account_Builder::buildable() const
 {
-    return build_phase.empty() && account_accepted;
+    return true; 
 }
 
 Account Account_Builder::build()
 {
-    invalid_account_build errors("",{});
-
     if (!buildable())
-        throw invalid_account_build(errors.default_msg, {errors.building_unbuildable});
-
-    if (account_field.at(Field_Types::Account_Type) == "Manager")
-        return Account(name.value(), address.value(), Manager(), id_generator);
-
-    if (account_field.at(Field_Types::Account_Type) == "Provider")
-        return Account(name.value(), address.value(), Provider(), id_generator);
+        throw invalid_account_build("Failed to build account", issues);
     
-    return Account(name.value(), address.value(), Member(), id_generator);
+    return Account(
+            Name(std::get<First_Name>(build_phase).first_name.value_or(""),
+                 std::get<Last_Name>(build_phase).last_name.value_or("")),
+                  Address(build_phase.street.value_or(""),
+                          build_phase.city.value_or(""),
+                          build_phase.state.value_or(""),
+                          build_phase.zip.value_or(0)), 
+                  build_phase.account_type.value(),           
+                  id_generator);                            
 
 }
 
