@@ -194,8 +194,9 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 
 Application_State State_Controller::operator()(View_Account& state)
 {
-    state_viewer->render_state(state) ;
-    input_controller->read_input();
+    state_viewer->render_state(state, [&](){
+        input_controller->read_input();
+    }) ;
     return pop_runtime();
 }
 
