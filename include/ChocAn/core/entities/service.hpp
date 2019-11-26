@@ -64,7 +64,7 @@ public:
         return 
         {
             { "name", _name },
-            { "code", std::to_string(_code)       },
+            { "code", std::to_string(_code) },
             { "cost", _cost.to_string() }
         };
     }
