@@ -1,3 +1,13 @@
 ignore:
   - "third_party/"  # ignore folders and all its contents
 
+coverage:
+  status:
+    project:
+      default: false
+      tests:
+        target: 100%
+        paths: "tests/"
+      app:  
+        target: 90%
+        paths: "!tests/"
