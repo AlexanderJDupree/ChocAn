@@ -77,36 +77,27 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Confirm_Transa
     table.insert({ "state_name", "Confirm Transaction" });
     return table;
 }
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Find_Account_MM&)
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Find_Account& state)
 {
-    return { { "state_name", [&](){ return "Find Account"; } } };
-}
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Find_Account_PM&)
-{
-    return { { "state_name", [&](){ return "Find Account"; } } };
+    return 
+    { 
+        { "state_name", "Find Account" },
+        { "status", state.status}
+    };
 }
 Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& state)
 {  
-    return
-    {
-        { "state_name",   [&](){ return "View Account"; } },
-        { "account.id",   [&](){ return std::to_string(state.account.id()); } },
-        { "account.type", [&]()
-            { 
-                return std::visit( overloaded {
-                    [](const Member&)   { return  "Member"; },
-                    [](const Manager&)  { return "Manager"; },
-                    [](const Provider&) { return  "Provider"; }
-                }, state.account.type() );
-            } },
-        { "account.name.last",  [&](){ return state.account.name().last();  } },
-        { "account.name.first", [&](){ return state.account.name().first(); } },
-
-        { "account.address.street", [&](){ return state.account.address().street(); } },
-        { "account.address.city",   [&](){ return state.account.address().city();   } },
-        { "account.address.state",  [&](){ return state.account.address().state();  } },
-        { "account.address.zip",    [&](){ return std::to_string(state.account.address().zip()); } }
-    };
+    Resource_Table table = state.account.serialize();
+    table.insert({ "state_name", "View Account" });
+    table.insert({ "state_status", [&](){
+        switch(state.status)
+        {
+            case View_Account::Status::Confirm_Creation : return "Is this correct? (Y/N):";
+            case View_Account::Status::Confirm_Deletion : return "Delete account? (Y/N):";
+            default : return "Press 'Enter' to continue:";
+        };
+    }() });
+    return table;
 }
 
 std::string Resource_Loader::render_user_error(const chocan_user_exception& err)

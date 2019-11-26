@@ -53,12 +53,18 @@ class Confirm_Transaction
 public: 
     Transaction transaction;
 };
-class Find_Account_MM {};
-class Find_Account_PM {};
+class Find_Account 
+{
+public:
+    std::string status;
+};
+
 class View_Account
 {
-  public:
+public:
+    enum class Status { Wait, Confirm_Creation, Confirm_Deletion };
     Account account;
+    Status status = Status::Wait;
 };
 
 using Application_State = std::variant< Login
@@ -67,8 +73,7 @@ using Application_State = std::variant< Login
                                       , Manager_Menu
                                       , Add_Transaction
                                       , Confirm_Transaction
-                                      , Find_Account_MM
-                                      , Find_Account_PM
+                                      , Find_Account
                                       , View_Account
                                       >;
 
