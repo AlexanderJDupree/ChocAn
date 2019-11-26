@@ -56,7 +56,8 @@ Transaction::Data_Table Transaction::serialize() const
     return 
     {
         { "service_date_alt", service_date["month"] + '-' + service_date["day"] + '-' + service_date["year"] },
-        { "filed_date_alt"  , filed_date["month"] + '-' + filed_date["day"] + '-' + filed_date["year"] },
+        { "filed_date_alt"  , filed_date["month"] + '-' + filed_date["day"] + '-' + filed_date["year"] + ' ' 
+                            + filed_date["hour"] + ':' + filed_date["minutes"] + ':' + filed_date["seconds"] },
         { "service_date",  service_date["unix"] },
         { "filed_date"  ,  filed_date["unix"] },
         { "provider_name", _provider.name().first() + ' ' + _provider.name().last() },
