@@ -15,12 +15,24 @@ https://github.com/AlexanderJDupree/LinkedListsCPP
  
 */
 
+#include <clara.hpp>
 #include <ChocAn/data/mock_db.hpp>
+#include <ChocAn/data/sqlite_db.hpp>
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/view/terminal_state_viewer.hpp>
 #include <ChocAn/view/terminal_input_controller.hpp>
 
-int main () 
+int run();
+
+int main (int, char **) 
+{
+    using namespace clara;
+
+    auto cli = 
+    run();
+}
+
+int run()
 {
     ChocAn::Database_Ptr db = std::make_unique<Mock_DB>();
 
