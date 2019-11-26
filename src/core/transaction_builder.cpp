@@ -15,9 +15,8 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <map>
-#include <sstream>
 #include <functional>
-#include <iostream>
+#include <ChocAn/core/utils/parsers.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
 
@@ -135,32 +134,9 @@ void Transaction_Builder::set_provider_acct_field(const std::string& input)
 
 void Transaction_Builder::set_service_date_field(const std::string& input)
 {
-    std::string token;
-    std::vector<unsigned> tokens;
-    std::stringstream stream(input);
-
-    // Parse Datetime
-    while(std::getline(stream, token, '-'))
-    {
-        try
-        {
-            tokens.push_back(std::stoi(token));
-        }
-        catch(const std::exception&)
-        {
-            error.emplace(invalid_datetime("Unrecognized Datetime format", {}));
-            return;
-        }
-    }
-    if(tokens.size() != 3)
-    {
-        error.emplace(invalid_datetime("Invalid Datetime", {}));
-        return;
-    }
-
     try
     {
-        DateTime date(Month{ tokens[0] }, Day{ tokens[1] }, Year{ tokens[2] });
+        DateTime date = Parsers::parse_date(input, "MM-DD-YYYY", "-");
 
         if(date > DateTime::get_current_datetime())
         {
