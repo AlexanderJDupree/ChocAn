@@ -118,7 +118,11 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return View_Account {chocan->login_manager.session_owner() }; } },
         { "4"   , [&](){ return Find_Account(); } },
-        { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
+        { "5"   , [&](){ 
+            chocan->transaction_builder.reset();
+            chocan->transaction_builder.set_provider_acct_field(chocan->login_manager.session_owner());
+            return Add_Transaction{ &chocan->transaction_builder }; } 
+        }
     };
 
     try

@@ -48,15 +48,9 @@ Transaction_Builder& Transaction_Builder::reset()
     return *this;
 }
 
-std::string Transaction_Builder::get_current_field() const
+Transaction_Builder::Builder_State Transaction_Builder::builder_state() const
 {
-    return std::visit( overloaded {
-        [](const Set_Service_Date&){ return "Service Date (MM-DD-YYYY)"; },
-        [](const Set_Provider_Acct&){ return "Provider ID"; },
-        [](const Set_Member_Acct&){ return "Member ID"; },
-        [](const Set_Service&){ return "Service Code"; },
-        [](const Set_Comments&){ return "Comments"; }
-    }, state);
+    return state;
 }
 
 void Transaction_Builder::set_current_field(const std::string& input)
@@ -130,6 +124,11 @@ void Transaction_Builder::set_provider_acct_field(const std::string& input)
         error.emplace(chocan_user_exception("No provider account associated with ID", {}));
         return;
     }
+}
+void Transaction_Builder::set_provider_acct_field(const Account& account)
+{
+    if(!provider_acct) { provider_acct.emplace(account); }
+    if(std::holds_alternative<Set_Provider_Acct>(state)) { state = Set_Member_Acct(); }
 }
 
 void Transaction_Builder::set_service_date_field(const std::string& input)

@@ -60,7 +60,16 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Add_Transactio
 
         { "builder.user_error", render_user_error(transaction.builder->get_last_error()) },
 
-        { "builder.current_field", transaction.builder->get_current_field() }
+        { "builder.current_field", [&]() -> std::string
+        {
+            return std::visit( overloaded {
+                [&](const Transaction_Builder::Set_Member_Acct)  { return "Enter Member ID:"; },
+                [&](const Transaction_Builder::Set_Provider_Acct){ return "Enter Provider ID:"; },
+                [&](const Transaction_Builder::Set_Service_Date) { return "Enter service date (MM-DD-YYYY):"; },
+                [&](const Transaction_Builder::Set_Service)      { return "Enter Service Code:"; },
+                [&](const Transaction_Builder::Set_Comments)     { return "Enter comments:"; }
+            }, transaction.builder->builder_state() );
+        }() }
     };
 }
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Confirm_Transaction& state)
