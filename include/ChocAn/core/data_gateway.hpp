@@ -40,11 +40,13 @@ public:
     // Updates fields of specific accounts, creates account if account DNE
     virtual bool update_account(const Account& account) = 0;
 
-    virtual bool create_account(const Account& account) = 0;
+    // Returns 0 if creation failed, otherwise the ID of the account
+    virtual unsigned create_account(const Account& account) = 0;
 
     virtual bool delete_account(const unsigned ID) = 0;
 
-    virtual bool add_transaction(const Transaction& transaction) = 0;
+    // Returns 0 on failure, otherwise transaction number
+    virtual unsigned add_transaction(const Transaction& transaction) = 0;
 
     // DB retrieval may fail, wrap in Maybe type
     virtual std::optional<Account> get_account(const unsigned ID) = 0;

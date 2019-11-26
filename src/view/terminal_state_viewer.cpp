@@ -14,9 +14,9 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
+#include <sstream>
 #include <fstream>
 #include <iostream>
-#include <ChocAn/view/resource_loader.hpp>
 #include <ChocAn/view/terminal_state_viewer.hpp>
 
 Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
@@ -30,12 +30,12 @@ Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
         , { "footer",       [&](){ return render_view("footer");  } }
         , { "prompt",       [&](){ event_callback(); } }
     } )
-    , resource_table ( { }     )
+    , resources ({})
     {}
 
 void Terminal_State_Viewer::render_state(const Application_State& state, Callback handler)
 {
-    resource_table = std::visit(Resource_Loader(), state);
+    resources = Resource_Loader(state);
 
     event_callback = handler;
 
@@ -44,9 +44,10 @@ void Terminal_State_Viewer::render_state(const Application_State& state, Callbac
 
 void Terminal_State_Viewer::update()
 {
+    resources.update();
     try
     {
-        render_view(resource_table.at("state_name")());
+        render_view(resources.table.at("state_name"));
     }
     catch(const std::out_of_range&)
     {
@@ -106,7 +107,7 @@ std::string Terminal_State_Viewer::read_resource(const std::string& resource_nam
 {
     try
     {
-        return resource_table.at(resource_name)();
+        return resources.table.at(resource_name);
     }
     catch(const std::out_of_range&)
     {

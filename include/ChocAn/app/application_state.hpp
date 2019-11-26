@@ -54,6 +54,19 @@ class Confirm_Transaction
 public: 
     Transaction transaction;
 };
+class Find_Account 
+{
+public:
+    std::string status;
+};
+
+class View_Account
+{
+public:
+    enum class Status { Wait, Confirm_Creation, Confirm_Deletion };
+    Account account;
+    Status status = Status::Wait;
+};
 
 class Create_Account
 {
@@ -68,6 +81,8 @@ using Application_State = std::variant< Login
                                       , Add_Transaction
                                       , Confirm_Transaction
                                       , Create_Account
+                                      , Find_Account
+                                      , View_Account
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;

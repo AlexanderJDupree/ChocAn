@@ -1,13 +1,13 @@
 
 <header>
 
-Date of Service: <@service_date.month>-<@service_date.day>-<@service_date.year>
-Current Date:    <@filed_date.month>-<@filed_date.day>-<@filed_date.year>
+Date of Service:  <@service_date_alt>
+Current Datetime: <@filed_date_alt> HH:MM:SS
 
-Provider ID:     <@provider.id>
-Member ID:       <@member.id>
+Provider ID:     <@provider_id>
+Member ID:       <@member_id>
 
-Service: <@service.name> | <@service.code>
+Service: <@service> | <@service_code>
 
 Comments:
 <@comments>

@@ -22,23 +22,41 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <string>
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/utils/passkey.hpp>
+#include <ChocAn/core/utils/serializable.hpp>
 
 struct USD { double value = 0; };
 
-class Service
+class Service : public Serializable<Service, std::string, std::string>
 {
 public:
 
-    // Only DB can construct Service objects
-    Service(unsigned code, USD cost, const std::string& service_name, Key<Data_Gateway>&)
+    Service(unsigned code, USD cost, const std::string& service_name, const Key<Data_Gateway>&)
         : _cost(cost)
         , _code(code)
         , _name(service_name)
         { }
 
+    Service(const Data_Table& data, const Key<Data_Gateway>&)
+        : _cost( { std::stod(data.at("cost")) } )
+        , _code( std::stoi(data.at("code")) )
+        , _name( data.at("name") )
+        { }
+    
+    virtual ~Service() = default;
+
     const USD&         cost() const { return _cost; }
     unsigned           code() const { return _code; }
     const std::string& name() const { return _name; }
+
+    Data_Table serialize() const 
+    {
+        return 
+        {
+            { "name", _name },
+            { "code", std::to_string(_code)       },
+            { "cost", std::to_string(_cost.value) }
+        };
+    }
     
 private:
 
