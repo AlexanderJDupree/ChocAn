@@ -51,7 +51,7 @@ private:
 struct invalid_address : public chocan_user_exception
 {
     const std::string street_range = "Street address must be less than 25 characters";
-    const std::string city_range = "City must be less than 14 character";
+    const std::string city_range = "Cities must be less than 14 character";
     const std::string state_range = "State must be in abbreviated 2 character format";
     const std::string not_US_state = " is not a U.S. state";
     const std::string zip_range = "Zip code must be 5 digit number";

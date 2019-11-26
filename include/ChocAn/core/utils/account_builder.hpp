@@ -24,7 +24,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <stack>
 #include <optional>
 
-enum field_types{current_type,current_first,current_last,current_street,current_city,current_state,current_zip};
+enum class Field_Types{Account_Type,First_Name,Last_Name,Street,City,State,Zip};
 
 struct Build_Instructions{
 
@@ -47,7 +47,7 @@ class Account_Builder{
     public:
 
     using Database_Ptr = Data_Gateway::Database_Ptr;
-    using Account_field = std::map<field_types, std::string>;
+    using Account_field = std::map<Field_Types, std::string>;
     
     Account_Builder(Database_Ptr db) 
         : id_generator(db)

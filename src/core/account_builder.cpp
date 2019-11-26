@@ -32,10 +32,10 @@ Account Account_Builder::build()
     if (!buildable())
         throw invalid_account_build(errors.default_msg, {errors.building_unbuildable});
 
-    if (account_field.at(current_type) == "Manager")
+    if (account_field.at(Field_Types::Account_Type) == "Manager")
         return Account(name.value(), address.value(), Manager(), id_generator);
 
-    if (account_field.at(current_type) == "Provider")
+    if (account_field.at(Field_Types::Account_Type) == "Provider")
         return Account(name.value(), address.value(), Provider(), id_generator);
     
     return Account(name.value(), address.value(), Member(), id_generator);
@@ -91,7 +91,7 @@ void Account_Builder::set_current_field(const std::string &input)
         std::string type = valid_account_type(input);
 
         if (type != "")
-            account_field[current_type] = type;
+            account_field[Field_Types::Account_Type] = type;
 
         else
             issues.emplace(chocan_user_exception(building_phase.invalid_type_msg, {}));
@@ -103,7 +103,7 @@ void Account_Builder::set_current_field(const std::string &input)
         try
         {
 
-            name = Name(account_field.at(current_first), account_field.at(current_last));
+            name = Name(account_field.at(Field_Types::First_Name), account_field.at(Field_Types::Last_Name));
         }
         catch (const chocan_user_exception &err)
         {
@@ -118,7 +118,7 @@ void Account_Builder::set_current_field(const std::string &input)
 
         try
         {
-            zip = std::stol(account_field.at(current_zip));
+            zip = std::stol(account_field.at(Field_Types::Zip));
         }
         catch (const std::invalid_argument &err)
         {
@@ -131,7 +131,7 @@ void Account_Builder::set_current_field(const std::string &input)
 
         try
         {
-            address = Address(account_field.at(current_street), account_field.at(current_city), account_field.at(current_state), zip.value());
+            address = Address(account_field.at(Field_Types::Street), account_field.at(Field_Types::City), account_field.at(Field_Types::State), zip.value());
         }
         catch (const chocan_user_exception &err)
         {
@@ -172,16 +172,16 @@ void Account_Builder::parseName(const std::string &input)
 
     if(delimiter_position == std::string::npos){
     
-        account_field[current_first] = "";
-        account_field[current_last] = "";
+        account_field[Field_Types::First_Name] = "";
+        account_field[Field_Types::Last_Name] = "";
 
     }else{
 
-        account_field[current_first] = input.substr(0, input.find(","));
-        account_field[current_last] = input.substr(input.find(",") + 1, input.length());
+        account_field[Field_Types::First_Name] = input.substr(0, input.find(","));
+        account_field[Field_Types::Last_Name] = input.substr(input.find(",") + 1, input.length());
 
-        remove_leading_white_space(account_field[current_first]);
-        remove_leading_white_space(account_field[current_last]);
+        remove_leading_white_space(account_field[Field_Types::First_Name]);
+        remove_leading_white_space(account_field[Field_Types::Last_Name]);
     }
 
 }
@@ -192,7 +192,7 @@ void Account_Builder::parseAddress(const std::string &input)
     size_t delimiter_position = 0;
     const std::string delimiter = ",";
     std::string temp_input(input + delimiter);
-    std::stack<field_types> current_field({current_zip, current_state, current_city, current_street});
+    std::stack<Field_Types> current_field({Field_Types::Zip, Field_Types::State, Field_Types::City, Field_Types::Street});
 
     while (!current_field.empty() && (delimiter_position = temp_input.find(delimiter)) != std::string::npos)
     {
@@ -210,7 +210,7 @@ void Account_Builder::parseAddress(const std::string &input)
         current_field.pop();
     }
 
-    account_field[current_zip] = account_field[current_zip].substr(0,5);
+    account_field[Field_Types::Zip] = account_field[Field_Types::Zip].substr(0,5);
 }
 
 const std::string Account_Builder::valid_account_type(const std::string &input)
@@ -239,13 +239,13 @@ const std::string Account_Builder::review_account() const
 {
 
     return "(Y)es or (N)o to confirm/reject this account."
-           "\nType   : " + account_field.at(current_type)   + " " + 
-           "\nName   : " + account_field.at(current_first)  + " " 
-                         + account_field.at(current_last)   + 
-           "\nAddress: " + account_field.at(current_street) + " " 
-                         + account_field.at(current_city)   + " " 
-                         + account_field.at(current_state)  + " " 
-                         + account_field.at(current_zip);
+           "\nType   : " + account_field.at(Field_Types::Account_Type)   + " " + 
+           "\nName   : " + account_field.at(Field_Types::First_Name)  + " " 
+                         + account_field.at(Field_Types::Last_Name)   + 
+           "\nAddress: " + account_field.at(Field_Types::Street) + " " 
+                         + account_field.at(Field_Types::City)   + " " 
+                         + account_field.at(Field_Types::State)  + " " 
+                         + account_field.at(Field_Types::Zip);
 }
 
 bool Account_Builder::confirm_account(const std::string &input) const
