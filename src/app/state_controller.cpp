@@ -115,7 +115,6 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-        { "4"   , [&](){ return Find_Account(); } },
         { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
     };
 
@@ -137,7 +136,6 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
     const Transition_Table manager_menu
     {
         { "exit", [&](){ return Exit();  } },
-        { "1"   , [&](){ return Find_Account(); } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
     };
 
@@ -190,39 +188,4 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
         return Add_Transaction { &chocan->transaction_builder.reset() };
     }
     return state;
-}
-
-Application_State State_Controller::operator()(View_Account& state)
-{
-    state_viewer->render_state(state) ;
-    input_controller->read_input();
-    return pop_runtime();
-}
-
-Application_State State_Controller::operator()(Find_Account& state)
-{
-    using Get_Account_Function = std::function<std::optional<Account>(const std::string&)>;
-
-    auto get_account = [&]() -> Get_Account_Function {
-        if(std::holds_alternative<Manager>(chocan->login_manager.session_owner().type()))
-        {
-            return [&](const std::string& id) { return chocan->db->get_account(id);};
-        }
-        return [&](const std::string& id) { return chocan->db->get_member_account(id);};
-    }();
-
-    std::string input;
-    state_viewer->render_state(state, [&]()
-    {
-        input = input_controller->read_input();
-    } ) ;
-
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return pop_runtime(); }
-
-    if( auto maybe_account = get_account(input))
-    {
-        return View_Account { maybe_account.value() };
-    }
-    return Find_Account { "Invalid ID" };
 }

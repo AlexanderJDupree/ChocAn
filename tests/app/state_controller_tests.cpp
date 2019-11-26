@@ -201,12 +201,6 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
-    SECTION("Provider menu transitions to Find Account on input '4'")
-    {
-        mocks.in_stream << "4\n";
-        
-        REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
-    }
 }
 
 TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
@@ -234,15 +228,9 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
-    SECTION("Manager  menu transitions to Find Account on input '1'")
-    {
-        mocks.in_stream << "1\n";
-        
-        REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
-    }
 }
 
-TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controller]")
+TEST_CASE("Add Transaction state behavior", "[add_transaction], [state_controller]")
 {
     mock_dependencies mocks;
 
@@ -339,39 +327,5 @@ TEST_CASE("Exit State Behavior", "[exit], [state_controller]")
         controller.interact();
 
         REQUIRE_FALSE(mocks.chocan->login_manager.logged_in());
-    }
-}
-TEST_CASE("Find Account State behavior", "[find_account], [state_controller]")
-{
-    mock_dependencies mocks;
-
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Provider_Menu() );
-
-    mocks.chocan->login_manager.login(1234);
-
-    mocks.in_stream << "4\n";
-
-    controller.interact(); // Transition to find_account with the provider menu on the runtime stack
-
-    SECTION("Find Account transitions to View Account on valid member id '9876'")
-    {
-        mocks.in_stream << "9876\n";
-
-        REQUIRE(std::holds_alternative<View_Account>(controller.interact().current_state()));
-    }
-    SECTION("Find Account transitions to the previous menu on input 'cancel'")
-    {
-        mocks.in_stream << "cancel\n";
-
-        REQUIRE(std::holds_alternative<Provider_Menu>(controller.interact().current_state()));
-    }
-    SECTION("Find Account does not transition state on invalid input")
-    {
-        mocks.in_stream << "garbage\n";
-
-        REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
 }

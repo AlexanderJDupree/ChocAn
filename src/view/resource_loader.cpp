@@ -77,28 +77,6 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Confirm_Transa
     table.insert({ "state_name", "Confirm Transaction" });
     return table;
 }
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Find_Account& state)
-{
-    return 
-    { 
-        { "state_name", "Find Account" },
-        { "status", state.status}
-    };
-}
-Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& state)
-{  
-    Resource_Table table = state.account.serialize();
-    table.insert({ "state_name", "View Account" });
-    table.insert({ "state_status", [&](){
-        switch(state.status)
-        {
-            case View_Account::Status::Confirm_Creation : return "Is this correct? (Y/N):";
-            case View_Account::Status::Confirm_Deletion : return "Delete account? (Y/N):";
-            default : return "Press 'Enter' to continue:";
-        };
-    }() });
-    return table;
-}
 
 std::string Resource_Loader::render_user_error(const chocan_user_exception& err)
 {
