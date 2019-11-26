@@ -65,7 +65,8 @@ Transaction::Data_Table Transaction::serialize() const
         { "member_name", _member.name().first() + ' ' + _member.name().last() },
         { "member_id"   ,  std::to_string(_member.id())    },
         { "service_code", std::to_string(_service.code()) },
-        { "service", _service.name() },
+        { "service_cost", _service.cost().to_string() },
+        { "service_name", _service.name() },
         { "comments", _comments }
     };
 }

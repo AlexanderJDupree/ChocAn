@@ -20,11 +20,22 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_SERVICE_HPP
 
 #include <string>
+#include <sstream>
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/utils/passkey.hpp>
 #include <ChocAn/core/utils/serializable.hpp>
 
-struct USD { double value = 0; };
+struct USD 
+{ 
+    std::string to_string() const
+    {
+        std::stringstream s;
+        s.precision(4);
+        s << value;
+        return s.str();
+    }
+    double value = 0; 
+};
 
 class Service : public Serializable<Service, std::string, std::string>
 {
@@ -54,7 +65,7 @@ public:
         {
             { "name", _name },
             { "code", std::to_string(_code)       },
-            { "cost", std::to_string(_cost.value) }
+            { "cost", _cost.to_string() }
         };
     }
     
