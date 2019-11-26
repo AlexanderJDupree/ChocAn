@@ -58,15 +58,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Add_Transactio
     { 
         { "state_name", "Transaction Manager" },
 
-        { "builder.user_error", [&]()
-            {
-                if(auto maybe_error = transaction.builder->get_last_error())
-                {
-                    return render_user_error(maybe_error.value());
-                } 
-                return std::string("");
-            }()
-        },
+        { "builder.user_error", render_user_error(transaction.builder->get_last_error()) },
 
         { "builder.current_field", transaction.builder->get_current_field() }
     };
@@ -100,11 +92,24 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
     return table;
 }
 
-std::string Resource_Loader::render_user_error(const chocan_user_exception& err)
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Generate_Report& state)
 {
+    return 
+    {
+        { "state_name", "Report Generator" },
+        { "errors", render_user_error(state.error) },
+        { "status", (state.date_range.empty()) ? "Enter report starting date (" + state.date_structure + "):" 
+                                               : "Enter report ending date (" + state.date_structure + "):" }
+    };
+}
+
+std::string Resource_Loader::render_user_error(const std::optional<chocan_user_exception>& maybe_err)
+{
+    if(!maybe_err) { return ""; }
+
     std::stringstream stream;
-    stream << err.what() << "\n";
-    for (const std::string& item : err.info())
+    stream << maybe_err.value().what() << "\n";
+    for (const std::string& item : maybe_err.value().info())
     {
         stream << '\t' << item << '\n';
     }

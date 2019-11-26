@@ -34,13 +34,14 @@ struct Resource_Loader
     Resource_Table operator()(const Exit&);
     Resource_Table operator()(const Login& login);
     Resource_Table operator()(const View_Account&);
+    Resource_Table operator()(const Find_Account& state);
     Resource_Table operator()(const Provider_Menu& menu);
     Resource_Table operator()(const Manager_Menu& menu);
+    Resource_Table operator()(const Generate_Report& state);
     Resource_Table operator()(const Add_Transaction& transaction);
     Resource_Table operator()(const Confirm_Transaction& state);
-    Resource_Table operator()(const Find_Account& state);
 
-    std::string render_user_error(const chocan_user_exception& err);
+    std::string render_user_error(const std::optional<chocan_user_exception>& maybe_err);
 
     const Application_State* state;
     Resource_Table table;

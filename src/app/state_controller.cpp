@@ -17,6 +17,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <functional>
+#include <ChocAn/core/utils/parsers.hpp>
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
@@ -137,9 +138,10 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
 
     const Transition_Table manager_menu
     {
-        { "exit", [&](){ return Exit();  } },
+        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } }
+        { "5"   , [&](){ return Generate_Report(); } },
+        { "exit", [&](){ return Exit();  } }
     };
 
     try
@@ -227,4 +229,35 @@ Application_State State_Controller::operator()(Find_Account& state)
         return View_Account { maybe_account.value() };
     }
     return Find_Account { "Invalid ID" };
+}
+
+Application_State State_Controller::operator()(Generate_Report& state)
+{
+    if(state.date_range.size() == 2) { return pop_runtime(); }
+
+    state.error.reset();
+
+    std::string input;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return pop_runtime(); }
+    if(input == "all") 
+    {
+        state.date_range = { DateTime(0), DateTime::get_current_datetime() };
+        return state;
+    }
+
+    try
+    {
+        state.date_range.push_back(Parsers::parse_date(input, state.date_structure, "-"));
+    }
+    catch(const invalid_datetime& err)
+    {
+        state.error.emplace(err);
+    }
+    return state;
 }
