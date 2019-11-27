@@ -4,8 +4,8 @@
 Date of Service:  <@service_date_alt>
 Current Datetime: <@filed_date_alt> HH:MM:SS
 
-Provider ID:     <@provider_id>
-Member ID:       <@member_id>
+Provider: <@provider_id> | <@provider_name>
+Member:   <@member_id> | <@member_name>
 
 Service: <@service> | <@service_code>
 
