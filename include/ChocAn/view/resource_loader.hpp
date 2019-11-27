@@ -41,6 +41,15 @@ struct Resource_Loader
     Resource_Table operator()(const Create_Account& state);
     Resource_Table operator()(const Find_Account& state);
 
+    //for getting fields while creating account 
+    Resource_Table operator()(const Get_Type& field_state);
+    Resource_Table operator()(const Get_First& field_state);
+    Resource_Table operator()(const Get_Last& field_state);
+    Resource_Table operator()(const Get_Street& field_state);
+    Resource_Table operator()(const Get_City& field_state);
+    Resource_Table operator()(const Get_State& field_state);
+    Resource_Table operator()(const Get_Zip& field_state);
+
     std::string render_user_error(const chocan_user_exception& err);
 
     const Application_State* state;

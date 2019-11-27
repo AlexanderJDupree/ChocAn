@@ -16,310 +16,180 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <ChocAn/core/utils/account_builder.hpp>
-#include <ChocAn/core/utils/validators.hpp>
 #include <algorithm>
-
-bool Account_Type::parse_input(const std::string& input){ 
-    
-    switch(input[0]){
-
-        case '1': account_type = Manager();
-                  break;
-        case '2': account_type = Member();
-                  break;
-        case '3': account_type = Provider();
-                  break;
-    
-        default: return false;
-    }
-
-    return true; 
-};
-
-bool First_Name::parse_input(const std::string& input){ 
-
-    return true; 
-};
-
-bool Last_Name::parse_input(const std::string& input){ 
-
-    return true; 
-};
-
-bool Street::parse_input(const std::string& input){ 
-
-    return true; 
-};
-
-bool City::parse_input(const std::string& input){ 
-
-    return true; 
-};
-
-bool State::parse_input(const std::string& input){ 
-
-    return true; 
-};
-
-bool Zip::parse_input(const std::string& input){ 
-
-    return true; 
-};
-
 
 bool Account_Builder::buildable() const
 {
     return true; 
 }
 
+
 Account Account_Builder::build()
 {
     if (!buildable())
-        throw invalid_account_build("Failed to build account", issues);
-    
-    return Account(
-            Name(   std::get<First_Name>(build_phase).first_name.value_or(""),
-                    std::get<Last_Name>(build_phase).last_name.value_or("")),
-           Address( std::get<Street>(build_phase.street.value_or("")),
-                    std::get<City>(build_phase.city.value_or("")),
-                          build_phase.state.value_or(""),
-                          build_phase.zip.value_or(0)), 
-                  build_phase.account_type.value(),           
-                  id_generator);                            
+    {
+        throw invalid_account_build("Attempt to build prematurely", issues);
+    }
 
+    try{
+        return Account(name.value(),address.value(),type.value(),id_generator);
+
+    }catch(...){
+        
+        throw invalid_account_build("Failed to build account", issues);
+    }
 }
 
 Account_Builder &Account_Builder::reset()
 {
-
-    while (!build_phase.empty())
-        build_phase.pop();
-
-    Build_Instructions building_phase;
-    
-    build_phase.push(building_phase.street_address);
-    build_phase.push(building_phase.full_name);
-    build_phase.push(building_phase.account_type);
-
+    type.reset();
     name.reset();
     address.reset();
-    zip.reset();
-    issues.reset();
-
-    account_accepted = false;
+    issues.clear();
+    fields = {Get_Type(),Get_First(),Get_Last(),Get_Street(),Get_City(),Get_State(),Get_Zip()};
 
     return *this;
 }
 
-void Account_Builder::set_current_field(const std::string &input)
-{
+const Input_State& Account_Builder::get_field() const{
 
-    Build_Instructions building_phase;
-   
-    if (build_phase.empty())
-    {
+    if(buildable()) throw invalid_account_build("Cannot recieve input while account is buildable",{});
 
-        account_accepted = confirm_account(input);
+    for(auto&& field: fields){
+    
+        std::visit(overload{
 
-        if (!account_accepted){
+            [&](Type& arg)  {if(!arg.type) return field;},
+            [&](Word& arg)  {if(!arg.word) return field;},
+            [&](Number& arg){if(!arg.num)  return field;}
 
-            reset();
-            issues.emplace(invalid_account_build(building_phase.account_rejected,{ "With input value: " + input}));
+        },field);
+    }
+}
 
-        }
+std::optional<const invalid_account_build> Account_Builder::get_issues() const{
+
+    if(issues.empty()) return std::optional<const invalid_account_build>();
+
+    return invalid_account_build("Issues with account",issues);
+
+}
+
+void Account_Builder::set_field(const std::string& input){
+
+    if(buildable()) return;
+
+    issues.clear();
+
+    for(auto&& field: fields){
+    
+        std::visit(overload{
+
+            [&](Type& arg)  {if(!arg.type) arg.type = deriveType(input);},
+            [&](Word& arg)  {if(!arg.word) arg.word = input;},
+            [&](Number& arg){if(!arg.num)  arg.num  = deriveZip(input);}
+
+        },field);
+    }
+
+    if(!type && fields_ready(0,0)){
         
-        return;
+        type = std::get<Type>(fields.at(0)).type.value();
     }
+    else if(!name && fields_ready(1,2)){
 
-    std::string current_phase = build_phase.top();
+        try{ 
 
-    if (current_phase == building_phase.account_type)
-    {
-        std::string type = valid_account_type(input);
+            name = Name(std::get<Word>(fields.at(1)).word.value()
+                       ,std::get<Word>(fields.at(2)).word.value());
 
-        if (type != "")
-            account_field[Field_Types::Account_Type] = type;
+        }catch(const invalid_name& err){
 
-        else
-            issues.emplace(chocan_user_exception(building_phase.invalid_type_msg, {}));
-    }
-    else if (current_phase == building_phase.full_name)
-    {
-        parseName(input);
+            issues = err.info();
+        }
+
+    }else if(!address && fields_ready(3,6)){
 
         try
         {
 
-            name = Name(account_field.at(Field_Types::First_Name), account_field.at(Field_Types::Last_Name));
+            address = Address(std::get<Word>(fields.at(3)).word.value()
+                            , std::get<Word>(fields.at(4)).word.value()
+                            , std::get<Word>(fields.at(5)).word.value()
+                            , std::get<Number>(fields.at(6)).num.value());
         }
-        catch (const chocan_user_exception &err)
+        catch (const invalid_address& err)
         {
-
-            issues.emplace(err);
+            issues = err.info();
         }
     }
-    else if (current_phase == building_phase.street_address)
-    {
-
-        parseAddress(input);
-
-        try
-        {
-            zip = std::stol(account_field.at(Field_Types::Zip));
-        }
-        catch (const std::invalid_argument &err)
-        {
-            zip = 0;
-        }
-        catch (const std::out_of_range &err)
-        {
-            zip = 0;
-        }
-
-        try
-        {
-            address = Address(account_field.at(Field_Types::Street), account_field.at(Field_Types::City), account_field.at(Field_Types::State), zip.value());
-        }
-        catch (const chocan_user_exception &err)
-        {
-            issues.emplace(err);
-
-        }
-    }
-
-    if (!issues)
-        build_phase.pop();
-
-    return;
-}
-
-const chocan_user_exception Account_Builder::get_current_issues()
-{
-
-    std::optional<chocan_user_exception> return_msg = issues;
-
-    issues.reset();
-
-    return return_msg.value_or(chocan_user_exception{"", {}});
-}
-
-const std::string Account_Builder::get_current_field() const
-{
-
-    if (build_phase.empty())
-        return review_account();
-
-    return build_phase.top();
-}
-
-void Account_Builder::parseName(const std::string &input)
-{
-
-    size_t delimiter_position = input.find(",");
-
-    if(delimiter_position == std::string::npos){
     
-        account_field[Field_Types::First_Name] = "";
-        account_field[Field_Types::Last_Name] = "";
-
-    }else{
-
-        account_field[Field_Types::First_Name] = input.substr(0, input.find(","));
-        account_field[Field_Types::Last_Name] = input.substr(input.find(",") + 1, input.length());
-
-        remove_leading_white_space(account_field[Field_Types::First_Name]);
-        remove_leading_white_space(account_field[Field_Types::Last_Name]);
-    }
-
+    reset_fields_as_needed();
 }
 
-void Account_Builder::parseAddress(const std::string &input)
-{
+void Account_Builder::reset_fields_as_needed(){
 
-    size_t delimiter_position = 0;
-    const std::string delimiter = ",";
-    std::string temp_input(input + delimiter);
-    std::stack<Field_Types> current_field({Field_Types::Zip, Field_Types::State, Field_Types::City, Field_Types::Street});
+    if(issues.empty()) return;
 
-    while (!current_field.empty() && (delimiter_position = temp_input.find(delimiter)) != std::string::npos)
-    {
-        account_field[current_field.top()] = temp_input.substr(0, delimiter_position);
+    for(std::string it: issues){
 
-        remove_leading_white_space(account_field[current_field.top()]);
+        if(it.find("First") != std::string::npos){
+            
+            fields[1] = Get_First();
+        } 
+        else if(it.find("Last")  != std::string::npos){
 
-        current_field.pop();
+            fields[2] = Get_Last();
+        } 
+        else if(it.find("Full")  != std::string::npos){
 
-        temp_input.erase(0, delimiter_position + delimiter.length());
-    }
+            fields[1] = Get_First();
+            fields[2] = Get_Last();
+        }
+        else if(it.find("Street")  != std::string::npos){
 
-    while(!current_field.empty()){
-        account_field[current_field.top()] = "";
-        current_field.pop();
-    }
+            fields[3] = Get_Street();
+        }
+        else if(it.find("Cities")  != std::string::npos){
 
-    account_field[Field_Types::Zip] = account_field[Field_Types::Zip].substr(0,5);
-}
+            fields[4] = Get_City();
+        }
+        else if(it.find("State")  != std::string::npos){
 
-const std::string Account_Builder::valid_account_type(const std::string &input)
-{
+            fields[5] = Get_State();
+        }
+        else if(it.find("Zip")  != std::string::npos){
 
-    std::string temp("");
-
-    for (std::vector<std::string>::iterator it = valid_types.begin(); it <= valid_types.end(); ++it)
-    {
-
-        if (input == *it)
-        {
-
-            temp = *it;
-            temp[0] = toupper(temp[0]);
-            it = valid_types.end();
+            fields[6] = Get_Zip();
         }
     }
 
-    remove_leading_white_space(temp);
-    
+}
+
+bool Account_Builder::fields_ready(int from, int to) const{
+
+    for(int i = from; i <= to; ++i){
+
+        std::visit(overload{
+
+            [](Type arg)  {if (!arg.type) return false;},
+            [](Word arg)  {if (!arg.word) return false;},
+            [](Number arg){if (!arg.num)  return false;}
+        },
+        fields.at(i));
+    }
+
+    return true;
+}
+std::optional<Account::Account_Type> Account_Builder::deriveType(const std::string& input){
+
+    std::optional<Account::Account_Type> temp;
+
     return temp;
 }
+std::optional<unsigned> Account_Builder::deriveZip(const std::string& input){
 
-const std::string Account_Builder::review_account() const
-{
+    std::optional<unsigned> temp;
 
-    return "(Y)es or (N)o to confirm/reject this account."
-           "\nType   : " + account_field.at(Field_Types::Account_Type)   + " " + 
-           "\nName   : " + account_field.at(Field_Types::First_Name)  + " " 
-                         + account_field.at(Field_Types::Last_Name)   + 
-           "\nAddress: " + account_field.at(Field_Types::Street) + " " 
-                         + account_field.at(Field_Types::City)   + " " 
-                         + account_field.at(Field_Types::State)  + " " 
-                         + account_field.at(Field_Types::Zip);
-}
-
-bool Account_Builder::confirm_account(const std::string &input) const
-{
-
-    switch (input[0])
-    {
-
-    case 'y':
-    case 'Y':
-        return true;
-    case 'n':
-    case 'N':
-    default:;
-    }
-
-    return false;
-}
-
-void Account_Builder::remove_leading_white_space(std::string& str){
-
-    if(str == "") return;
-
-    int i = 0;
-
-    while(str[i] == ' ') ++i;
-
-    if(i) str = str.substr(i,str.length());
-
+    return temp;
 }

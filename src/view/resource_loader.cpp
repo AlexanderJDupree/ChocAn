@@ -103,13 +103,77 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account& state)
 {
 
-    return
+    return 
     {
         {"state_name", "Create Account"},
-        {"builder.issues",render_user_error(state.builder->get_current_issues())},
-        {"builder.current_field", state.builder->get_current_field() }
-    };
+    
+        {"builder.instructions", state.builder->instructions()},
+   
+        {"builder.status", [&]() {
+             if (std::optional<const invalid_account_build> issues = state.builder->get_issues())
+             {
+                return render_user_error(issues.value());
+             }
+         }()
+        }
 
+    };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Type& field_state){
+    
+    return
+    {
+        {"state_name", "Get_Type"}
+    };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_First& field_state){
+    
+    return
+    {
+        {"state_name", "Get_First"}
+    };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Last& field_state){
+    
+    return
+    {
+        {"state_name", "Get_Last"}
+    };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Street& field_state){
+    
+    return
+    {
+        {"state_name", "Get_Street"}
+    };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_City& field_state){
+    
+    return
+    {
+        {"state_name", "Get_City"}
+    };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_State& field_state){
+    
+    return
+    {
+        {"state_name", "Get_State"}
+    };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Zip& field_state){
+    
+    return
+    {
+        {"state_name", "Get_Zip"}
+    };
 }
 
 std::string Resource_Loader::render_user_error(const chocan_user_exception& err)

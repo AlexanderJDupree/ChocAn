@@ -26,9 +26,9 @@ TEST_CASE("Account builds with valid inputs", "[account_builder]")
 {
     Account_Builder builder(db);
 
-    SECTION("Account builder contructs with build phase set to Account_Type")
+    SECTION("Account builder contructs")
     {
-        REQUIRE(std::holds_alternative(builder.get_current_field(),Account_Type));
+        REQUIRE(
     }
 
 }

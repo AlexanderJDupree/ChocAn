@@ -83,6 +83,13 @@ using Application_State = std::variant< Login
                                       , Create_Account
                                       , Find_Account
                                       , View_Account
+                                      , Type
+                                      , Get_First
+                                      , Get_Last
+                                      , Get_Street
+                                      , Get_City
+                                      , Get_State
+                                      , Get_Zip
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;
