@@ -30,16 +30,16 @@ public:
     using Info = std::vector<std::string>;
 
     const Info error_info;
-    const char* error_msg;
+    const std::string error_msg;
 
-    chocan_user_exception(const char* err, Info info)
+    chocan_user_exception(std::string err, Info info)
         : error_info ( std::move(info) )
-        , error_msg  ( err )
+        , error_msg  ( std::move(err)  )
         {}
 
     virtual const char* what() const noexcept
     {
-        return error_msg;
+        return error_msg.c_str();
     }
 
     virtual const Info& info() const noexcept
@@ -55,17 +55,17 @@ public:
     using Row_Info = std::map<std::string, std::string>;
 
     const Row_Info error_info; // Holds the specific DB row that caused the error
-    const char* error_msg;
+    const std::string error_msg;
 
-    chocan_db_exception(const char* err, Row_Info info)
+    chocan_db_exception(std::string err, Row_Info info)
         : error_info ( std::move(info) ) 
-        , error_msg  ( err )
+        , error_msg  ( std::move(err)  )
         { }
 
-   virtual const char* what() const noexcept
-   {
-       return error_msg;
-   } 
+    virtual const char* what() const noexcept
+    {
+        return error_msg.c_str();
+    } 
 
     virtual const Row_Info& info() const noexcept
     {

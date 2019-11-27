@@ -103,7 +103,7 @@ void Transaction_Builder::set_member_acct_field(const std::string& input)
     }
     catch(const std::bad_optional_access&)
     {
-        error.emplace(chocan_user_exception("No member account associated with ID", {}));
+        error.emplace(chocan_user_exception("No member account associated with ID: " + input, {}));
         return;
     }
     if (std::get<Member>(member_acct.value().type()).status() == Account_Status::Suspended)
@@ -160,7 +160,7 @@ void Transaction_Builder::set_service_field(const std::string& input)
     }
     catch(const std::bad_optional_access&)
     {
-        error.emplace(chocan_user_exception("No service associated with service code", {}));
+        error.emplace(chocan_user_exception("No service associated with service code: " + input, {}));
     }
 }
 

@@ -55,7 +55,7 @@ public:
         { }
 
     Service(const Data_Table& data, const Key<Data_Gateway>&)
-        : _cost( { std::stod(data.at("cost")) } )
+        : _cost( std::stod(data.at("cost")) )
         , _code( std::stoi(data.at("code")) )
         , _name( data.at("name") )
         { }
