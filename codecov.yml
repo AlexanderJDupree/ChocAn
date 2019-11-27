@@ -3,10 +3,7 @@ ignore:
 
 coverage:
   status:
-<<<<<<< HEAD
-=======
     patch: no
->>>>>>> system_tests/cli
     project:
       default: false
       tests:
@@ -15,7 +12,3 @@ coverage:
       app:  
         target: 90%
         paths: "!tests/"
-<<<<<<< HEAD
-=======
-
->>>>>>> system_tests/cli
