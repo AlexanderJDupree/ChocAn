@@ -2,7 +2,7 @@
 <header>
 
 Date of Service:  <@service_date_alt>
-Current Datetime: <@filed_date_alt> HH:MM:SS
+Current Datetime: <@filed_date_alt> (UTC)
 
 Provider: <@provider_id> | <@provider_name>
 Member:   <@member_id> | <@member_name>

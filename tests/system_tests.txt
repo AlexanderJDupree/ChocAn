@@ -9,8 +9,18 @@
 123123123
 11-23-2019
 123456
-some comments
+Add first transaction
 yes
+5
+987654321
+123412345
+11-23-2019
+123123
+Added second transaction
+y
+5
+987654321
+cancel
 0
 123456789
 1

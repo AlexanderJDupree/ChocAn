@@ -12,4 +12,3 @@ coverage:
       app:  
         target: 90%
         paths: "!tests/"
-

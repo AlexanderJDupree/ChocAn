@@ -24,7 +24,10 @@ std::ostream& operator<<(std::ostream& os, const DateTime& date)
 {
     os << static_cast<unsigned>(date.day().count()) << "-" 
        << static_cast<unsigned>(date.month().count()) << "-" 
-       << static_cast<unsigned>(date.year().count());
+       << static_cast<unsigned>(date.year().count())  << " "
+       << static_cast<unsigned>(date.hour().count()) << ":" 
+       << static_cast<unsigned>(date.minutes().count()) << ":" 
+       << static_cast<unsigned>(date.seconds().count());
     return os;
 }
 
@@ -51,7 +54,7 @@ mock_clock::time_point mock_clock::time = mock_clock::time_point();
 TEST_CASE("Getting DateTime from system clock", "[clock], [datetime]")
 {
     DateTime epoch(Day(1), Month(1), Year(1970));
-    DateTime expected_date(Day(5), Month(10), Year(2019));
+    DateTime expected_date(Day(5), Month(10), Year(2019), Hours(4), Minutes(35), Seconds(29));
 
     SECTION("0 seconds since epoch")
     {
@@ -85,7 +88,10 @@ TEST_CASE("Converting DateTime to unix time stamps", "[unix_timestamp], [datetim
 TEST_CASE("Serializing Datetime objects", "[serialize], [datetime]")
 {
     DateTime date ( Day(24), Month(11), Year(2019));
-    DateTime::Data_Table data { {"day", "24"}, {"month", "11"}, {"year", "2019"}, {"unix", "1574553600"}};
+    DateTime::Data_Table data { {"day", "24"}, {"month", "11"}, {"year", "2019"}, 
+                                {"hour", "0"}, {"minutes", "0"}, {"seconds", "0"}, 
+                                {"unix", "1574553600"} };
+
     DateTime::Data_Table test = date.serialize();
 
     SECTION("deserializing into a datetime object")
@@ -200,6 +206,10 @@ TEST_CASE("DateTime comparison operators", "[operators], [datetime]")
         REQUIRE( DateTime(Month(10), Day(10), Year(4020)) 
                > DateTime(Month(10), Day(10), Year(2010)));
     }
+    SECTION("Greater by a second")
+    {
+        REQUIRE(DateTime(1574553600) < DateTime(1574553601));
+    }
 }
 
 TEST_CASE("Testing ostream operator", "[datetime]")
@@ -208,7 +218,7 @@ TEST_CASE("Testing ostream operator", "[datetime]")
 
     oss << DateTime(Day(10), Month(10), Year(2020));
 
-    REQUIRE(oss.str() == "10-10-2020");
+    REQUIRE(oss.str() == "10-10-2020 0:0:0");
 }
 
 TEST_CASE("Testing invalid_datetime exception", "[exception], [datetime]")
