@@ -26,4 +26,7 @@ cancel
 1
 987654321
   
+5
+all
+ 
 exit
