@@ -66,14 +66,20 @@ public:
     Transactions get_transactions(DateTime start, DateTime end, Account acct) override;
     Transactions get_transactions(DateTime start, DateTime end) override;
 
+    Accounts get_member_accounts() override;
+    Accounts get_provider_accounts() override;
+    Accounts get_all_accounts(const std::string& type);
+
     Service_Directory service_directory() override;
 
 private:
 
+
     std::optional<Account> get_account(const unsigned ID, const std::string& type);
     std::optional<Account> get_account(const std::string& ID, const std::string& type);
 
-    unsigned assign_transaction_id() const;
+    std::vector<SQL_Row> get_transaction_data(DateTime start, DateTime end, unsigned id = 0, std::string type = "*");
+
     bool id_exists(const unsigned ID, std::string& table);
 
     std::string sqlquote(const std::string& str) const;

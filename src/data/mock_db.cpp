@@ -316,6 +316,26 @@ Data_Gateway::Transactions Mock_DB::get_transactions(DateTime start, DateTime en
     return {};
 }
 
+Data_Gateway::Accounts Mock_DB::get_member_accounts()
+{
+    Accounts accounts;
+    for(const auto& account : _member_table)
+    {
+        accounts.push_back(account.second);
+    }
+    return accounts;
+}
+
+Data_Gateway::Accounts Mock_DB::get_provider_accounts()
+{
+    Accounts accounts;
+    for(const auto& account : _provider_table)
+    {
+        accounts.push_back(account.second);
+    }
+    return accounts;
+}
+
 bool Mock_DB::id_exists(const unsigned ID) const
 {
     return _account_table.find(ID) != _account_table.end();

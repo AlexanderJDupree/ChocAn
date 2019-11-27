@@ -37,6 +37,7 @@ public:
     using Database_Ptr      = std::shared_ptr<Data_Gateway>;
     using Service_Directory = std::map<unsigned, Service>;
     using Transactions      = std::vector<Transaction>;
+    using Accounts          = std::vector<Account>;
 
     virtual ~Data_Gateway() {}
 
@@ -69,6 +70,9 @@ public:
 
     virtual Transactions get_transactions(DateTime start, DateTime end, Account acct) = 0;
     virtual Transactions get_transactions(DateTime start, DateTime end) = 0;
+
+    virtual Accounts get_member_accounts()   = 0;
+    virtual Accounts get_provider_accounts() = 0;
 
     virtual Service_Directory service_directory() = 0;
 

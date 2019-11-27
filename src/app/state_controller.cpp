@@ -237,15 +237,21 @@ Application_State State_Controller::operator()(Find_Account& state)
 
 Application_State State_Controller::operator()(Generate_Report& state)
 {
-    if(state.date_range.size() == 2) { return pop_runtime(); }
-
-    state.error.reset();
+    // We have enough dates to generate a report
+    if(state.date_range.size() == 2) 
+    { 
+        return View_Summary_Report { 
+            chocan->reporter.gen_summary_report(state.date_range[0], state.date_range[1]) 
+        }; 
+    }
 
     std::string input;
     state_viewer->render_state(state, [&]()
     {
         input = input_controller->read_input();
     } ) ;
+
+    state.error.reset();
 
     if(input == "exit")   { return Exit(); }
     if(input == "cancel") { return pop_runtime(); }
@@ -264,4 +270,12 @@ Application_State State_Controller::operator()(Generate_Report& state)
         state.error.emplace(err);
     }
     return state;
+}
+
+Application_State State_Controller::operator()(View_Summary_Report& state)
+{
+    state_viewer->render_state(state, [&](){
+        input_controller->read_input();
+    }) ;
+    return pop_runtime();
 }

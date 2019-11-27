@@ -107,12 +107,25 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Generate_Repor
     {
         { "state_name", "Report Generator" },
         { "errors", render_user_error(state.error) },
-        { "status", (state.date_range.empty()) ? "Enter report starting date (" + state.date_structure + "):" 
-                                               : "Enter report ending date (" + state.date_structure + "):" }
+        { "status", (state.date_range.empty()) ? "Enter report start date (" + state.date_structure + "):" 
+                                               : "Enter report end date (" + state.date_structure + "):" }
+    };
+}
+Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Summary_Report& state)
+{
+    DateTime::Data_Table start = state.report.start_date().serialize();
+    DateTime::Data_Table end   = state.report.end_date().serialize();
+    return
+    {
+        { "state_name", "Summary Report" },
+        { "summary_totals"   , render_summary(state.report) },
+        { "provider_activity", render_provider_activity(state.report.activity()) },
+        { "start_date"       , start["month"] + '/' + start["day"] + '/' + start["year"] },
+        { "end_date"         , end["month"] + '/' + end["day"] + '/' + end["year"] }
     };
 }
 
-std::string Resource_Loader::render_user_error(const std::optional<chocan_user_exception>& maybe_err)
+std::string Resource_Loader::render_user_error(const std::optional<chocan_user_exception>& maybe_err) const
 {
     if(!maybe_err) { return ""; }
 
@@ -123,4 +136,64 @@ std::string Resource_Loader::render_user_error(const std::optional<chocan_user_e
         stream << '\t' << item << '\n';
     }
     return stream.str();
+}
+
+std::string Resource_Loader::render_provider_activity(const Provider_Activity& activity) const
+{
+    if(activity.empty())
+    {
+        return '|' + center("No Activity For This Period", 83) + '|' + row_bar(4);
+    }
+
+    std::string stream;
+    for (const auto& report : activity)
+    {
+        std::string provider_name(report.account().name().last() + ", " + report.account().name().first()[0]);
+        stream += ( '|' + center(report.account().id())      +
+                    '|' + center(provider_name)              + 
+                    '|' + center(report.services_rendered()) +
+                    '|' + center('$' + report.total_fee().to_string()) + 
+                    '|' + row_bar(4));
+    }
+    return stream;
+}
+
+std::string Resource_Loader::render_summary(const Summary_Report& report) const
+{
+    return '|' + center(report.num_providers()) +
+           '|' + center(report.num_services())  + 
+           '|' + center('$' + report.total_cost().to_string()) + 
+           '|' + row_bar(3);
+}
+
+std::string Resource_Loader::center(unsigned num, unsigned width) const
+{
+    try
+    {
+        return center(std::to_string(num), width);
+    }
+    catch(const std::exception&)
+    {
+        return center("N/A", width);
+    }
+}
+std::string Resource_Loader::center(const std::string& str, unsigned width) const
+{
+    if (str.length() >= width) { return str.substr(0, width); }
+
+    unsigned pad = width - str.length();
+    unsigned rpad = pad / 2;
+    unsigned lpad = pad - rpad;
+
+    return std::string(lpad, ' ') + str + std::string(rpad, ' ');
+}
+
+std::string Resource_Loader::row_bar(unsigned fields) const
+{
+    std::string bar("\n+");
+    while (fields-- > 0)
+    {
+        bar += "--------------------+";
+    }
+    return bar += '\n';
 }

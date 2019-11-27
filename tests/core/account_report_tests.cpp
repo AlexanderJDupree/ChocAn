@@ -17,6 +17,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <catch.hpp>
 #include <ChocAn/data/mock_db.hpp>
+#include <ChocAn/core/reporter.hpp>
 #include <ChocAn/core/entities/datetime.hpp>
 #include <ChocAn/core/entities/account_report.hpp>
 
@@ -97,20 +98,23 @@ TEST_CASE("Constructing Summary Reports", "[summary_report], [constructors]")
 
     Mock_DB mock_db;
 
+    DateTime start(0);
+    DateTime current = DateTime::get_current_datetime();
+
     Account provider1 = mock_db.get_provider_account(1234).value();
     Account provider2 = mock_db.get_provider_account(1111).value();
 
     // Mock DB holds transaction data for the Provider with ID 1234
-    Provider_Activity activity { { provider1, mock_db.get_transactions(DateTime(0), DateTime::get_current_datetime(),provider1) }
-                               , { provider2, mock_db.get_transactions(DateTime(0), DateTime::get_current_datetime(),provider2) } };
+    Provider_Activity activity { { provider1, mock_db.get_transactions(start, current,provider1) }
+                               , { provider2, mock_db.get_transactions(start, current,provider2) } };
     
     SECTION("Summary Reports are constructed with a list of Provider Reports")
     {
-        REQUIRE_NOTHROW(Summary_Report(activity));
+        REQUIRE_NOTHROW(Summary_Report(start, current, activity));
     }
     SECTION("Summary Reports can be constructed with no reports")
     {
-        REQUIRE_NOTHROW(Summary_Report( {} ));
+        REQUIRE_NOTHROW(Summary_Report(start, current, {} ));
     }
 }
 
@@ -120,18 +124,21 @@ TEST_CASE("Calculating total cost and total number of services rendered")
 
     Mock_DB mock_db;
 
+    Reporter reporter(std::make_shared<Mock_DB>(mock_db));
+
     Account provider1 = mock_db.get_provider_account(1234).value();
     Account provider2 = mock_db.get_provider_account(1111).value();
 
-    Provider_Report report1 { provider1, mock_db.get_transactions(DateTime(0), DateTime::get_current_datetime(),provider1) };
-    Provider_Report report2 { provider2, mock_db.get_transactions(DateTime(0), DateTime::get_current_datetime(),provider2) };
+    // Compile the provider reports for the test
+    Provider_Report report1 { reporter.gen_provider_report(DateTime(0), DateTime::get_current_datetime(),provider1) };
+    Provider_Report report2 { reporter.gen_provider_report(DateTime(0), DateTime::get_current_datetime(),provider2) };
 
-    // Mock DB holds transaction data for the Provider with ID 1234
     Provider_Activity activity { report1, report2 };
 
-    Summary_Report summary( activity );
+    // Generate summary report with reporter
+    Summary_Report summary = reporter.gen_summary_report(DateTime(0), DateTime::get_current_datetime());
 
-    SECTION("The number of providers invovled is the length of the activity list")
+    SECTION("The number of providers involved is the length of the activity list")
     {
         REQUIRE(summary.num_providers() == activity.size());
     }

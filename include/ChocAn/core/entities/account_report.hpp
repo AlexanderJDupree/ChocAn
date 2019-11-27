@@ -60,8 +60,16 @@ public:
 
     using Provider_Activity = std::vector<Provider_Report>;
 
-    Summary_Report(const Provider_Activity& activity)
-        : _activity(activity) {} 
+    Summary_Report( const DateTime& start
+                  , const DateTime& end
+                  , const Provider_Activity& activity)
+        : _end(end)
+        , _start(start)
+        , _activity(activity) 
+        { } 
+
+    const DateTime& start_date() const { return _start; }
+    const DateTime& end_date() const   { return _end;   }
 
     const Provider_Activity& activity() const { return _activity; }
 
@@ -71,6 +79,8 @@ public:
 
 private:
 
+    DateTime _end;
+    DateTime _start;
     Provider_Activity _activity;
 };
 

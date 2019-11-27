@@ -52,12 +52,13 @@ public:
     /** Visitor Methods **/
     Application_State operator()(Exit&);
     Application_State operator()(Login&);
-    Application_State operator()(View_Account&);
     Application_State operator()(Find_Account&);
+    Application_State operator()(View_Account&);
     Application_State operator()(Manager_Menu&);
     Application_State operator()(Provider_Menu&);
     Application_State operator()(Add_Transaction&);
     Application_State operator()(Generate_Report&);
+    Application_State operator()(View_Summary_Report&);
     Application_State operator()(Confirm_Transaction&);
 
 private:

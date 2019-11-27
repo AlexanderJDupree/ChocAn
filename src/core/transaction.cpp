@@ -49,6 +49,23 @@ Transaction::Transaction( const Account&     provider
         : void();
 }
 
+Transaction::Transaction( const Account& provider
+                        , const Account& member
+                        , const Service& service 
+                        , const DateTime& service_date
+                        , const DateTime& filed_date
+                        , const std::string& comments
+                        , const Key<Data_Gateway>& )
+                : _service_date( service_date )
+                , _filed_date  ( filed_date   )
+                , _provider    ( provider     )
+                , _member      ( member       )
+                , _service     ( service      )
+                , _comments    ( comments     )
+{ 
+    // Database constructor ASSUMES the data is stored in valid state
+}
+
 Transaction::Data_Table Transaction::serialize() const
 {
     DateTime::Data_Table service_date = _service_date.serialize();

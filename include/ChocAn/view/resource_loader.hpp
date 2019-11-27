@@ -20,10 +20,12 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <map>
 #include <ChocAn/app/application_state.hpp>
+#include <ChocAn/core/entities/account_report.hpp>
 
 struct Resource_Loader
 {
-    using Resource_Table = std::map<std::string, std::string>;
+    using Resource_Table    = std::map<std::string, std::string>;
+    using Provider_Activity = Summary_Report::Provider_Activity;
 
     Resource_Loader(const Application_State& state)
         : state(&state)
@@ -38,10 +40,21 @@ struct Resource_Loader
     Resource_Table operator()(const Provider_Menu& menu);
     Resource_Table operator()(const Manager_Menu& menu);
     Resource_Table operator()(const Generate_Report& state);
-    Resource_Table operator()(const Add_Transaction& transaction);
+    Resource_Table operator()(const View_Summary_Report& state);
     Resource_Table operator()(const Confirm_Transaction& state);
+    Resource_Table operator()(const Add_Transaction& transaction);
 
-    std::string render_user_error(const std::optional<chocan_user_exception>& maybe_err);
+    /* String Formatting Methods */
+    std::string row_bar(unsigned num_fields) const;
+    std::string center(unsigned num, unsigned width = 20) const;
+    std::string center(const std::string& str, unsigned width = 20) const;
+
+    /* Special Rendering Methods */
+    std::string render_user_error(const std::optional<chocan_user_exception>& maybe_err) const;
+
+    std::string render_provider_activity(const Provider_Activity& activity) const;
+
+    std::string render_summary(const Summary_Report& summary) const;
 
     const Application_State* state;
     Resource_Table table;

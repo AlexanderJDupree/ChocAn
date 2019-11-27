@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <variant>
 #include <ChocAn/core/entities/transaction.hpp>
+#include <ChocAn/core/entities/account_report.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
 
 class Menu 
@@ -75,6 +76,12 @@ public:
     std::optional<chocan_user_exception> error;
 };
 
+class View_Summary_Report
+{
+public:
+    Summary_Report report;
+};
+
 using Application_State = std::variant< Login
                                       , Exit
                                       , Provider_Menu
@@ -84,6 +91,7 @@ using Application_State = std::variant< Login
                                       , Find_Account
                                       , View_Account
                                       , Generate_Report
+                                      , View_Summary_Report
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;

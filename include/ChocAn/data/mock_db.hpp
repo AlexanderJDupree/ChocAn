@@ -66,6 +66,9 @@ public:
     Transactions get_transactions(DateTime start, DateTime end, Account acct) override;
     Transactions get_transactions(DateTime start, DateTime end) override;
 
+    Accounts get_member_accounts() override;
+    Accounts get_provider_accounts() override;
+
     const Key<Data_Gateway>& get_db_key() const { return db_key; };
 
     std::map<unsigned, Account> _account_table;

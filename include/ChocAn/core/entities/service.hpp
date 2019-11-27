@@ -31,7 +31,7 @@ struct USD
     std::string to_string() const
     {
         std::stringstream s;
-        s.precision(4);
+        s.precision(5);
         s << value;
         return s.str();
     }
