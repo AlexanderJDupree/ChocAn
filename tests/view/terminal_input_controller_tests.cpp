@@ -57,4 +57,12 @@ TEST_CASE("Retrieving input from the Input Controller", "[input_controller]")
 
         REQUIRE(input_controller.read_form({ "Name", "Address", "Age" }, callback) == expected_form);
     }
+    SECTION("Input controller reads exit when eof flag is set")
+    {
+        test_stream << '\0';
+
+        Terminal_Input_Controller input_controller(test_stream);
+
+        REQUIRE(input_controller.read_input() == "exit");
+    }
 }
