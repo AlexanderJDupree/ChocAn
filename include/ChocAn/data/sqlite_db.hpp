@@ -63,6 +63,9 @@ public:
     std::optional<Service> lookup_service(const unsigned code) override;
     std::optional<Service> lookup_service(const std::string& code) override;
 
+    Transactions get_transactions(DateTime start, DateTime end, Account acct) override;
+    Transactions get_transactions(DateTime start, DateTime end) override;
+
     Service_Directory service_directory() override;
 
 private:

@@ -15,6 +15,7 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
+#include <algorithm>
 #include <ChocAn/data/mock_db.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 
@@ -38,6 +39,14 @@ Mock_DB::Mock_DB()
                                     , 97030 )
                         , Provider()
                         , 1234
+                        , db_key ) },
+        { 1111, Account( Name ("Dude", "Awesome")
+                        , Address ( "1234 totally st."
+                                    , "Los Angeles"
+                                    , "CA"
+                                    , 91510 )
+                        , Provider()
+                        , 1111
                         , db_key ) },
 
         { 6789, Account( Name ("Alex", "Member")
@@ -65,7 +74,8 @@ Mock_DB::Mock_DB()
     } )
     , _provider_table
     ( {
-        { 1234, _account_table.at(1234) }
+        { 1234, _account_table.at(1234) },
+        { 1111, _account_table.at(1111) }
     } )
     , _manager_table
     ( {
@@ -76,6 +86,32 @@ Mock_DB::Mock_DB()
         { 123456, Service ( 123456, USD { 29.99 }, "Back Rub", db_key ) },
         { 111111, Service ( 111111, USD { 59.99 }, "Addiction Consulting", db_key ) },
         { 222222, Service ( 222222, USD { 100.00 }, "Addiction Treatment", db_key ) }
+    })
+    , _transaction_table
+    ( {
+        { 1, Transaction ( _provider_table.at(1234)
+                         , _member_table.at(6789)
+                         , DateTime(1574380800)
+                         , _service_directory.at(123456)
+                         , "comments" ) },
+
+        { 2, Transaction ( _provider_table.at(1234)
+                         , _member_table.at(6789)
+                         , DateTime(1574480800)
+                         , _service_directory.at(222222)
+                         , "some comments" ) },
+
+        { 3, Transaction ( _provider_table.at(1111)
+                         , _member_table.at(6789)
+                         , DateTime(1574680800)
+                         , _service_directory.at(123456)
+                         , "lame comments" ) },
+
+        { 4, Transaction ( _provider_table.at(1111)
+                         , _member_table.at(6789)
+                         , DateTime(1574580800)
+                         , _service_directory.at(111111)
+                         , "more comments" ) }
     })
 { }
 
@@ -107,9 +143,18 @@ bool Mock_DB::delete_account(const unsigned ID)
     return true;
 }
 
-unsigned Mock_DB::add_transaction(const Transaction&)
+unsigned Mock_DB::add_transaction(const Transaction& transaction)
 {
-    return 1;
+    try
+    {
+        unsigned transaction_id = transaction.filed_date().unix_timestamp();
+        _transaction_table.insert( { transaction_id, transaction } );
+        return transaction_id;
+    }
+    catch(const std::exception&)
+    {
+        return 0;
+    }
 }
 
 std::optional<Account> Mock_DB::account_table_lookup(const unsigned ID, const Account_Table& table) const
@@ -227,6 +272,48 @@ std::optional<Service> Mock_DB::lookup_service(const std::string& code)
 Data_Gateway::Service_Directory Mock_DB::service_directory()
 {
     return _service_directory;
+}
+
+Data_Gateway::Transactions Mock_DB::get_transactions(DateTime start, DateTime end, Account acct)
+{
+    Transactions transactions;
+    auto ids_match = [&](const Transaction& transaction) -> bool
+    {
+        return std::visit( overloaded {
+            [&](const Member&)  { return transaction.member() == acct;   },
+            [&](const Provider&){ return transaction.provider() == acct; },
+            [&](const Manager&) { return false; }
+        }, acct.type() );
+    };
+    auto predicate = [&](const std::pair<const unsigned, Transaction>& entry)
+    {
+        DateTime service_date = entry.second.service_date();
+        if(start <= service_date && service_date <= end && ids_match(entry.second))
+        {
+            transactions.push_back(entry.second);
+        }
+    };
+
+    std::for_each(_transaction_table.begin(), _transaction_table.end(), predicate);
+
+    return transactions;
+}
+
+Data_Gateway::Transactions Mock_DB::get_transactions(DateTime start, DateTime end)
+{
+    Transactions transactions;
+    auto predicate = [&](const std::pair<const unsigned, Transaction>& entry)
+    {
+        DateTime service_date = entry.second.service_date();
+        if(start <= service_date && service_date <= end)
+        {
+            transactions.push_back(entry.second);
+        }
+    };
+
+    std::for_each(_transaction_table.begin(), _transaction_table.end(), predicate);
+
+    return {};
 }
 
 bool Mock_DB::id_exists(const unsigned ID) const

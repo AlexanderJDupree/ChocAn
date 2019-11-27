@@ -27,6 +27,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 struct USD 
 { 
+    USD(double val = 0) : value(val) { };
     std::string to_string() const
     {
         std::stringstream s;
@@ -34,6 +35,12 @@ struct USD
         s << value;
         return s.str();
     }
+
+    USD  operator+ (const USD& rhs) const { return value +  rhs.value; }
+    USD& operator+=(const USD& rhs) { value += rhs.value; return *this; }
+
+    operator double() { return value; }
+
     double value = 0; 
 };
 

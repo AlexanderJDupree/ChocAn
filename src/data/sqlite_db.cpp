@@ -249,6 +249,15 @@ std::optional<Account> SQLite_DB::get_manager_account(const std::string& ID)
     return get_account(ID, "Manager");
 }
 
+Data_Gateway::Transactions SQLite_DB::get_transactions(DateTime, DateTime, Account)
+{
+    return {};
+}
+Data_Gateway::Transactions SQLite_DB::get_transactions(DateTime, DateTime)
+{
+    return {};
+}
+
 Data_Gateway::Service_Directory SQLite_DB::service_directory()
 {
     Service_Directory directory;

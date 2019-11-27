@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/account.hpp>
 #include <ChocAn/core/entities/service.hpp>
+#include <ChocAn/core/entities/transaction.hpp>
 
 class Mock_DB : public Data_Gateway
 {
@@ -62,6 +63,9 @@ public:
     std::optional<Account> account_table_lookup(const unsigned ID, const Account_Table& table) const;
     std::optional<Account> account_table_lookup(const unsigned ID, const Reference_Table& table) const;
 
+    Transactions get_transactions(DateTime start, DateTime end, Account acct) override;
+    Transactions get_transactions(DateTime start, DateTime end) override;
+
     const Key<Data_Gateway>& get_db_key() const { return db_key; };
 
     std::map<unsigned, Account> _account_table;
@@ -70,6 +74,8 @@ public:
     std::map<unsigned, Account&> _manager_table;
 
     Service_Directory _service_directory;
+
+    std::map<unsigned, Transaction> _transaction_table;
 };
 
 #endif // CHOCAN_MOCK_DB_HPP

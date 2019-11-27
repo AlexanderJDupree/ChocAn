@@ -66,6 +66,7 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/account.o \
+	$(OBJDIR)/account_report.o \
 	$(OBJDIR)/address.o \
 	$(OBJDIR)/datetime.o \
 	$(OBJDIR)/id_generator.o \
@@ -133,6 +134,9 @@ $(OBJECTS): | $(OBJDIR)
 endif
 
 $(OBJDIR)/account.o: ../src/core/account.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/account_report.o: ../src/core/account_report.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/address.o: ../src/core/address.cpp

@@ -19,6 +19,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_DATA_GATEWAY_HPP
 
 #include <map>
+#include <vector>
 #include <memory>
 #include <optional>
 #include <ChocAn/core/utils/passkey.hpp>
@@ -26,6 +27,7 @@ https://github.com/AlexanderJDupree/ChocAn
 // Forward Declare
 class Account;
 class Service;
+class DateTime;
 class Transaction;
 
 class Data_Gateway
@@ -34,6 +36,7 @@ public:
 
     using Database_Ptr      = std::shared_ptr<Data_Gateway>;
     using Service_Directory = std::map<unsigned, Service>;
+    using Transactions      = std::vector<Transaction>;
 
     virtual ~Data_Gateway() {}
 
@@ -63,6 +66,9 @@ public:
 
     virtual std::optional<Service> lookup_service(const unsigned code) = 0;
     virtual std::optional<Service> lookup_service(const std::string& code) = 0;
+
+    virtual Transactions get_transactions(DateTime start, DateTime end, Account acct) = 0;
+    virtual Transactions get_transactions(DateTime start, DateTime end) = 0;
 
     virtual Service_Directory service_directory() = 0;
 
