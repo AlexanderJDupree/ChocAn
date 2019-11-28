@@ -20,19 +20,19 @@ https://github.com/AlexanderJDupree/ChocAn
 
 bool Account_Builder::buildable() const
 {
-    return fields.type && name && address;
+    return build_state == Build_State::Buildable;
 }
 
 Account Account_Builder::build()
 {
-    if (!buildable())
+    if (build_state != Build_State::Buildable)
     {
         throw invalid_account_build("Attempt made to build prematurely", issues);
     }
 
     try
     {
-        return Account(name.value(), address.value(), yield_account_type(fields.type.value()), id_generator);
+        return Account(name.value(), address.value(), yield_account_type(), id_generator);
     }
     catch (...)
     {
@@ -43,8 +43,6 @@ Account Account_Builder::build()
 
 Account_Builder &Account_Builder::reset()
 {
-    name.reset();
-    address.reset();
     fields.type.reset();
     fields.first.reset();
     fields.last.reset();
@@ -52,10 +50,13 @@ Account_Builder &Account_Builder::reset()
     fields.city.reset();
     fields.state.reset();
     fields.zip.reset();
+    
+    name.reset();
+    address.reset();
 
     issues.clear();
     
-    build_state = 0;
+    build_state = Build_State::Type;
 
     return *this;
 }
@@ -65,10 +66,8 @@ const std::string Account_Builder::get_status()
     return "here goes the status";
 }
 
-int Account_Builder::get_state() const
-{ 
-    if(buildable()) return -1;
-
+const Build_State& Account_Builder::get_state() const
+{
     return build_state;   
 }
 
@@ -85,19 +84,19 @@ void Account_Builder::accept_input(const std::string &input)
 {
     switch(build_state){
             
-            case 0: deriveType(input);
+            case Build_State::Type: deriveType(input);
             break;
-            case 1: fields.first = input;
+            case Build_State::First: fields.first = input;
             break;
-            case 2: fields.last = input;
+            case Build_State::Last: fields.last = input;
             break;
-            case 3: fields.street = input;
+            case Build_State::Street: fields.street = input;
             break;
-            case 4: fields.city = input;
+            case Build_State::City: fields.city = input;
             break;
-            case 5: fields.state = input;
+            case Build_State::State: fields.state = input;
             break;
-            case 6: deriveZip(input);
+            case Build_State::Zip: deriveZip(input);
             break;
             default:;
     }
@@ -178,48 +177,50 @@ void Account_Builder::reset_fields_as_needed()
         else if (it.find("Zip") != std::string::npos)
         {
             fields.zip.reset();
-        }
+
+        }else fields.type.reset();
     }
 }
 
 void Account_Builder::transition_state(){
 
-    if(buildable()) return;
+    if (buildable()) return;
 
     if(!fields.type){
         
-        build_state = 0;
+        build_state = Build_State::Type;
     }
     else if(!name){
 
         if(!fields.first){
 
-            build_state = 1;
+            build_state = Build_State::First;
 
-        }else{
+        }else if(!fields.last){
 
-            build_state = 2;
+            build_state = Build_State::Last;
         }
 
     }else if(!address){
 
         if(!fields.street){
             
-            build_state = 3;
+            build_state = Build_State::Street;
 
         }else if(!fields.city){
 
-            build_state = 4;
+            build_state = Build_State::City;
         
         }else if(!fields.state){
 
-            build_state = 5;
+            build_state = Build_State::State;
 
-        }else{
+        }else if(!fields.zip){
 
-            build_state = 6;
+            build_state = Build_State::Zip;
         }
-    }
+    
+    }else build_state = Build_State::Buildable;
 }
 
 void Account_Builder::deriveType(const std::string &input)
@@ -248,11 +249,11 @@ void Account_Builder::deriveZip(const std::string &input)
         issues.emplace_back(input + " is not a valid zip");
     }
 }
-Account::Account_Type Account_Builder::yield_account_type(const std::string& type){
+Account::Account_Type Account_Builder::yield_account_type() const{
 
-    if(type == "Manager") return Manager();
+    if(fields.type.value() == "Manager") return Manager();
     
-    if(type == "Provider") return Provider();
+    if(fields.type.value() == "Provider") return Provider();
 
     return Member();
 }

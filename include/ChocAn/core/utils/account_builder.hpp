@@ -34,6 +34,8 @@ struct Fields
 
 };
 
+enum class Build_State{Type,First,Last,Street,City,State,Zip,Buildable};
+
 class Account_Builder
 {
 
@@ -45,8 +47,8 @@ public:
     Account build();
     Account_Builder &reset();
 
-    bool buildable() const;
-    int get_state() const;
+    bool buildable()const;
+    const Build_State& get_state() const;
     const std::string get_status();
     void set_field(const std::string &input);
     std::optional<const chocan_user_exception> get_issues() const;
@@ -57,11 +59,11 @@ private:
     void transition_state();
     void deriveType(const std::string &input);
     void deriveZip(const std::string &input);
-    Account::Account_Type yield_account_type(const std::string& type);
+    Account::Account_Type yield_account_type()const;
 
     ID_Generator id_generator;
     Fields       fields;
-    int          build_state;
+    Build_State  build_state;
     
     std::vector<std::string> issues;
     std::optional<Name> name;

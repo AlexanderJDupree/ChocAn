@@ -199,24 +199,17 @@ Application_State State_Controller::operator()(const Create_Account& state)
 {
     state_viewer->render_state(state);
     
-    int state_index = chocan->account_builder.get_state();
+    const Build_State& state_index = chocan->account_builder.get_state();
 
     switch(state_index){
 
-        case 0: return Get_Type();
-        break;
-        case 1: return Get_First();
-        break;
-        case 2: return Get_Last();
-        break;
-        case 3: return Get_Street();
-        break;
-        case 4: return Get_City();
-        break;
-        case 5: return Get_State();
-        break;
-        case 6: return Get_Zip();
-        break;
+        case Build_State::Type:   return Get_Type();
+        case Build_State::First:  return Get_First();
+        case Build_State::Last:   return Get_Last();
+        case Build_State::Street: return Get_Street();
+        case Build_State::City:   return Get_City();
+        case Build_State::State:  return Get_State();
+        case Build_State::Zip:    return Get_Zip();
         default:;
     }
    
