@@ -107,20 +107,22 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account
     {
         {"state_name", "Create Account"},
     
-        {"builder.instructions", state.builder->instructions()},
+        {"builder.status", state.builder->get_status()},
    
-        {"builder.status", [&]() {
-             if (std::optional<const invalid_account_build> issues = state.builder->get_issues())
+        {"builder.issues", [&]() {
+             if (std::optional<const chocan_user_exception> issues = state.builder->get_issues())
              {
                 return render_user_error(issues.value());
+
              }
+             return std::string("");
          }()
         }
 
     };
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Type& field_state){
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Type&){
     
     return
     {
@@ -128,7 +130,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Type& fiel
     };
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_First& field_state){
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_First&){
     
     return
     {
@@ -136,7 +138,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_First& fie
     };
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Last& field_state){
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Last&){
     
     return
     {
@@ -144,7 +146,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Last& fiel
     };
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Street& field_state){
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Street&){
     
     return
     {
@@ -152,7 +154,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Street& fi
     };
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_City& field_state){
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_City&){
     
     return
     {
@@ -160,7 +162,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_City& fiel
     };
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_State& field_state){
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_State&){
     
     return
     {
@@ -168,7 +170,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_State& fie
     };
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Zip& field_state){
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Zip&){
     
     return
     {

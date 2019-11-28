@@ -20,9 +20,8 @@ https://github.com/AlexanderJDupree/ChocAn
 
 bool Account_Builder::buildable() const
 {
-    return true; 
+    return fields.type && name && address;
 }
-
 
 Account Account_Builder::build()
 {
@@ -31,165 +30,229 @@ Account Account_Builder::build()
         throw invalid_account_build("Attempt to build prematurely", issues);
     }
 
-    try{
-        return Account(name.value(),address.value(),type.value(),id_generator);
+    try
+    {
+        return Account(name.value(), address.value(), yield_account_type(fields.type.value()), id_generator);
+    }
+    catch (...)
+    {
 
-    }catch(...){
-        
         throw invalid_account_build("Failed to build account", issues);
     }
 }
 
 Account_Builder &Account_Builder::reset()
 {
-    type.reset();
     name.reset();
     address.reset();
+    fields.type.reset();
+    fields.first.reset();
+    fields.last.reset();
+    fields.street.reset();
+    fields.city.reset();
+    fields.state.reset();
+    fields.zip.reset();
+
     issues.clear();
-    fields = {Get_Type(),Get_First(),Get_Last(),Get_Street(),Get_City(),Get_State(),Get_Zip()};
+    
+    build_state = 0;
 
     return *this;
 }
 
-const Input_State& Account_Builder::get_field() const{
+const std::string Account_Builder::get_status()
+{
+    return "here goes the status";
+}
 
-    if(buildable()) throw invalid_account_build("Cannot recieve input while account is buildable",{});
+int Account_Builder::get_state() const
+{ 
+    if(buildable()) return -1;
 
-    for(auto&& field: fields){
-    
-        std::visit(overload{
+    return build_state;   
+}
 
-            [&](Type& arg)  {if(!arg.type) return field;},
-            [&](Word& arg)  {if(!arg.word) return field;},
-            [&](Number& arg){if(!arg.num)  return field;}
+std::optional<const chocan_user_exception> Account_Builder::get_issues() const
+{
 
-        },field);
+    if (issues.empty())
+        return std::optional<const invalid_account_build>();
+
+    return invalid_account_build("Issues with account", issues);
+}
+
+void Account_Builder::accept_input(const std::string &input)
+{
+    switch(build_state){
+            
+            case 0: deriveType(input);
+            break;
+            case 1: fields.first = input;
+            break;
+            case 2: fields.last = input;
+            break;
+            case 3: fields.street = input;
+            break;
+            case 4: fields.city = input;
+            break;
+            case 5: fields.state = input;
+            break;
+            case 6: deriveZip(input);
+            break;
+            default:;
     }
 }
 
-std::optional<const invalid_account_build> Account_Builder::get_issues() const{
+void Account_Builder::set_field(const std::string &input)
+{
 
-    if(issues.empty()) return std::optional<const invalid_account_build>();
-
-    return invalid_account_build("Issues with account",issues);
-
-}
-
-void Account_Builder::set_field(const std::string& input){
-
-    if(buildable()) return;
+    if (buildable()) return;
 
     issues.clear();
 
-    for(auto&& field: fields){
-    
-        std::visit(overload{
+    accept_input(input);
 
-            [&](Type& arg)  {if(!arg.type) arg.type = deriveType(input);},
-            [&](Word& arg)  {if(!arg.word) arg.word = input;},
-            [&](Number& arg){if(!arg.num)  arg.num  = deriveZip(input);}
-
-        },field);
-    }
-
-    if(!type && fields_ready(0,0)){
-        
-        type = std::get<Type>(fields.at(0)).type.value();
-    }
-    else if(!name && fields_ready(1,2)){
-
-        try{ 
-
-            name = Name(std::get<Word>(fields.at(1)).word.value()
-                       ,std::get<Word>(fields.at(2)).word.value());
-
-        }catch(const invalid_name& err){
-
-            issues = err.info();
-        }
-
-    }else if(!address && fields_ready(3,6)){
+    if(!name && fields.first && fields.last){
 
         try
         {
-
-            address = Address(std::get<Word>(fields.at(3)).word.value()
-                            , std::get<Word>(fields.at(4)).word.value()
-                            , std::get<Word>(fields.at(5)).word.value()
-                            , std::get<Number>(fields.at(6)).num.value());
+            name = Name(fields.first.value(),fields.last.value());
         }
-        catch (const invalid_address& err)
+        catch (const invalid_name &err)
         {
-            issues = err.info();
+
+            issues.insert(issues.end(), err.info().begin(), err.info().end());
+        }
+    }
+
+    else if (!address && fields.street && fields.city && fields.state && fields.zip) 
+    {
+        try
+        {
+            address = Address(fields.street.value(),fields.city.value(),fields.state.value(),fields.zip.value() );
+        }
+        catch (const invalid_address &err)
+        {
+            issues.insert(issues.end(), err.info().begin(), err.info().end());
         }
     }
     
     reset_fields_as_needed();
+
+    transition_state();
 }
 
-void Account_Builder::reset_fields_as_needed(){
+void Account_Builder::reset_fields_as_needed()
+{
 
-    if(issues.empty()) return;
+    if (issues.empty())
+        return;
 
-    for(std::string it: issues){
+    for (const std::string &it : issues)
+    {
+        if (it.find("First") != std::string::npos)
+        {
+            fields.first.reset();
+        }
+        else if (it.find("Last") != std::string::npos)
+        {
+            fields.last.reset();
+        }
+        else if (it.find("Full") != std::string::npos)
+        {
+            fields.first.reset();
+            fields.last.reset();
+        }
+        else if (it.find("Street") != std::string::npos)
+        {
+            fields.street.reset();
+        }
+        else if (it.find("Cities") != std::string::npos)
+        {
+            fields.city.reset();
+        }
+        else if (it.find("State") != std::string::npos)
+        {
+            fields.state.reset();
+        }
+        else if (it.find("Zip") != std::string::npos)
+        {
+            fields.zip.reset();
+        }
+    }
+}
 
-        if(it.find("First") != std::string::npos){
+void Account_Builder::transition_state(){
+
+    if(buildable()) return;
+
+    if(!fields.type){
+        
+        build_state = 0;
+    }
+    else if(!name){
+
+        if(!fields.first){
+
+            build_state = 1;
+
+        }else{
+
+            build_state = 2;
+        }
+
+    }else if(!address){
+
+        if(!fields.street){
             
-            fields[1] = Get_First();
-        } 
-        else if(it.find("Last")  != std::string::npos){
+            build_state = 3;
 
-            fields[2] = Get_Last();
-        } 
-        else if(it.find("Full")  != std::string::npos){
+        }else if(!fields.city){
 
-            fields[1] = Get_First();
-            fields[2] = Get_Last();
-        }
-        else if(it.find("Street")  != std::string::npos){
+            build_state = 4;
+        
+        }else if(!fields.state){
 
-            fields[3] = Get_Street();
-        }
-        else if(it.find("Cities")  != std::string::npos){
+            build_state = 5;
 
-            fields[4] = Get_City();
-        }
-        else if(it.find("State")  != std::string::npos){
+        }else{
 
-            fields[5] = Get_State();
-        }
-        else if(it.find("Zip")  != std::string::npos){
-
-            fields[6] = Get_Zip();
+            build_state = 6;
         }
     }
+}
+
+void Account_Builder::deriveType(const std::string &input)
+{
+    if(input == "Manager" || input == "manager") fields.type = "Manager";
+    
+    else if(input == "Member" || input == "member") fields.type = "Member";
+    
+    else if(input == "Provider" || input == "provider") fields.type = "Provider";
+
+    else issues.emplace_back(input + " is not a valid type");
 
 }
 
-bool Account_Builder::fields_ready(int from, int to) const{
+void Account_Builder::deriveZip(const std::string &input)
+{
 
-    for(int i = from; i <= to; ++i){
+    try{
+        
+        unsigned temp = stoul(input);
 
-        std::visit(overload{
+        fields.zip = temp;
 
-            [](Type arg)  {if (!arg.type) return false;},
-            [](Word arg)  {if (!arg.word) return false;},
-            [](Number arg){if (!arg.num)  return false;}
-        },
-        fields.at(i));
+    }catch(...){
+
+        issues.emplace_back(input + " is not a valid zip");
     }
-
-    return true;
 }
-std::optional<Account::Account_Type> Account_Builder::deriveType(const std::string& input){
+Account::Account_Type Account_Builder::yield_account_type(const std::string& type){
 
-    std::optional<Account::Account_Type> temp;
+    if(type == "Manager") return Manager();
+    
+    if(type == "Provider") return Provider();
 
-    return temp;
-}
-std::optional<unsigned> Account_Builder::deriveZip(const std::string& input){
-
-    std::optional<unsigned> temp;
-
-    return temp;
+    return Member();
 }

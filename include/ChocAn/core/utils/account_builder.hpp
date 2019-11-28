@@ -20,65 +20,52 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/account.hpp>
-#include <ChocAn/view/terminal_input_controller.hpp>
-#include <stack>
 #include <optional>
 
-class Type {
-    public:
-        std::optional<Account::Account_Type> type;
+struct Fields
+{
+    std::optional<std::string> type;
+    std::optional<std::string> first;
+    std::optional<std::string> last;
+    std::optional<std::string> street;
+    std::optional<std::string> city;
+    std::optional<std::string> state;
+    std::optional<unsigned> zip;
+
 };
 
-class Word {
-    public:
-        std::optional<std::string> word;
-};
+class Account_Builder
+{
 
-class Number {
-    public:
-        std::optional<unsigned> num;
-};
+public:
+    using Database_Ptr = Data_Gateway::Database_Ptr;
 
-class Get_Type   : public Type{};
-class Get_First  : public Word{};
-class Get_Last   : public Word{};
-class Get_Street : public Word{};
-class Get_City   : public Word{};
-class Get_State  : public Word{};
-class Get_Zip    : public Number{};
+    Account_Builder(Database_Ptr db) : id_generator(db) { reset(); }
 
-class Account_Builder{
+    Account build();
+    Account_Builder &reset();
 
-    public:
-        template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
-        template<class... Ts> overload(Ts...) -> overload<Ts...>;
+    bool buildable() const;
+    int get_state() const;
+    const std::string get_status();
+    void set_field(const std::string &input);
+    std::optional<const chocan_user_exception> get_issues() const;
 
-        using Input_State  = std::variant<Get_Type,Get_First,Get_Last,Get_Street,Get_City,Get_State,Get_Zip>;
-        using Fields       = std::vector<Input_State>;
-        using Database_Ptr = Data_Gateway::Database_Ptr;
+private:
+    void accept_input(const std::string &input);
+    void reset_fields_as_needed();
+    void transition_state();
+    void deriveType(const std::string &input);
+    void deriveZip(const std::string &input);
+    Account::Account_Type yield_account_type(const std::string& type);
 
-        Account_Builder(Database_Ptr db) : id_generator(db) {reset();}
-
-        Account build();
-        Account_Builder& reset();
-        bool buildable() const;
-        void set_field(const std::string& input);
-        
-        const Input_State& get_field() const;
-        std::optional<const chocan_user_exception> get_issues()const;
-
-    private:
-
-        bool fields_ready(int from, int to) const;
-        std::optional<Account::Account_Type> deriveType(const std::string& input);
-        std::optional<unsigned> deriveZip(const std::string& input);
-
-        ID_Generator                         id_generator;
-        Fields                               fields;
-        std::vector<std::string>             issues;
-        std::optional<Name>                  name;
-        std::optional<Address>               address;
-        std::optional<Account::Account_Type> type;
+    ID_Generator id_generator;
+    Fields       fields;
+    int          build_state;
+    
+    std::vector<std::string> issues;
+    std::optional<Name> name;
+    std::optional<Address> address;
 };
 
 struct invalid_account_build : public chocan_user_exception
@@ -90,50 +77,3 @@ struct invalid_account_build : public chocan_user_exception
 
 
 #endif  //CHOCAN_ACCOUNT_BUILDER_HPP
-
-
-
-class Account_Builder{
-
-    public:
-        template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
-        template<class... Ts> overload(Ts...) -> overload<Ts...>;
-        
-        using Fields =  std::vector<std::variant<Type, Word, Number>>;
-        using Database_Ptr = Data_Gateway::Database_Ptr;
-
-        Account_Builder(Database_Ptr db) : id_generator(db) {reset();}
-
-        Account build();
-        Account_Builder& reset();
-        
-        bool buildable() const;
-        void set_field(const std::string& input);
-        const std::string instructions()const;
-        const chocan_user_exception status();
-
-    private:
-
-        void reset_fields_as_needed();
-        bool fields_ready(int from, int to)const;
-        std::optional<Account::Account_Type> deriveType(const std::string& input);
-        std::optional<unsigned> deriveZip(const std::string& input);
-
-        ID_Generator                         id_generator;
-        Fields                               fields;
-        std::vector<std::string>             issues;
-        std::optional<Name>                  name;
-        std::optional<Address>               address;
-        std::optional<Account::Account_Type> type;
-};
-
-struct invalid_account_build : public chocan_user_exception
-{
-    explicit invalid_account_build(const char* err, Info info) 
-        : chocan_user_exception(err, info)
-    { }
-};
-
-
-#endif  //CHOCAN_ACCOUNT_BUILDER_HPP
-

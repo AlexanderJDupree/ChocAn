@@ -28,7 +28,6 @@ TEST_CASE("Account builds with valid inputs", "[account_builder]")
 
     SECTION("Account builder contructs")
     {
-        REQUIRE(
     }
 
 }
