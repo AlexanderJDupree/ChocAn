@@ -27,7 +27,7 @@ Account Account_Builder::build()
 {
     if (!buildable())
     {
-        throw invalid_account_build("Attempt to build prematurely", issues);
+        throw invalid_account_build("Attempt made to build prematurely", issues);
     }
 
     try
