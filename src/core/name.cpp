@@ -31,7 +31,7 @@ Name::Name(const std::string& first, const std::string& last)
     else if (!Validators::length(last, 1, 24) && Validators::length(first, 1, 24))
         errors.push_back("Last Name must be 1 to 24 characters long");
 
-    else
+    else if (!Validators::length(last + first, 1, 25))
         errors.push_back("Full Name must be 1 to 25 characters long");
 
 if (!errors.empty())
