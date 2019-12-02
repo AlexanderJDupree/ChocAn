@@ -55,6 +55,8 @@ public:
     DateTime(double unix_timestamp);
     DateTime(Day, Month, Year, Hours, Minutes, Seconds);
 
+    virtual ~DateTime() = default;
+
     Data_Table serialize() const override;
 
     // remove system clock dependency by templating clock type

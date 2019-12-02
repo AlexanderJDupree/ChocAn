@@ -66,11 +66,13 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/account.o \
+	$(OBJDIR)/account_report.o \
 	$(OBJDIR)/address.o \
 	$(OBJDIR)/datetime.o \
 	$(OBJDIR)/id_generator.o \
 	$(OBJDIR)/login_manager.o \
 	$(OBJDIR)/name.o \
+	$(OBJDIR)/reporter.o \
 	$(OBJDIR)/transaction.o \
 	$(OBJDIR)/transaction_builder.o \
 	$(OBJDIR)/validators.o \
@@ -135,6 +137,9 @@ endif
 $(OBJDIR)/account.o: ../src/core/account.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/account_report.o: ../src/core/account_report.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/address.o: ../src/core/address.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -148,6 +153,9 @@ $(OBJDIR)/login_manager.o: ../src/core/login_manager.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/name.o: ../src/core/name.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/reporter.o: ../src/core/reporter.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/transaction.o: ../src/core/transaction.cpp

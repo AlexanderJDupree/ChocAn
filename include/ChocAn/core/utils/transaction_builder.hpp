@@ -57,13 +57,14 @@ public:
     // Resets builder to initial state
     Transaction_Builder& reset();
 
-    std::string get_current_field() const;
+    Builder_State builder_state() const;
     void set_current_field(const std::string& input);
 
     const std::optional<chocan_user_exception>& get_last_error() const;
 
     void set_member_acct_field   (const std::string& input);
     void set_provider_acct_field (const std::string& input);
+    void set_provider_acct_field (const Account& account);
     void set_service_date_field  (const std::string& input);
     void set_service_field       (const std::string& input);
     void set_comments_field      (const std::string& input);
