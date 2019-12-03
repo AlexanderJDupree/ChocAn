@@ -79,11 +79,105 @@ mock_errors error;
  
 TEST_CASE("Account builds with valid inputs", "[account_builder]")
 {
-    Account_Builder builder(db);
 
-    SECTION("Builds a Member Account", "[account_builder][use_case]")
-    {
+    mock_dependencies mocks;
+
+    State_Controller controller( mocks.chocan
+            , mocks.state_viewer
+            , mocks.input_controller
+            , Create_Account{ &mocks.chocan->account_builder.reset() } );
+    
+    controller.interact();
         
+    mocks.in_stream << "member\n";
+
+    SECTION("Transitions to Get_Type with valid input", "[account_builder][use_case][happy_path]")
+    {
+        Application_State expected_state{Get_Type()};
+    
+        REQUIRE(controller.current_state().index() == expected_state.index());
+        
+    }
+    
+    controller.interact();
+
+    mocks.in_stream << "first\n";
+
+    controller.interact();
+
+    SECTION("Transitions to Get_First with valid input", "[account_builder][use_case][happy_path]")
+    {
+        Application_State expected_state{Get_First()};
+
+        REQUIRE(controller.current_state().index() == expected_state.index());
+
+    }
+    
+    controller.interact();
+    
+    mocks.in_stream << "last\n";
+    
+    controller.interact();
+
+    SECTION("Transitions to Get_Last with valid input", "[account_builder][use_case][happy_path]")
+    {
+        Application_State expected_state{Get_Last()};
+
+        REQUIRE(controller.current_state().index() == expected_state.index());
+
+    }
+    
+    controller.interact();
+    
+    mocks.in_stream << "street\n";
+    
+    controller.interact();
+
+    SECTION("Transitions to Get_Street with valid input", "[account_builder][use_case][happy_path]")
+    {
+        Application_State expected_state{Get_Street()};
+
+        REQUIRE(controller.current_state().index() == expected_state.index());
+
+    }
+
+    controller.interact();
+    
+    mocks.in_stream << "city\n";
+    
+    controller.interact();
+
+    SECTION("Transitions to Get_City with valid input", "[account_builder][use_case][happy_path]")
+    {
+        Application_State expected_state{Get_City()};
+
+        REQUIRE(controller.current_state().index() == expected_state.index());
+    }
+
+    controller.interact();
+    
+    mocks.in_stream << "or\n";
+    
+    controller.interact();
+
+    SECTION("Transitions to Get_City with valid input", "[account_builder][use_case][happy_path]")
+    {
+        Application_State expected_state{Get_State()};
+
+        REQUIRE(controller.current_state().index() == expected_state.index());
+    }
+    
+    controller.interact();
+    
+    mocks.in_stream << "97080\n";
+    
+    controller.interact();
+
+    SECTION("Transitions to Get_Zip with valid input", "[account_builder][use_case][happy_path]")
+    {
+        Application_State expected_state{Get_Zip()};
+
+        REQUIRE(controller.current_state().index() == expected_state.index());
     }
 
 }

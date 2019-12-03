@@ -217,7 +217,11 @@ Application_State State_Controller::operator()(const Create_Account& state)
 
         try{
  
-            chocan->db->create_account(chocan->account_builder.build());
+            Account temp(chocan->account_builder.build());
+
+            state_viewer->render_state(View_Account{temp});
+
+            chocan->db->create_account(temp);
         
         }catch(const chocan_user_exception& err){
 

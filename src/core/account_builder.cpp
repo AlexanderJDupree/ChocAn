@@ -80,6 +80,7 @@ std::optional<const chocan_user_exception> Account_Builder::get_issues() const
     return invalid_account_build("Issues with account", issues);
 }
 
+
 void Account_Builder::accept_input(const std::string &input)
 {
     switch(build_state){
