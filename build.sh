@@ -29,7 +29,7 @@ export LibBashRepo="https://github.com/kigster/lib-bash"
 
 check_cpp17_compatible(){
 
-    CPP_REQUIRED=12
+    CPP_REQUIRED=7
     version=$(g++ -dumpversion)
     CPP_VERSION=( ${version//./ } ) # replace points, split into array
 
