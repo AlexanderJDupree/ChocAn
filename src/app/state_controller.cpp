@@ -230,9 +230,15 @@ Application_State State_Controller::operator()(Find_Account& state)
 
     if( auto maybe_account = get_account(input))
     {
-        return View_Account { maybe_account.value() };
+        switch (state.next)
+        {
+        case Find_Account::Next::Delete_Account : void();
+        case Find_Account::Next::Update_Account : void();
+        default: return View_Account { maybe_account.value() };
+        }
     }
-    return Find_Account { "Invalid ID" };
+    state.status = "Invalid ID: " + input;
+    return state;
 }
 
 Application_State State_Controller::operator()(Generate_Report& state)

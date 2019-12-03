@@ -32,18 +32,22 @@ Transaction::Transaction( const Account&     provider
 {
     chocan_user_exception::Info errors;
 
-    ( !std::holds_alternative<Provider>(_provider.type()) )
-        ? errors.push_back("Account is not of type: Provider")
-        : void();
-    ( !std::holds_alternative<Member>(_member.type()) )
-        ? errors.push_back("Account is not of type: Member")
-        : void();
-    ( service_date > _filed_date )
-        ? errors.push_back("Service date cannot be future dated")
-        : void();
-    ( !Validators::length(comments, 0, 100) )
-        ? errors.push_back("Comments field must be less than 100 characters")
-        : void();
+    if( !std::holds_alternative<Provider>(_provider.type()) )
+    {
+        errors["Provider"] = Invalid_Value { "Account", "is not a provider account"};
+    }
+    if( !std::holds_alternative<Member>(_member.type()) )
+    {
+        errors["Member"] = Invalid_Value { "Account", "is not a member account"};
+    }
+    if( service_date > _filed_date )
+    {
+        errors["Service date"] = Invalid_Value { "", "cannot be future dated" };
+    }
+    if( !Validators::length(comments, 0, 100) )
+    {
+        errors["Comments"] = Invalid_Length { comments, 0, 100 };
+    }
     ( !errors.empty() )
         ? throw invalid_transaction("Invalid Transaction fields", errors)
         : void();

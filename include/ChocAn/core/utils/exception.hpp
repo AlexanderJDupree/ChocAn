@@ -20,14 +20,15 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_EXCEPTION_HPP
 
 #include <map>
-#include <vector>
 #include <string>
 #include <exception>
+#include <ChocAn/core/utils/error_type.hpp>
 
 class chocan_user_exception : public std::exception
 {
 public:
-    using Info = std::vector<std::string>;
+    // Key is the field name, Error Type holds specific error info
+    using Info = std::map<std::string, Error_Type>;
 
     const Info error_info;
     const std::string error_msg;

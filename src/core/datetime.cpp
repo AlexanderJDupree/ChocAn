@@ -26,27 +26,35 @@ DateTime::DateTime(Day day, Month month, Year year, Hours hour, Minutes min, Sec
 {
     chocan_user_exception::Info errors;
 
-    (Validators::range(day.count(), 1, 31))
-        ? void() : errors.push_back("Day should be between 1 - 31");
-
-    (Validators::range(hour.count(), 0, 23))
-        ? void() : errors.push_back("Hour should be between 0-23");
-
-    (Validators::range(min.count(), 0, 60))
-        ? void() : errors.push_back("Minutes should be between 0-60");
-
-    (Validators::range(sec.count(), 0, 60))
-        ? void() : errors.push_back("Seconds should be between 0-60");
-
-    (Validators::range(year.count(), 1970, Year::max().count()))
-        ? void() : errors.push_back("Year should be greater than 1970");
-
-    (Validators::range(month.count(), 1, 12) && ok()) 
-        ? void() : errors.push_back( "Month: " 
-                                   + std::to_string(month.count()) 
-                                   + ", and Day: "
-                                   + std::to_string(day.count())
-                                   + " does not exist." );
+    if( !Validators::range(day.count(), 1, 31) )
+    {
+        errors["Day"] = Invalid_Range { day.count(), 1, 31 };
+    }
+    if( !Validators::range(hour.count(), 0, 23) )
+    {
+        errors["Hour"] = Invalid_Range { hour.count(), 0, 23 };
+    }
+    if( !Validators::range(min.count(), 0, 59) )
+    {
+        errors["Minutes"] = Invalid_Range { min.count(), 0, 59 };
+    }
+    if( !Validators::range(sec.count(), 0, 60) )
+    {
+        errors["Seconds"] = Invalid_Range{ sec.count(), 0, 59 };
+    }
+    if( !Validators::range(year.count(), 1970, Year::max().count()) )
+    {
+        errors["Year"] = Invalid_Value { "", "Must be greater than greater than 1970" };
+    }
+    if( !Validators::range(month.count(), 1, 12) )
+    {
+        errors["Month"] = Invalid_Range { month.count(), 1, 12 };
+    }
+    if(!ok())
+    {
+        errors["Date"] = Incompatible_Values{ "Month=" + std::to_string(month.count())
+                                            , "Day=" + std::to_string(day.count()) };
+    }
     (errors.empty())
         ? void() :throw invalid_datetime("Invalid datetime values", errors);
 }
