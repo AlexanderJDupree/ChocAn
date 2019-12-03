@@ -13,6 +13,7 @@
 # TODO If lib-bash fails we should build manually with make -C gmake
 
 VERBOSE=""
+COMPILER="g++"
 
 ( [[ -n ${ZSH_EVAL_CONTEXT} && ${ZSH_EVAL_CONTEXT} =~ :file$ ]] || \
   [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && _s_=1 || _s_=0
@@ -28,11 +29,11 @@ export LibBashRepo="https://github.com/kigster/lib-bash"
 
 check_cpp17_compatible(){
 
-    CPP_REQUIRED=7
+    CPP_REQUIRED=12
     version=$(g++ -dumpversion)
     CPP_VERSION=( ${version//./ } ) # replace points, split into array
 
-    if [ "${CPP_VERSION[0]}" -lt "$CPP_REQUIRED" ]
+    if [ "${CPP_VERSION[0]}" -lt "$CPP_REQUIRED" ] && [ $COMPILER == "g++" ]
     then
         echo "ERROR: ChocAn requires g++ version" $CPP_REQUIRED  "or greater to support c++ standard 17."
         echo "current version: " $CPP_VERSION
@@ -163,6 +164,8 @@ main() {
 while [ "$1" != "" ]; do
     case $1 in
         -v | --verbose )        VERBOSE="verbose=true"
+                                ;;
+        -c | --clang )          COMPILER="clang"
                                 ;;
         -h | --help | -? )      usage
                                 exit
