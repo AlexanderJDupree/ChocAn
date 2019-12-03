@@ -25,10 +25,10 @@ Name::Name(const std::string& first, const std::string& last)
     invalid_name name_errors("", {});
 
     if (first == "")
-        errors.push_back("First Name cannot be empty");
+        errors["First Name"] = Invalid_Value { first, "Cannot be empty" }; 
 
     if (last == "")
-        errors.push_back("Last Name cannot be empty");
+        errors["Last Name"] = Invalid_Value { last, "Cannot be empty" }; 
 
     if (!errors.empty())
         throw invalid_name("Invalid name length", errors);
