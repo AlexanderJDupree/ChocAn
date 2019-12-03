@@ -203,23 +203,37 @@ Application_State State_Controller::operator()(const Create_Account& state)
 
     switch(state_index){
 
-        case Build_State::Type:   return Get_Type();
-        case Build_State::First:  return Get_First();
-        case Build_State::Last:   return Get_Last();
-        case Build_State::Street: return Get_Street();
-        case Build_State::City:   return Get_City();
-        case Build_State::State:  return Get_State();
-        case Build_State::Zip:    return Get_Zip();
+        case Build_State::Type:   state_viewer->render_state(Get_Type());
+        break;
+        case Build_State::First:  state_viewer->render_state(Get_First());
+        break;
+        case Build_State::Last:   state_viewer->render_state(Get_Last());
+        break;
+        case Build_State::Street: state_viewer->render_state(Get_Street());
+        break;
+        case Build_State::City:   state_viewer->render_state(Get_City());
+        break;
+        case Build_State::State:  state_viewer->render_state(Get_State());
+        break;
+        case Build_State::Zip:    state_viewer->render_state(Get_Zip());
+        break;
         default:;
     }
    
+    std::string input = input_controller->read_input();
+    
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
+    
+    chocan->account_builder.set_field(input);
+    
     if(chocan->account_builder.buildable()){
 
         try{
  
             Account temp(chocan->account_builder.build());
 
-            state_viewer->render_state(View_Account{temp});
+            state_viewer->render_state(View_Account{temp,View_Account::Status::Confirm_Creation});
 
             chocan->db->create_account(temp);
         
@@ -235,9 +249,12 @@ Application_State State_Controller::operator()(const Create_Account& state)
 }
 Application_State State_Controller::operator()(View_Account& state)
 {
+    std::string input;
+
     state_viewer->render_state(state, [&](){
-        input_controller->read_input();
+        input = input_controller->read_input();
     }) ;
+    
     return pop_runtime();
 }
 
@@ -273,90 +290,41 @@ Application_State State_Controller::operator()(const Get_Type& state){
 
     state_viewer->render_state(state);
 
-    std::string input = input_controller->read_input();
-
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-
-    chocan->account_builder.set_field(input);
-
-    return Create_Account{&chocan->account_builder};
+    return pop_runtime();
 }
 Application_State State_Controller::operator()(const Get_First& state){
 
     state_viewer->render_state(state);
-    
-    std::string input = input_controller->read_input();
 
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-
-    chocan->account_builder.set_field(input);
-
-    return Create_Account{&chocan->account_builder};
+    return pop_runtime();    
 }
 Application_State State_Controller::operator()(const Get_Last& state){
     
     state_viewer->render_state(state);
     
-    std::string input = input_controller->read_input();
-
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-
-    chocan->account_builder.set_field(input);
-
-    return Create_Account{&chocan->account_builder};
+    return pop_runtime();    
 }
 Application_State State_Controller::operator()(const Get_City& state){
     
     state_viewer->render_state(state);
-
-    std::string input = input_controller->read_input();
-
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-
-    chocan->account_builder.set_field(input);
     
-    return Create_Account{&chocan->account_builder};
+    return pop_runtime();    
 }
 Application_State State_Controller::operator()(const Get_Street& state){
     
     state_viewer->render_state(state);
-
-    std::string input = input_controller->read_input();
-
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-
-    chocan->account_builder.set_field(input);
     
-    return Create_Account{&chocan->account_builder};
+    return pop_runtime();    
 }
 Application_State State_Controller::operator()(const Get_State& state){
     
     state_viewer->render_state(state);
 
-    std::string input = input_controller->read_input();
-
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-
-    chocan->account_builder.set_field(input);
-    
-    return Create_Account{&chocan->account_builder};
+    return pop_runtime();    
 }
 Application_State State_Controller::operator()(const Get_Zip& state){
     
     state_viewer->render_state(state);
 
-    std::string input = input_controller->read_input();
-
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-
-    chocan->account_builder.set_field(input);
-    
-    return Create_Account{&chocan->account_builder};
+    return pop_runtime();    
 }

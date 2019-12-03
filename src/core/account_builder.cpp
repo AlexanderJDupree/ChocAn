@@ -18,6 +18,13 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/utils/account_builder.hpp>
 #include <algorithm>
 
+const std::set<std::string> Account_Builder::US_states
+{ "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA"
+, "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD"
+, "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ"
+, "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC"
+, "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" };
+
 bool Account_Builder::buildable() const
 {
     return build_state == Build_State::Buildable;
@@ -32,7 +39,15 @@ Account Account_Builder::build()
 
     try
     {
-        return Account(name.value(), address.value(), yield_account_type(), id_generator);
+        return Account(
+                Name(    fields.first.value()
+                        ,fields.last.value()),
+                Address( fields.street.value()
+                        ,fields.city.value()
+                        ,fields.state.value()
+                        ,fields.zip.value()), 
+                yield_account_type(), 
+                id_generator);
     }
     catch (...)
     {
@@ -50,9 +65,6 @@ Account_Builder &Account_Builder::reset()
     fields.city.reset();
     fields.state.reset();
     fields.zip.reset();
-    
-    name.reset();
-    address.reset();
 
     issues.clear();
     
@@ -80,22 +92,21 @@ std::optional<const chocan_user_exception> Account_Builder::get_issues() const
     return invalid_account_build("Issues with account", issues);
 }
 
-
 void Account_Builder::accept_input(const std::string &input)
 {
     switch(build_state){
             
             case Build_State::Type: deriveType(input);
             break;
-            case Build_State::First: fields.first = input;
+            case Build_State::First: deriveFirst(input);
             break;
-            case Build_State::Last: fields.last = input;
+            case Build_State::Last: deriveLast(input);
             break;
-            case Build_State::Street: fields.street = input;
+            case Build_State::Street: deriveStreet(input);
             break;
-            case Build_State::City: fields.city = input;
+            case Build_State::City: deriveCity(input);
             break;
-            case Build_State::State: fields.state = input;
+            case Build_State::State: deriveState(input);
             break;
             case Build_State::Zip: deriveZip(input);
             break;
@@ -111,117 +122,52 @@ void Account_Builder::set_field(const std::string &input)
     issues.clear();
 
     accept_input(input);
-
-    if(!name && fields.first && fields.last){
-
-        try
-        {
-            name = Name(fields.first.value(),fields.last.value());
-        }
-        catch (const invalid_name &err)
-        {
-
-            issues.insert(issues.end(), err.info().begin(), err.info().end());
-        }
-    }
-
-    else if (!address && fields.street && fields.city && fields.state && fields.zip) 
-    {
-        try
-        {
-            address = Address(fields.street.value(),fields.city.value(),fields.state.value(),fields.zip.value() );
-        }
-        catch (const invalid_address &err)
-        {
-            issues.insert(issues.end(), err.info().begin(), err.info().end());
-        }
-    }
     
-    reset_fields_as_needed();
-
     transition_state();
-}
-
-void Account_Builder::reset_fields_as_needed()
-{
-
-    if (issues.empty())
-        return;
-
-    for (const std::string &it : issues)
-    {
-        if (it.find("First") != std::string::npos)
-        {
-            fields.first.reset();
-        }
-        else if (it.find("Last") != std::string::npos)
-        {
-            fields.last.reset();
-        }
-        else if (it.find("Full") != std::string::npos)
-        {
-            fields.first.reset();
-            fields.last.reset();
-        }
-        else if (it.find("Street") != std::string::npos)
-        {
-            fields.street.reset();
-        }
-        else if (it.find("Cities") != std::string::npos)
-        {
-            fields.city.reset();
-        }
-        else if (it.find("State") != std::string::npos)
-        {
-            fields.state.reset();
-        }
-        else if (it.find("Zip") != std::string::npos)
-        {
-            fields.zip.reset();
-
-        }else fields.type.reset();
-    }
 }
 
 void Account_Builder::transition_state(){
 
-    if (buildable()) return;
+    if (buildable())
+        return;
 
-    if(!fields.type){
-        
+    if (!fields.type)
+    {
         build_state = Build_State::Type;
     }
-    else if(!name){
+    else if (!fields.first)
+    {
+        build_state = Build_State::First;
+    }
+    else if (!fields.last)
+    {
+        build_state = Build_State::Last;
+    }
+    else if (!fields.street)
+    {
+        build_state = Build_State::Street;
+    }
+    else if (!fields.city)
+    {
+        build_state = Build_State::City;
+    }
+    else if (!fields.state)
+    {
+        build_state = Build_State::State;
+    }
+    else if (!fields.zip)
+    {
+        build_state = Build_State::Zip;
+    }
+    else
+    {
+        build_state = Build_State::Buildable;
+    }
+}
 
-        if(!fields.first){
-
-            build_state = Build_State::First;
-
-        }else if(!fields.last){
-
-            build_state = Build_State::Last;
-        }
-
-    }else if(!address){
-
-        if(!fields.street){
-            
-            build_state = Build_State::Street;
-
-        }else if(!fields.city){
-
-            build_state = Build_State::City;
-        
-        }else if(!fields.state){
-
-            build_state = Build_State::State;
-
-        }else if(!fields.zip){
-
-            build_state = Build_State::Zip;
-        }
-    
-    }else build_state = Build_State::Buildable;
+bool Account_Builder::full_name_valid()const
+{
+    return Validators::length(fields.last.value_or(" ") + fields.first.value_or(" "), 1, 25);
 }
 
 void Account_Builder::deriveType(const std::string &input)
@@ -236,18 +182,111 @@ void Account_Builder::deriveType(const std::string &input)
 
 }
 
+void Account_Builder::deriveFirst(const std::string &input)
+{
+
+    if (!Validators::length(input, 1, 24)){
+
+        issues.push_back("First Name must be 1 to 24 characters long");
+    }
+    else if (!full_name_valid())
+    {
+        issues.push_back("Full Name must be 1 to 25 characters long");
+        fields.first.reset();
+        fields.last.reset();
+    }
+    else
+    {
+        fields.first = input;
+    }
+}
+
+void Account_Builder::deriveLast(const std::string &input)
+{
+
+    if (!Validators::length(input, 1, 24))
+    {
+        issues.push_back("Last Name must be 1 to 24 characters long");
+    }
+    else if (!full_name_valid())
+    {
+        issues.push_back("Full Name must be 1 to 25 characters long");
+        fields.first.reset();
+        fields.last.reset();
+    }
+    else
+    {
+        fields.last= input;
+    }
+}
+
+void Account_Builder::deriveStreet(const std::string &input)
+{
+    if( !Validators::length(input, 1, 25) ) 
+    {
+        issues.push_back("Street address must be less than 25 characters");
+    }
+    else
+    {
+        fields.street = input;
+    }
+}
+
+void Account_Builder::deriveCity(const std::string &input)
+{
+    if( !Validators::length(input, 1, 14) ) 
+    {
+        issues.push_back("Cities must be less than 14 character");
+    }
+    else
+    {
+        fields.city = input;
+    }
+    
+
+}
+
+void Account_Builder::deriveState(const std::string &input)
+{
+    std::string temp = input;
+
+    for(char& c : temp) { c = std::toupper(c); }
+    
+    if( !Validators::length(temp, 2, 2) ) {
+
+        issues.push_back("State must be in abbreviated 2 character format");
+    }
+    else if(US_states.find(temp) == US_states.end() )
+    {
+        issues.push_back("\"" + input + "\" is not a U.S. state");
+    }
+    else
+    {
+        fields.state = temp;
+    }
+    
+}
+
 void Account_Builder::deriveZip(const std::string &input)
 {
 
-    try{
-        
-        unsigned temp = stoul(input);
+    if( !Validators::length(input, 5, 5) ) 
+    {
+         issues.push_back("Zip code must be 5 digit number");
+    }
+    else{
 
-        fields.zip = temp;
+        try
+        {
+            unsigned temp = stoul(input);
 
-    }catch(...){
+            fields.zip = temp;
+        }
+        catch (...)
+        {
 
-        issues.emplace_back(input + " is not a valid zip");
+            issues.push_back(input + " is not a valid zip");
+        }
     }
 }
 Account::Account_Type Account_Builder::yield_account_type() const{

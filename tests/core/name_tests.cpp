@@ -35,10 +35,6 @@ TEST_CASE("Constructing Name objects", "[constructors], [name]")
     {
         REQUIRE_THROWS_AS( Name( valid_first, ""), invalid_name);
     }
-    SECTION("Name is too long")
-    {
-        REQUIRE_THROWS_AS( Name( "Really really ", "really long name"), invalid_name);
-    }
 }
 
 TEST_CASE("Name equality operators", "[operators], [name]")

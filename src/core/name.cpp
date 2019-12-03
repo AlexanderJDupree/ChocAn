@@ -16,7 +16,6 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <ChocAn/core/entities/name.hpp>
-#include <ChocAn/core/utils/validators.hpp>
 
 Name::Name(const std::string& first, const std::string& last)
         : _first ( first ) , _last ( last ) 
@@ -25,17 +24,14 @@ Name::Name(const std::string& first, const std::string& last)
 
     invalid_name name_errors("", {});
 
-    if (!Validators::length(first, 1, 24) && Validators::length(last, 1, 24))
-        errors.push_back("First Name must be 1 to 24 characters long");
+    if (first == "")
+        errors.push_back("First Name cannot be empty");
 
-    else if (!Validators::length(last, 1, 24) && Validators::length(first, 1, 24))
-        errors.push_back("Last Name must be 1 to 24 characters long");
+    if (last == "")
+        errors.push_back("Last Name cannot be empty");
 
-    else if (!Validators::length(last + first, 1, 25))
-        errors.push_back("Full Name must be 1 to 25 characters long");
-
-if (!errors.empty())
-    throw invalid_name("Invalid name length", errors);
+    if (!errors.empty())
+        throw invalid_name("Invalid name length", errors);
 }
 
 bool Name::operator==(const Name& rhs) const

@@ -20,6 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/account.hpp>
+#include <ChocAn/core/utils/validators.hpp>
 #include <optional>
 
 struct Fields
@@ -42,7 +43,7 @@ class Account_Builder
 public:
     using Database_Ptr = Data_Gateway::Database_Ptr;
 
-    Account_Builder(Database_Ptr db) : id_generator(db) { reset(); }
+    Account_Builder(Database_Ptr db) : id_generator(db) {reset();};
 
     Account build();
     Account_Builder &reset();
@@ -54,11 +55,17 @@ public:
     std::optional<const chocan_user_exception> get_issues() const;
 
 private:
+    bool full_name_valid()const;
     void accept_input(const std::string &input);
-    void reset_fields_as_needed();
     void transition_state();
     void deriveType(const std::string &input);
+    void deriveFirst(const std::string &input);
+    void deriveLast(const std::string &input);
+    void deriveStreet(const std::string &input);
+    void deriveCity(const std::string &input);
+    void deriveState(const std::string &input);
     void deriveZip(const std::string &input);
+    
     Account::Account_Type yield_account_type()const;
 
     ID_Generator id_generator;
@@ -66,8 +73,8 @@ private:
     Build_State  build_state;
     
     std::vector<std::string> issues;
-    std::optional<Name> name;
-    std::optional<Address> address;
+    static const std::set<std::string> US_states;
+
 };
 
 struct invalid_account_build : public chocan_user_exception
