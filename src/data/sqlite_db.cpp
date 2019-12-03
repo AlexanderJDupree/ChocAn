@@ -249,6 +249,128 @@ std::optional<Account> SQLite_DB::get_manager_account(const std::string& ID)
     return get_account(ID, "Manager");
 }
 
+Data_Gateway::Transactions SQLite_DB::get_transactions(DateTime start, DateTime end, Account acct)
+{
+    std::string acct_type = std::visit( overloaded {
+        [](Member)  { return "member_id";   },
+        [](Provider){ return "provider_id"; },
+        [](Manager) { return "*"; }
+    }, acct.type());
+
+    Transactions transactions;
+    std::vector<SQL_Row> rows = get_transaction_data(start, end, acct.id(), acct_type);
+    for (const auto& row : rows)
+    {
+        try
+        {
+            transactions.emplace_back( get_provider_account(row.at("provider_id")).value()
+                                        , get_member_account(row.at("member_id")).value()
+                                        , lookup_service(row.at("service_code")).value()
+                                        , DateTime(std::stoi(row.at("service_date")))
+                                        , DateTime(std::stoi(row.at("filed_date")))
+                                        , row.at("comments")
+                                        , db_key );
+        }
+        catch(const std::exception&)
+        {
+            // TODO log bad row
+        }
+    }
+    return transactions;
+}
+Data_Gateway::Transactions SQLite_DB::get_transactions(DateTime start, DateTime end)
+{
+    Transactions transactions;
+    std::vector<SQL_Row> rows = get_transaction_data(start, end);
+    for (const auto& row : rows)
+    {
+        try
+        {
+            transactions.emplace_back( get_provider_account(row.at("provider_id")).value()
+                                        , get_member_account(row.at("member_id")).value()
+                                        , lookup_service(row.at("service_code")).value()
+                                        , DateTime(std::stoi(row.at("service_date")))
+                                        , DateTime(std::stoi(row.at("filed_date")))
+                                        , row.at("comments")
+                                        , db_key );
+        }
+        catch(const std::exception&)
+        {
+            // TODO log bad row
+        }
+    }
+    return transactions;
+}
+
+std::vector<SQLite_DB::SQL_Row> SQLite_DB::get_transaction_data(DateTime start, DateTime end, unsigned id, std::string type)
+{
+    std::vector<SQL_Row> rows;
+    auto callback = [](void* list, int argc, char** argv, char** col_name) -> int
+    {
+        std::vector<SQL_Row>* rows = static_cast<std::vector<SQL_Row>*>(list);
+
+        SQL_Row data;
+        for(int i = 0; i < argc; ++i)
+        {
+            data.insert( { col_name[i], argv[i] } );
+        }
+        rows->push_back(data);
+
+        return 0;
+    };
+
+    std::string acct_type = (type == "*") ? ";" : " AND " + type + "=" + std::to_string(id) + ";";
+    std::string sql = "SELECT * FROM transactions WHERE service_date BETWEEN "   
+                    + std::to_string(start.unix_timestamp()) + " AND "
+                    + std::to_string(end.unix_timestamp()) 
+                    + acct_type;
+
+    execute_statement(sql, callback, &rows);
+    return rows;
+}
+
+Data_Gateway::Accounts SQLite_DB::get_all_accounts(const std::string& type)
+{
+    std::vector<SQL_Row> rows;
+    auto callback = [](void* list, int argc, char** argv, char** col_name) -> int
+    {
+        std::vector<SQL_Row>* accounts = static_cast<std::vector<SQL_Row>*>(list);
+
+        SQL_Row data;
+        for(int i = 0; i < argc; ++i)
+        {
+            data.insert( { col_name[i], argv[i] } );
+        }
+        accounts->push_back(data);
+
+        return 0;
+    };
+
+    std::string acct_type = (type == "*") ? "" : " WHERE type=" + sqlquote(type);
+
+    std::string sql = "SELECT * FROM accounts" + acct_type;
+
+    Accounts accounts;
+    if(execute_statement(sql, callback, &rows))
+    {
+        std::for_each(rows.begin(), rows.end(), [&](const SQL_Row& row)
+        {
+            accounts.emplace_back(row, db_key);
+        } );
+    }
+    return accounts;
+}
+
+Data_Gateway::Accounts SQLite_DB::get_provider_accounts()
+{
+    return get_all_accounts("Provider");
+}
+
+Data_Gateway::Accounts SQLite_DB::get_member_accounts()
+{
+    return get_all_accounts("Member");
+}
+
 Data_Gateway::Service_Directory SQLite_DB::service_directory()
 {
     Service_Directory directory;

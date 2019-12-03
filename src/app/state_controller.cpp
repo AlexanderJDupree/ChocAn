@@ -17,7 +17,11 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <functional>
+<<<<<<< HEAD
 #include <ChocAn/app/application_state.hpp>
+=======
+#include <ChocAn/core/utils/parsers.hpp>
+>>>>>>> master
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
@@ -118,7 +122,11 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return View_Account {chocan->login_manager.session_owner() }; } },
         { "4"   , [&](){ return Find_Account(); } },
-        { "5"   , [&](){ return Add_Transaction{ &chocan->transaction_builder.reset() }; } }
+        { "5"   , [&](){ 
+            chocan->transaction_builder.reset();
+            chocan->transaction_builder.set_provider_acct_field(chocan->login_manager.session_owner());
+            return Add_Transaction{ &chocan->transaction_builder }; } 
+        }
     };
 
     try
@@ -138,10 +146,17 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
 
     const Transition_Table manager_menu
     {
+<<<<<<< HEAD
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
         { "2"   , [&](){ return Create_Account{ &chocan->account_builder.reset()}; } }
+=======
+        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
+        { "1"   , [&](){ return Find_Account(); } },
+        { "5"   , [&](){ return Generate_Report(); } },
+        { "exit", [&](){ return Exit();  } }
+>>>>>>> master
     };
 
     try
@@ -281,11 +296,55 @@ Application_State State_Controller::operator()(Find_Account& state)
 
     if( auto maybe_account = get_account(input))
     {
-        return View_Account { maybe_account.value() };
+        switch (state.next)
+        {
+        case Find_Account::Next::Delete_Account : void();
+        case Find_Account::Next::Update_Account : void();
+        default: return View_Account { maybe_account.value() };
+        }
     }
-    return Find_Account { "Invalid ID" };
+    state.status = "Invalid ID: " + input;
+    return state;
 }
 
+Application_State State_Controller::operator()(Generate_Report& state)
+{
+    // We have enough dates to generate a report
+    if(state.date_range.size() == 2) 
+    { 
+        return View_Summary_Report { 
+            chocan->reporter.gen_summary_report(state.date_range[0], state.date_range[1]) 
+        }; 
+    }
+
+    std::string input;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
+
+    state.error.reset();
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return pop_runtime(); }
+    if(input == "all") 
+    {
+        state.date_range = { DateTime(0), DateTime::get_current_datetime() };
+        return state;
+    }
+
+    try
+    {
+        state.date_range.push_back(Parsers::parse_date(input, state.date_structure, "-"));
+    }
+    catch(const invalid_datetime& err)
+    {
+        state.error.emplace(err);
+    }
+    return state;
+}
+
+<<<<<<< HEAD
 Application_State State_Controller::operator()(const Get_Type& state){
 
     state_viewer->render_state(state);
@@ -328,3 +387,12 @@ Application_State State_Controller::operator()(const Get_Zip& state){
 
     return pop_runtime();    
 }
+=======
+Application_State State_Controller::operator()(View_Summary_Report& state)
+{
+    state_viewer->render_state(state, [&](){
+        input_controller->read_input();
+    }) ;
+    return pop_runtime();
+}
+>>>>>>> master

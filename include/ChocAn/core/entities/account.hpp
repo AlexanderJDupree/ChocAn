@@ -99,7 +99,7 @@ public:
 
     // Two accounts are equal iff they have the same id
     bool operator == (const Account& rhs) const { return _id == rhs._id;   }
-    bool operator != (const Account& rhs) const { return (*this) == rhs; }
+    bool operator != (const Account& rhs) const { return !(*this == rhs); }
 
 private:
 

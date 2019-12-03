@@ -33,9 +33,10 @@ public:
     using Command_Table  = std::map<std::string, std::function<void()>>;
     using Resource_Table = std::map<std::string, std::function<std::string()>>;
 
-    Terminal_State_Viewer( std::string&& view_location  = "views/" 
-                         , std::string&& file_extension = ".txt" 
-                         , std::ostream& out_stream     = std::cout );
+    Terminal_State_Viewer( bool compact_output          = false
+                         , std::ostream& out_stream     = std::cout
+                         , std::string&& view_location  = "views/" 
+                         , std::string&& file_extension = ".txt" );
 
 
     // Re-renders the stored state
@@ -53,6 +54,8 @@ private:
     std::string read_command(std::ifstream& file);
     void execute_command(const std::string& command);
 
+    void clear_screen() const;
+
     // Relative file location where view files are located
     // TODO Update view_location to use absolute paths
     const std::string   view_location; 
@@ -61,6 +64,7 @@ private:
     Command_Table       command_table;
     Resource_Loader     resources;
     Callback            event_callback;
+    bool                compact_output;
 };
 
 #endif // CHOCAN_TERMINAL_STATE_VIEWER_H

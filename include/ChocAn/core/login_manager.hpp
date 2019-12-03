@@ -26,7 +26,6 @@ class Login_Manager
 public:
 
     using Database_Ptr = Data_Gateway::Database_Ptr;
-    using Account_Ptr  = Account::Account_Ptr;
 
     Login_Manager(Database_Ptr db);
 

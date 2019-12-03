@@ -37,6 +37,10 @@ using Year = std::chrono::duration
 using Month = std::chrono::duration
     <int, std::ratio_divide<Year::period, std::ratio<12>>::type>;
 
+using Hours   = std::chrono::hours;
+using Minutes = std::chrono::minutes;
+using Seconds = std::chrono::seconds;
+
 class DateTime : public Serializable<DateTime, std::string, std::string>
 {
 public:
@@ -49,6 +53,9 @@ public:
     DateTime(Year, Day, Month);
     DateTime(const Data_Table& data);
     DateTime(double unix_timestamp);
+    DateTime(Day, Month, Year, Hours, Minutes, Seconds);
+
+    virtual ~DateTime() = default;
 
     Data_Table serialize() const override;
 
@@ -56,9 +63,12 @@ public:
     template <typename clock_t = std::chrono::system_clock>
     static DateTime get_current_datetime();
 
-    const Day&   day() const;
-    const Month& month() const;
-    const Year&  year() const;
+    const Day&     day()     const;
+    const Month&   month()   const;
+    const Year&    year()    const;
+    const Hours&   hour()    const;
+    const Minutes& minutes() const;
+    const Seconds& seconds() const;
 
     static bool is_leap_year(const Year& year);
     int unix_timestamp() const;
@@ -73,10 +83,12 @@ protected:
 
     bool ok() const;
 
-    Day   _day;
-    Month _month;
-    Year  _year;
-
+    Day     _day;
+    Month   _month;
+    Year    _year;
+    Hours   _hour;
+    Minutes _minutes;
+    Seconds _seconds;
 };
 
 
@@ -85,15 +97,18 @@ DateTime DateTime::get_current_datetime()
 {
     using namespace std::chrono;
 
-    auto time_point = time_point_cast<seconds>(clock_t::now());
+    auto time_point = time_point_cast<Seconds>(clock_t::now());
 
     time_t time = system_clock::to_time_t(time_point);
 
     tm utc_time = *gmtime(&time);
 
-    return DateTime( Day   { utc_time.tm_mday }
-                   , Month { utc_time.tm_mon + 1 }
-                   , Year  { utc_time.tm_year + 1900 } );
+    return DateTime( Day     { utc_time.tm_mday }
+                   , Month   { utc_time.tm_mon + 1 }
+                   , Year    { utc_time.tm_year + 1900 } 
+                   , Hours   { utc_time.tm_hour }
+                   , Minutes { utc_time.tm_min  }
+                   , Seconds { utc_time.tm_sec  } );
 }
 
 class invalid_datetime : public chocan_user_exception

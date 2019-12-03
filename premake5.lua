@@ -118,7 +118,7 @@ project "ChocAn-Exe"
     local include = "include/"
 
     files (source .. "main.cpp")
-    includedirs(include)
+    includedirs{ include, "third_party" }
 
 project "Tests"
     kind "ConsoleApp"

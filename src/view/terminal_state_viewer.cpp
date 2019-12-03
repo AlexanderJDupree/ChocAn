@@ -19,9 +19,10 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <iostream>
 #include <ChocAn/view/terminal_state_viewer.hpp>
 
-Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
-                                            , std::string&& file_extension 
-                                            , std::ostream& out_stream )
+Terminal_State_Viewer::Terminal_State_Viewer( bool compact_output
+                                            , std::ostream& out_stream
+                                            , std::string&& view_location
+                                            , std::string&& file_extension )
     : view_location  ( view_location  )
     , file_extension ( file_extension )
     , out_stream     ( out_stream     )
@@ -31,6 +32,7 @@ Terminal_State_Viewer::Terminal_State_Viewer( std::string&& view_location
         , { "prompt",       [&](){ event_callback(); } }
     } )
     , resources ({})
+    , compact_output( compact_output )
     {}
 
 void Terminal_State_Viewer::render_state(const Application_State& state, Callback handler)
@@ -45,6 +47,7 @@ void Terminal_State_Viewer::render_state(const Application_State& state, Callbac
 void Terminal_State_Viewer::update()
 {
     resources.update();
+    if(!compact_output) { clear_screen(); }
     try
     {
         render_view(resources.table.at("state_name"));
@@ -126,4 +129,9 @@ void Terminal_State_Viewer::execute_command(const std::string& command)
         out_stream << "Viewer Command: " << command << ", not recognized\n";
     }
     return;
+}
+
+void Terminal_State_Viewer::clear_screen() const
+{
+    out_stream << std::string(100, '\n');
 }

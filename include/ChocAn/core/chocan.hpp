@@ -20,6 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_CORE_SERVICE_HPP
 #define CHOCAN_CORE_SERVICE_HPP
 
+#include <ChocAn/core/reporter.hpp>
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/id_generator.hpp>
 #include <ChocAn/core/login_manager.hpp>
@@ -37,6 +38,7 @@ public:
     // Service Objects will throw exception if db is null
     ChocAn(Database_Ptr db)
         : db            ( db ) 
+        , reporter      ( db )
         , id_generator  ( db )
         , login_manager ( db )
         , transaction_builder ( db )
@@ -48,6 +50,7 @@ public:
     // TODO wrap service object access behind function calls
     Database_Ptr  db;
 
+    Reporter      reporter;
     ID_Generator  id_generator;
     Login_Manager login_manager;
     Transaction_Builder transaction_builder;

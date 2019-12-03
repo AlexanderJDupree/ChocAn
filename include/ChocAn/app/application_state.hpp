@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <variant>
 #include <ChocAn/core/entities/transaction.hpp>
+#include <ChocAn/core/entities/account_report.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
 #include <ChocAn/core/utils/account_builder.hpp>
 
@@ -57,7 +58,10 @@ public:
 class Find_Account 
 {
 public:
+    // Represents the next state find account will proceed to
+    enum class Next { View_Account, Delete_Account, Update_Account };
     std::string status;
+    Next next = Next::View_Account;
 };
 
 class View_Account
@@ -82,6 +86,20 @@ class Get_City   {};
 class Get_State  {};
 class Get_Zip    {};
 
+class Generate_Report 
+{ 
+public:
+    std::vector<DateTime> date_range;
+    const std::string date_structure = "MM-DD-YYYY";
+    std::optional<chocan_user_exception> error;
+};
+
+class View_Summary_Report
+{
+public:
+    Summary_Report report;
+};
+
 using Application_State = std::variant< Login
                                       , Exit
                                       , Provider_Menu
@@ -98,6 +116,8 @@ using Application_State = std::variant< Login
                                       , Get_City
                                       , Get_State
                                       , Get_Zip
+                                      , Generate_Report
+                                      , View_Summary_Report
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;

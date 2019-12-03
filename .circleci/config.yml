@@ -42,8 +42,14 @@ jobs:
           name: Creating Build Files
           command: './premake5 --cc=gcc gmake'
       - run:
-          name: Build and run
-          command: './build.sh'
+          name: Build and Run Unit Tests
+          command: './build.sh --verbose'
+      - run:
+          name: Run System Tests, Debug
+          command: ./bin/debug/ChocAn_debug -i tests/system_tests.txt --compact-output --in-memory
+      - run:
+          name: Run System Tests, Release
+          command: ./bin/release/ChocAn_release -i tests/system_tests.txt --compact-output --in-memory
       - run:
           name: Upload code coverage
           command: 'bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect reports" '
@@ -61,7 +67,7 @@ jobs:
           command: './premake5 --cc=clang gmake'
       - run:
           name: Build and run
-          command: './build.sh'
+          command: './build.sh --verbose --clang'
 
 workflows:
   version: 2

@@ -177,6 +177,8 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
             , mocks.input_controller
             , Provider_Menu() );
 
+    mocks.chocan->login_manager.login(1234);
+
     SECTION("Provider menu transitions to login on input '0'")
     {
         Application_State expected_state { Login() };
@@ -255,6 +257,11 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
 
+    SECTION("Manager menu transitions to Generate Report input '5'")
+    {
+        mocks.in_stream << "5\n";
+        
+        REQUIRE(std::holds_alternative<Generate_Report>(controller.interact().current_state()));
     }
 }
 
@@ -413,5 +420,34 @@ TEST_CASE("Find Account State behavior", "[find_account], [state_controller]")
         mocks.in_stream << "garbage\n";
 
         REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
+    }
+}
+
+TEST_CASE("Generate Report state behavior", "[generate_report], [state_controller]")
+{
+    mock_dependencies mocks;
+
+    State_Controller controller( mocks.chocan
+                               , mocks.state_viewer
+                               , mocks.input_controller
+                               , Manager_Menu() );
+
+    mocks.chocan->login_manager.login(5678);
+
+    mocks.in_stream << "5\n";
+
+    controller.interact(); // Transition to Generate Report with the manager menu on the runtime stack
+
+    SECTION("Entering exit, exits the application")
+    {
+        mocks.in_stream << "exit\n";
+
+        REQUIRE(std::holds_alternative<Exit>(controller.interact().current_state()));
+    }
+    SECTION("Entering cancel returns to the previous menu")
+    {
+        mocks.in_stream << "cancel\n";
+
+        REQUIRE(std::holds_alternative<Manager_Menu>(controller.interact().current_state()));
     }
 }

@@ -67,12 +67,14 @@ endif
 OBJECTS := \
 	$(OBJDIR)/state_controller_tests.o \
 	$(OBJDIR)/account_builder_tests.o \
+	$(OBJDIR)/account_report_tests.o \
 	$(OBJDIR)/account_tests.o \
 	$(OBJDIR)/address_tests.o \
 	$(OBJDIR)/datetime_tests.o \
 	$(OBJDIR)/id_generator_tests.o \
 	$(OBJDIR)/login_tests.o \
 	$(OBJDIR)/name_tests.o \
+	$(OBJDIR)/parsers_tests.o \
 	$(OBJDIR)/transaction_builder_tests.o \
 	$(OBJDIR)/transaction_tests.o \
 	$(OBJDIR)/sqlite_db_tests.o \
@@ -140,6 +142,7 @@ $(OBJDIR)/state_controller_tests.o: ../tests/app/state_controller_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/account_builder_tests.o: ../tests/core/account_builder_tests.cpp
+$(OBJDIR)/account_report_tests.o: ../tests/core/account_report_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/account_tests.o: ../tests/core/account_tests.cpp
@@ -158,6 +161,9 @@ $(OBJDIR)/login_tests.o: ../tests/core/login_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/name_tests.o: ../tests/core/name_tests.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/parsers_tests.o: ../tests/core/parsers_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/transaction_builder_tests.o: ../tests/core/transaction_builder_tests.cpp

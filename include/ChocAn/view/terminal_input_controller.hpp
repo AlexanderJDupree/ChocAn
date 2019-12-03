@@ -42,6 +42,9 @@ public:
 
         std::getline(in_stream, input);
 
+        if(in_stream.eof())
+          input = "exit";
+
         return input;
     }
 

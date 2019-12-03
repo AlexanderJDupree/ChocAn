@@ -27,11 +27,21 @@ class Transaction : public Serializable<Transaction, std::string, std::string>
 {
 public:
 
+    // Client side Transaction creation
     Transaction( const Account& provider
                , const Account& member
                , const DateTime& service_date
                , const Service& service 
                , const std::string& comments );
+
+    // Database side Transaction de-serialization
+    Transaction( const Account& provider
+               , const Account& member
+               , const Service& service 
+               , const DateTime& service_date
+               , const DateTime& filed_date
+               , const std::string& comments
+               , const Key<Data_Gateway>& );
 
     virtual ~Transaction() = default;
 

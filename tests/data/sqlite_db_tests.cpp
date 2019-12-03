@@ -194,3 +194,68 @@ TEST_CASE("Retrieving the service directory", "[service_directory], [sqlite_db]"
         REQUIRE(no_schema_db.service_directory().empty());
     }
 }
+
+TEST_CASE("Retrieving all Provider Accounts", "[get_provider_accounts], [sqlite_db]")
+{
+    SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
+    SQLite_DB no_schema_db(TEST_DB);
+
+    SECTION("get_provider_accounts from a populated db returns a non-empty list of all provider accounts")
+    {
+        REQUIRE(db.get_provider_accounts().size() > 0);
+    }
+    SECTION("get_provider_accounts from an empty db returns a empty list")
+    {
+        REQUIRE(no_schema_db.get_provider_accounts().empty());
+    }
+}
+
+TEST_CASE("Retrieving Transaction data", "[get_transactions], [sqlite_db]")
+{
+    SQLite_DB db(TEST_DB, CHOCAN_SCHEMA);
+
+    Account member   = db.get_member_account(123123123).value();
+    Account provider = db.get_provider_account(987654321).value();
+    Account manager  = db.get_account(123456789).value();
+
+    SECTION("Retrieving all transactions from a populated DB returns a non-empty list of transactions")
+    {
+        REQUIRE(db.get_transactions(DateTime(0), DateTime::get_current_datetime()).size() > 0);
+    }
+    SECTION("If not transactions meet the date paramters the empty list is returnd")
+    {
+        REQUIRE(db.get_transactions(DateTime(0), DateTime(0)).empty());
+    }
+    SECTION("Providing a provider account will retrieve transactions relevant to that account")
+    {
+        Data_Gateway::Transactions transactions = db.get_transactions( DateTime(0)
+                                                                     , DateTime::get_current_datetime()
+                                                                     , provider );
+        REQUIRE_FALSE(transactions.empty());
+        for (const auto& transaction : transactions)
+        {
+            REQUIRE(transaction.provider() == provider);
+        }
+    }
+    SECTION("Providing a member account will retrieve transactions relevant to that account")
+    {
+        Data_Gateway::Transactions transactions = db.get_transactions( DateTime(0)
+                                                                     , DateTime::get_current_datetime()
+                                                                     , member );
+        REQUIRE_FALSE(transactions.empty());
+        for (const auto& transaction : transactions)
+        {
+            REQUIRE(transaction.member() == member);
+        }
+    }
+    SECTION("Providing a manager account will retrieve all transactions")
+    {
+        Data_Gateway::Transactions all_transactions = db.get_transactions( DateTime(0)
+                                                                         , DateTime::get_current_datetime() );
+
+        Data_Gateway::Transactions transactions = db.get_transactions( DateTime(0)
+                                                                     , DateTime::get_current_datetime()
+                                                                     , manager );
+        REQUIRE(all_transactions.size() == transactions.size());
+    }
+}
