@@ -325,13 +325,6 @@ TEST_CASE("Confirm Transaction State Behavior", "[confirm_transaction], [state_c
 
         REQUIRE(std::holds_alternative<Add_Transaction>(controller.interact().current_state()));
     }
-    SECTION("Confirm transaction does not transition if input cannot be confirmed")
-    {
-        // This input sequence will change if we make changes to the transaction builder
-        mocks.in_stream << "unintelligible\n";
-
-        REQUIRE(std::holds_alternative<Confirm_Transaction>(controller.interact().current_state()));
-    }
 }
 
 TEST_CASE("Exit State Behavior", "[exit], [state_controller]")
