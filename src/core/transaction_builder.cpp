@@ -103,7 +103,7 @@ void Transaction_Builder::set_member_acct_field(const std::string& input)
     }
     catch(const std::bad_optional_access&)
     {
-        error.emplace(chocan_user_exception("No member account associated with ID: " + input, {}));
+        error.emplace(chocan_user_exception("Invalid ID" , { {"Member Account", Invalid_Value { input, "does not belong to a member account" }}}));
         return;
     }
     if (std::get<Member>(member_acct.value().type()).status() == Account_Status::Suspended)
@@ -139,7 +139,7 @@ void Transaction_Builder::set_service_date_field(const std::string& input)
 
         if(date > DateTime::get_current_datetime())
         {
-            error.emplace(invalid_datetime("Service Date cannot be future dated", {}));
+            error.emplace(invalid_datetime("Invalid Datetime", {{"Service Date", Invalid_Value{"", "cannot be future dated"}}}));
             return;
         }
     
@@ -160,7 +160,7 @@ void Transaction_Builder::set_service_field(const std::string& input)
     }
     catch(const std::bad_optional_access&)
     {
-        error.emplace(chocan_user_exception("No service associated with service code: " + input, {}));
+        error.emplace(chocan_user_exception("Invalid Service", {{"Code", Invalid_Value{input, "is not associated with a service"}}}));
     }
 }
 

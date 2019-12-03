@@ -40,21 +40,26 @@ Address::Address( const std::string& street
     // Capitalize state
     for(char& c : _state) { c = std::toupper(c); }
 
-    ( !Validators::length(street, 1, 25) ) 
-        ? errors.push_back("Street address must be less than 25 characters")
-        : void();
-    ( !Validators::length(city, 1, 14) ) 
-        ? errors.push_back("City must be less than 14 character")
-        : void();
-    ( !Validators::length(state, 2, 2) ) 
-        ? errors.push_back("State must be in abbreviated 2 character format")
-        : void();
-    ( US_states.find(_state) == US_states.end() )
-        ? errors.push_back(state + " is not a U.S. state")
-        : void();
-    ( !Validators::length(std::to_string(zip), 5, 5) ) 
-        ? errors.push_back("Zip code must be 5 digits")
-        : void();
+    if( !Validators::length(street, 1, 25) )
+    {
+        errors["Street Address"] = Invalid_Length { street, 1, 25 };
+    }
+    if( !Validators::length(city, 1, 14) )
+    {
+        errors["City"] = Invalid_Length { city, 1, 14 };
+    }
+    if( !Validators::length(state, 2, 2) )
+    {
+        errors["State Length"] =  Invalid_Value { state, "must be in abbreviated 2 character format" };
+    }
+    if( US_states.find(_state) == US_states.end() )
+    {
+        errors["State"] = Invalid_Value { state, "is not a U.S. State (2 character format)"};
+    }
+    if( !Validators::length(std::to_string(zip), 5, 5) ) 
+    {
+        errors["Zip"] = Invalid_Value { std::to_string(zip), "must be 5 digits" };
+    }
     ( !errors.empty() ) 
         ? throw invalid_address("Invalid address values", errors)
         : void();

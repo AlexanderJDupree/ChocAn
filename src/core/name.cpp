@@ -23,16 +23,18 @@ Name::Name(const std::string& first, const std::string& last)
 {
     chocan_user_exception::Info errors;
 
-    ( !Validators::length(first, 1, 25) ) 
-        ? errors.push_back("First name cannot be empty")
-        : void();
-    ( !Validators::length(last, 1, 25) ) 
-        ? errors.push_back("Last name cannot be empty")
-        : void();
-    ( !Validators::length(first + last, 1, 25) ) 
-        ? errors.push_back("Full name must be less than 25 characters")
-        : void();
-
+    if(!Validators::length(first, 1, 25)) 
+    { 
+        errors["First Name"] = Invalid_Length { first, 1, 25 }; 
+    }
+    if(!Validators::length(last, 1, 25)) 
+    { 
+        errors["Last Name"] = Invalid_Length { first, 1, 25 }; 
+    }
+    if(!Validators::length(first + last, 1, 25))
+    {
+        errors["Full Name"] = Invalid_Length { first + last, 1, 25 };
+    }
     ( !errors.empty() ) 
         ? throw invalid_name("Invalid name length", errors)
         : void();

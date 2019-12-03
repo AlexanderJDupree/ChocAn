@@ -83,7 +83,15 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Find_Account& 
     return 
     { 
         { "state_name", "Find Account" },
-        { "status", state.status}
+        { "status", state.status},
+        { "string_prompt", [&](){
+            switch (state.next)
+            {
+            case Find_Account::Next::Delete_Account : return "Enter the ID of the account you wish to delete:";
+            case Find_Account::Next::Update_Account : return "Enter the ID of the account you wish to update:";
+            default: return "Enter the ID of the account you wish to view:";
+            }
+        }() }
     };
 }
 Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& state)
@@ -128,14 +136,35 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Summary_R
 std::string Resource_Loader::render_user_error(const std::optional<chocan_user_exception>& maybe_err) const
 {
     if(!maybe_err) { return ""; }
+    
+    std::string stream = maybe_err.value().what();
+    stream += ":";
 
-    std::stringstream stream;
-    stream << maybe_err.value().what() << "\n";
-    for (const std::string& item : maybe_err.value().info())
+    for (const auto& error : maybe_err.value().info())
     {
-        stream << '\t' << item << '\n';
+        stream += "\n\t" + error.first + ": ";
+        stream += std::visit( overloaded {
+            [](const Invalid_Range& err) 
+            { 
+                return "Must be between " + std::to_string(err.min) + '-' + std::to_string(err.max) 
+                       + ", '"  + std::to_string(err.value) + "' was entered";
+            },
+            [](const Invalid_Length& err)
+            {
+                return "Must be between " + std::to_string(err.min) + '-' + std::to_string(err.max) 
+                       + ", '" + err.value + "' is " + std::to_string(err.value.length()) + " characters";
+            },
+            [](const Invalid_Value& err)
+            {
+                return err.value + ' ' + err.expected;
+            },
+            [](const Incompatible_Values& err)
+            {
+                return err.val1 + " and " + err.val2 + " are incompatible values";
+            }
+        }, error.second);
     }
-    return stream.str();
+    return stream += '\n';
 }
 
 std::string Resource_Loader::render_provider_activity(const Provider_Activity& activity) const
