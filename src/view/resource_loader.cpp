@@ -133,6 +133,28 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Summary_R
     };
 }
 
+Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Service_Directory& state)
+{
+    return
+    {
+        { "state_name", "Service Directory" },
+        { "directory", render_directory(state.db->service_directory()) }
+    };
+}
+
+std::string Resource_Loader::render_directory(const Data_Gateway::Service_Directory& directory)
+{
+    std::string stream;
+    for (const auto& service : directory)
+    {
+        stream += ( '|' + center(service.second.name()) +
+                    '|' + center(service.second.code()) + 
+                    '|' + center('$' + service.second.cost().to_string()) + 
+                    '|' + row_bar(3));
+    }
+    return stream;
+}
+
 std::string Resource_Loader::render_user_error(const std::optional<chocan_user_exception>& maybe_err) const
 {
     if(!maybe_err) { return ""; }

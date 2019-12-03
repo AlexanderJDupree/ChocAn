@@ -293,6 +293,19 @@ TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controlle
 
         REQUIRE(std::holds_alternative<Exit>(controller.interact().current_state()));
     }
+    SECTION("Add transaction transitions to View Service Directory on input 'help'")
+    {
+        mocks.in_stream << "help\n";
+
+        REQUIRE(std::holds_alternative<View_Service_Directory>(controller.interact().current_state()));
+
+        SECTION("View Service Directory transitions back to add transaction after pressing enter")
+        {
+            mocks.in_stream << "\n";
+
+            REQUIRE(std::holds_alternative<Add_Transaction>(controller.interact().current_state()));
+        }
+    }
 }
 
 TEST_CASE("Confirm Transaction State Behavior", "[confirm_transaction], [state_controller]")
