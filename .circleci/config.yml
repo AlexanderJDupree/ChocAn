@@ -19,7 +19,7 @@ _run:
   - install-valgrind: &install-valgrind
       name: Install Valgrind
       command: |
-        sudo apt-get update && apt-get install -y valgrind 
+        sudo apt-get install -y valgrind 
   - install-clang-8: &install-clang-8
       name: Install Clang-8
       command: |
