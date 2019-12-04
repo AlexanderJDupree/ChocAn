@@ -34,9 +34,6 @@ enum class Account_Build_State { Set_Type
                                , Update_Name
                                , Update_Address };
 
-enum class Builder_Mode { Build, Update };
-
-
 class Account_Builder
 {
 public:
@@ -48,10 +45,8 @@ public:
     static const Build_Stack create_account_sequence;
 
     // Defaults to building full create account sequence
-    Account_Builder( Builder_Mode mode = Builder_Mode::Build
-                   , Build_Stack sequence = create_account_sequence )
+    Account_Builder( Build_Stack sequence = create_account_sequence )
         : build_stack ( sequence )
-        , mode ( mode )
     { }
 
     bool buildable() const noexcept
@@ -204,8 +199,6 @@ private:
     std::vector<Account_Build_State> build_stack;
 
     std::vector<std::string> inputs;
-
-    Builder_Mode mode;
 
     std::optional<Name> name;
     std::optional<Address> address;

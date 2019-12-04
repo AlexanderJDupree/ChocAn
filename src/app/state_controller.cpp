@@ -281,13 +281,13 @@ Application_State State_Controller::operator()(Update_Account& state)
             if(input == "name")
             {
                 state.msg.clear();
-                state.builder = Account_Builder( Builder_Mode::Update, Account_Builder::set_name_sequence);
+                state.builder = Account_Builder( Account_Builder::set_name_sequence);
                 state.status = Update_Account::Status::Update_Field;
             }
             else if(input == "address")
             {
                 state.msg.clear();
-                state.builder = Account_Builder( Builder_Mode::Update, Account_Builder::set_address_sequence);
+                state.builder = Account_Builder( Account_Builder::set_address_sequence);
                 state.status = Update_Account::Status::Update_Field;
             }
             else
