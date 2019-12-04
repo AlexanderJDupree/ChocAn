@@ -43,17 +43,7 @@ struct Resource_Loader
     Resource_Table operator()(const View_Summary_Report& state);
     Resource_Table operator()(const Confirm_Transaction& state);
     Resource_Table operator()(const Create_Account& state);
-    Resource_Table operator()(const Find_Account& state);
     Resource_Table operator()(const Add_Transaction& transaction);
-
-    //for getting fields while creating account 
-    Resource_Table operator()(const Get_Type&);
-    Resource_Table operator()(const Get_First&);
-    Resource_Table operator()(const Get_Last&);
-    Resource_Table operator()(const Get_Street&);
-    Resource_Table operator()(const Get_City&);
-    Resource_Table operator()(const Get_State&);
-    Resource_Table operator()(const Get_Zip&);
 
 
     /* String Formatting Methods */

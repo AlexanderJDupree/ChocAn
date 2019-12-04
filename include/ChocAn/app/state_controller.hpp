@@ -62,14 +62,6 @@ public:
     Application_State operator()(View_Summary_Report&);
     Application_State operator()(Confirm_Transaction&);
 
-    Application_State operator()(const Get_Type& state);
-    Application_State operator()(const Get_First& state);
-    Application_State operator()(const Get_Last& state);
-    Application_State operator()(const Get_City& state);
-    Application_State operator()(const Get_Street& state);
-    Application_State operator()(const Get_State& state);
-    Application_State operator()(const Get_Zip& state);
-
 private:
 
     Application_State pop_runtime();

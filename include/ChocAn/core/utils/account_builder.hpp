@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/entities/account.hpp>
 #include <ChocAn/core/utils/validators.hpp>
 #include <optional>
+#include <stack>
 
 struct Fields
 {
@@ -35,24 +36,36 @@ struct Fields
 
 };
 
-enum class Build_State{Type,First,Last,Street,City,State,Zip,Buildable};
+class Type{};
+class First{};
+class Last{};
+class Street{};
+class City{};
+class State{};
+class Zip{};
+class Buildable{};
 
 class Account_Builder
 {
 
 public:
+    
     using Database_Ptr = Data_Gateway::Database_Ptr;
+    using Build_State = std::variant<Type,First,Last,Street,City,State,Zip,Buildable>;
+    using Build_Stack = std::stack<Build_State>;
 
-    Account_Builder(Database_Ptr db) : id_generator(db) {reset();};
+    Account_Builder(Database_Ptr db) : id_generator(db) {};
+    Account_Builder(const Account& account_to_update, const Build_Stack& updates_requested);
 
-    Account build();
-    Account_Builder &reset();
+
+    const Account &build_new_account();
+    Account &update_existing_account(Account& account, Build_Stack updates_needed); 
 
     bool buildable()const;
-    const Build_State& get_state() const;
-    const std::string get_status();
-    void set_field(const std::string &input);
-    std::optional<const chocan_user_exception> get_issues() const;
+    const Build_State& builder_state() const;//relevant instructions/prompt
+    const std::string get_status();//cool status bar
+    void set_field(const std::string &input);//visitor pattern here
+    std::optional<const chocan_user_exception> get_errors() const;
 
 private:
     bool full_name_valid()const;
@@ -70,9 +83,9 @@ private:
 
     ID_Generator id_generator;
     Fields       fields;
-    Build_State  build_state;
+    Build_Stack  build_state;
     
-    std::vector<std::string> issues;
+    chocan_user_exception::Info errors;
     static const std::set<std::string> US_states;
 
 };

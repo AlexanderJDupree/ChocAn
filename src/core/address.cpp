@@ -32,21 +32,23 @@ Address::Address( const std::string& street
     //Grants access to class specific errors messages
     invalid_address error_msg("",{});
 
-    ( street == "" ) 
-        ? errors.push_back("Address requires a street")
-        
-        : void();
-    ( city == "" ) 
-        ? errors.push_back("Address requires a city")
+    if( street == "" ) {
 
-        : void();
-    ( state == "" ) 
-        ? errors.push_back("Address requires a state")
+        errors["Street"] = Invalid_Value { street, "Cannot be empty" };
 
-        : void();
-    ( !zip ) 
-        ? errors.push_back("Address requires a zip code")
-        : void();
+    }
+
+    if( city == "" ) {
+
+        errors["City"] = Invalid_Value { city, "Cannot be empty" };
+    }
+    if( state == "" ) {
+
+        errors["State"] = Invalid_Value { state, "Cannot be empty" };
+    }
+    if( !zip ) 
+        errors["Zip"] = Invalid_Value {std::to_string(zip),"Cannot be empty"};
+
     ( !errors.empty() ) 
         ? throw invalid_address("Invalid address values", errors)
         : void();

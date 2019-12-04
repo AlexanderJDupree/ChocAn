@@ -34,7 +34,7 @@ Account Account_Builder::build()
 {
     if (build_state != Build_State::Buildable)
     {
-        throw invalid_account_build("Attempt made to build prematurely", issues);
+        throw invalid_account_build("Attempt made to build prematurely", errors);
     }
 
     try
@@ -52,7 +52,7 @@ Account Account_Builder::build()
     catch (...)
     {
 
-        throw invalid_account_build("Failed to build account", issues);
+        throw invalid_account_build("Failed to build account", errors);
     }
 }
 
@@ -66,7 +66,7 @@ Account_Builder &Account_Builder::reset()
     fields.state.reset();
     fields.zip.reset();
 
-    issues.clear();
+    errors.clear();
     
     build_state = Build_State::Type;
 
@@ -83,13 +83,13 @@ const Build_State& Account_Builder::get_state() const
     return build_state;   
 }
 
-std::optional<const chocan_user_exception> Account_Builder::get_issues() const
+std::optional<const chocan_user_exception> Account_Builder::get_errors() const
 {
 
-    if (issues.empty())
+    if (errors.empty())
         return std::optional<const invalid_account_build>();
 
-    return invalid_account_build("Issues with account", issues);
+    return invalid_account_build("Issues with account", errors);
 }
 
 void Account_Builder::accept_input(const std::string &input)
@@ -119,7 +119,9 @@ void Account_Builder::set_field(const std::string &input)
 
     if (buildable()) return;
 
-    issues.clear();
+    errors.clear();
+
+    std::visit
 
     accept_input(input);
     
@@ -178,7 +180,7 @@ void Account_Builder::deriveType(const std::string &input)
     
     else if(input == "Provider" || input == "provider") fields.type = "Provider";
 
-    else issues.emplace_back(input + " is not a valid type");
+    else errors["Account Type"] = Invalid_Value {input, "Manager,Provder,Member"};
 
 }
 
@@ -187,11 +189,12 @@ void Account_Builder::deriveFirst(const std::string &input)
 
     if (!Validators::length(input, 1, 24)){
 
-        issues.push_back("First Name must be 1 to 24 characters long");
+        errors["First Name"] = Invalid_Length {input,1,24};
+        
     }
     else if (!full_name_valid())
     {
-        issues.push_back("Full Name must be 1 to 25 characters long");
+        errors["Full Name"] = Invalid_Length {input,2,25};
         fields.first.reset();
         fields.last.reset();
     }
@@ -206,11 +209,11 @@ void Account_Builder::deriveLast(const std::string &input)
 
     if (!Validators::length(input, 1, 24))
     {
-        issues.push_back("Last Name must be 1 to 24 characters long");
+        errors["Last Name"] = Invalid_Length {input,1,24};
     }
     else if (!full_name_valid())
     {
-        issues.push_back("Full Name must be 1 to 25 characters long");
+        errors["Full Name"] = Invalid_Length {input,2,25};
         fields.first.reset();
         fields.last.reset();
     }
@@ -224,7 +227,7 @@ void Account_Builder::deriveStreet(const std::string &input)
 {
     if( !Validators::length(input, 1, 25) ) 
     {
-        issues.push_back("Street address must be less than 25 characters");
+        errors["Street"] = Invalid_Length {input,1,25};
     }
     else
     {
@@ -236,7 +239,7 @@ void Account_Builder::deriveCity(const std::string &input)
 {
     if( !Validators::length(input, 1, 14) ) 
     {
-        issues.push_back("Cities must be less than 14 character");
+        errors["City"] = Invalid_Length {input,1,14};
     }
     else
     {
@@ -254,11 +257,11 @@ void Account_Builder::deriveState(const std::string &input)
     
     if( !Validators::length(temp, 2, 2) ) {
 
-        issues.push_back("State must be in abbreviated 2 character format");
+        errors["State"] = Invalid_Length {input,2,2};
     }
     else if(US_states.find(temp) == US_states.end() )
     {
-        issues.push_back("\"" + input + "\" is not a U.S. state");
+        errors["State"] = Invalid_Value {input,"Us state"};
     }
     else
     {
@@ -272,7 +275,7 @@ void Account_Builder::deriveZip(const std::string &input)
 
     if( !Validators::length(input, 5, 5) ) 
     {
-         issues.push_back("Zip code must be 5 digit number");
+        errors["State"] = Invalid_Length {input,5,5};
     }
     else{
 
@@ -285,7 +288,7 @@ void Account_Builder::deriveZip(const std::string &input)
         catch (...)
         {
 
-            issues.push_back(input + " is not a valid zip");
+            errors["State"] = Incompatible_Values {input,"Number"};
         }
     }
 }

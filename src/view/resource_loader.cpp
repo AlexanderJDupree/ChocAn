@@ -119,75 +119,27 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account
         {"builder.status", state.builder->get_status()},
    
         {"builder.issues", [&]() {
-             if (std::optional<const chocan_user_exception> issues = state.builder->get_issues())
+             if (std::optional<const chocan_user_exception> issues = state.builder->get_errors())
              {
                 return render_user_error(issues.value());
 
              }
              return std::string("");
          }()
-        }
-
+        },
+        { "builder.current_field", [&]() -> std::string
+        {
+            return std::visit( overloaded {
+                [&](const )  { return "Enter First Name:"; },
+                [&](const ){ return "Enter :"; },
+                [&](const ) { return "Enter:"; },
+                [&](const )      { return "Enter:"; },
+                [&](const )     { return "Enter :"; }
+            }, state.builder->builder_state() );
+        }() }
     };
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Type&){
-    
-    return
-    {
-        {"state_name", "Get_Type"}
-    };
-}
-
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_First&){
-    
-    return
-    {
-        {"state_name", "Get_First"}
-    };
-}
-
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Last&){
-    
-    return
-    {
-        {"state_name", "Get_Last"}
-    };
-}
-
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Street&){
-    
-    return
-    {
-        {"state_name", "Get_Street"}
-    };
-}
-
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_City&){
-    
-    return
-    {
-        {"state_name", "Get_City"}
-    };
-}
-
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_State&){
-    
-    return
-    {
-        {"state_name", "Get_State"}
-    };
-}
-
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Get_Zip&){
-    
-    return
-    {
-        {"state_name", "Get_Zip"}
-    };
-}
-
-std::string Resource_Loader::render_user_error(const chocan_user_exception& err)
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Generate_Report& state)
 {
     return 

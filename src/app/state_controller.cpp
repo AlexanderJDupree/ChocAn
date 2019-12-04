@@ -17,11 +17,8 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <functional>
-<<<<<<< HEAD
 #include <ChocAn/app/application_state.hpp>
-=======
 #include <ChocAn/core/utils/parsers.hpp>
->>>>>>> master
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
@@ -146,17 +143,11 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
 
     const Transition_Table manager_menu
     {
-<<<<<<< HEAD
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-        { "2"   , [&](){ return Create_Account{ &chocan->account_builder.reset()}; } }
-=======
-        { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-        { "1"   , [&](){ return Find_Account(); } },
-        { "5"   , [&](){ return Generate_Report(); } },
-        { "exit", [&](){ return Exit();  } }
->>>>>>> master
+        { "2"   , [&](){ return Create_Account{ &chocan->account_builder.build_new_account()}; } },
+        { "5"   , [&](){ return Generate_Report(); } }
     };
 
     try
@@ -214,29 +205,10 @@ Application_State State_Controller::operator()(const Create_Account& state)
 {
     state_viewer->render_state(state);
     
-    const Build_State& state_index = chocan->account_builder.get_state();
-
-    switch(state_index){
-
-        case Build_State::Type:   state_viewer->render_state(Get_Type());
-        break;
-        case Build_State::First:  state_viewer->render_state(Get_First());
-        break;
-        case Build_State::Last:   state_viewer->render_state(Get_Last());
-        break;
-        case Build_State::Street: state_viewer->render_state(Get_Street());
-        break;
-        case Build_State::City:   state_viewer->render_state(Get_City());
-        break;
-        case Build_State::State:  state_viewer->render_state(Get_State());
-        break;
-        case Build_State::Zip:    state_viewer->render_state(Get_Zip());
-        break;
-        default:;
-    }
-   
     std::string input = input_controller->read_input();
     
+    const Build_State& state_index = chocan->account_builder.get_state();
+
     if(input == "exit")   { return Exit(); }
     if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
     
@@ -344,50 +316,6 @@ Application_State State_Controller::operator()(Generate_Report& state)
     return state;
 }
 
-<<<<<<< HEAD
-Application_State State_Controller::operator()(const Get_Type& state){
-
-    state_viewer->render_state(state);
-
-    return pop_runtime();
-}
-Application_State State_Controller::operator()(const Get_First& state){
-
-    state_viewer->render_state(state);
-
-    return pop_runtime();    
-}
-Application_State State_Controller::operator()(const Get_Last& state){
-    
-    state_viewer->render_state(state);
-    
-    return pop_runtime();    
-}
-Application_State State_Controller::operator()(const Get_City& state){
-    
-    state_viewer->render_state(state);
-    
-    return pop_runtime();    
-}
-Application_State State_Controller::operator()(const Get_Street& state){
-    
-    state_viewer->render_state(state);
-    
-    return pop_runtime();    
-}
-Application_State State_Controller::operator()(const Get_State& state){
-    
-    state_viewer->render_state(state);
-
-    return pop_runtime();    
-}
-Application_State State_Controller::operator()(const Get_Zip& state){
-    
-    state_viewer->render_state(state);
-
-    return pop_runtime();    
-}
-=======
 Application_State State_Controller::operator()(View_Summary_Report& state)
 {
     state_viewer->render_state(state, [&](){
@@ -395,4 +323,3 @@ Application_State State_Controller::operator()(View_Summary_Report& state)
     }) ;
     return pop_runtime();
 }
->>>>>>> master

@@ -78,14 +78,6 @@ public:
     Account_Builder* builder; 
 };
 
-class Get_Type   {};
-class Get_First  {};
-class Get_Last   {};
-class Get_Street {};
-class Get_City   {};
-class Get_State  {};
-class Get_Zip    {};
-
 class Generate_Report 
 { 
 public:
@@ -109,13 +101,6 @@ using Application_State = std::variant< Login
                                       , Create_Account
                                       , Find_Account
                                       , View_Account
-                                      , Get_Type
-                                      , Get_First
-                                      , Get_Last
-                                      , Get_Street
-                                      , Get_City
-                                      , Get_State
-                                      , Get_Zip
                                       , Generate_Report
                                       , View_Summary_Report
                                       >;

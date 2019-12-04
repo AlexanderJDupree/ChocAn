@@ -90,8 +90,6 @@ TEST_CASE("Account builds with valid inputs", "[account_builder]")
 
     SECTION("Builds an account with valid input", "[account_builder][use_case][happy_path]")
     {
-        Application_State expected_state{Manager_Menu()};
-
         mocks.in_stream << "member\nfirst\nlast\nstreet\ncity\nor\n97080";
 
         // Controller must eat all the input from the stream
@@ -100,7 +98,7 @@ TEST_CASE("Account builds with valid inputs", "[account_builder]")
             controller.interact();
         }
     
-        REQUIRE(controller.current_state().index() == expected_state.index());
+        REQUIRE(std::holds_alternative<Manager_Menu>(controller.current_state()));
     }
     
 }
