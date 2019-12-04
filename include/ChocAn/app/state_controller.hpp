@@ -61,6 +61,7 @@ public:
     Application_State operator()(Generate_Report&);
     Application_State operator()(View_Summary_Report&);
     Application_State operator()(Confirm_Transaction&);
+    Application_State operator()(View_Service_Directory&);
 
 private:
 

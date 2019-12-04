@@ -61,7 +61,7 @@ public:
     const Account build_new_account(const ID_Generator& id_generator);
     void initiate_new_build_process();
 
-    void request_updates_to_account(const Build_Stack& updates_needed); 
+    void request_update_to_account(Build_State update_needed); 
     void apply_updates_to_account(Account& account); 
 
     void set_field(const std::string &input);

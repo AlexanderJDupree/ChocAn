@@ -44,9 +44,9 @@ Account_Builder& Account_Builder::reset()
     return *this;
 }
 
-void Account_Builder::request_updates_to_account(const Build_Stack& updates_needed)
+void Account_Builder::request_update_to_account(Build_State update_needed)
 {
-    build_state = updates_needed;
+    build_state.push(update_needed);
 }
 
 void Account_Builder::apply_updates_to_account(Account& account)

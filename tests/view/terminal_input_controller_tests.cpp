@@ -65,4 +65,28 @@ TEST_CASE("Retrieving input from the Input Controller", "[input_controller]")
 
         REQUIRE(input_controller.read_input() == "exit");
     }
+    SECTION("Confirmation of input returns true when input is yes")
+    {
+        test_stream << "Yes\n";
+
+        Terminal_Input_Controller input_controller(test_stream);
+
+        REQUIRE(input_controller.confirm_input().value());
+    }
+    SECTION("Confirmation of input returns false when input is no")
+    {
+        test_stream << "No\n";
+
+        Terminal_Input_Controller input_controller(test_stream);
+
+        REQUIRE_FALSE(input_controller.confirm_input().value());
+    }
+    SECTION("Confirmation of input returns nothing when input isn't intelligible")
+    {
+        test_stream << "garbage\n";
+
+        Terminal_Input_Controller input_controller(test_stream);
+
+        REQUIRE_FALSE(input_controller.confirm_input());
+    }
 }

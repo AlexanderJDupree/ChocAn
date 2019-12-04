@@ -3,6 +3,7 @@
 
 <footer>
 ( Entering 'cancel' will cancel the transaction )
+( Entering 'help' will display the Service Directory )
 
 <@builder.user_error>
 <@builder.current_field> <prompt>

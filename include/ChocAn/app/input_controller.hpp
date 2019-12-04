@@ -37,6 +37,8 @@ public:
     // Read a single line of input
     virtual std::string read_input() const = 0;
 
+    virtual std::optional<bool> confirm_input() const = 0;
+
     // Read a line of input for each field in fields
     virtual Form_Data read_form(const Fields& fields, Field_Callback prompt) const = 0;
 };

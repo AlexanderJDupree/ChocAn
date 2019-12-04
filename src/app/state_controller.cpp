@@ -170,7 +170,7 @@ Application_State State_Controller::operator()(Add_Transaction& state)
 
     if(input == "exit")   { return Exit(); }
     if(input == "cancel") { return Provider_Menu {{ "Transaction Request Cancelled!" }}; }
-    // TODO allow user to print out provider directory
+    if(input == "help")   { runtime.push(state); return View_Service_Directory { chocan->db }; }
 
     chocan->transaction_builder.set_current_field(input);
 
@@ -180,25 +180,35 @@ Application_State State_Controller::operator()(Add_Transaction& state)
            : Application_State   { state };
 }
 
+Application_State State_Controller::operator()(View_Service_Directory& state)
+{
+    state_viewer->render_state(state, [&](){
+        input_controller->read_input();
+    }) ;
+    return pop_runtime();
+}
+
 Application_State State_Controller::operator()(Confirm_Transaction& state)
 {
-    std::string input;
-    state_viewer->render_state(state, [&]()
+    std::optional<bool> confirmed;
+    while(!confirmed)
     {
-        input = input_controller->read_input();
-    } ) ;
+        state_viewer->render_state(state, [&]()
+        {
+            confirmed = input_controller->confirm_input();
+        } ) ;
+    }
 
-    if (input == "y" || input == "yes"  || input == "Y" || input == "YES" )
+    if (confirmed.value())
     {
         unsigned id = chocan->db->add_transaction(state.transaction);
         std::string processed = "Transaction Processed, ID: " + std::to_string(id);
         return Provider_Menu {{ processed }};
     }
-    if (input == "n" || input == "no" || input == "N" || input == "NO")
+    else
     {
         return Add_Transaction { &chocan->transaction_builder.reset() };
     }
-    return state;
 }
 
 Application_State State_Controller::operator()(const Create_Account& state)

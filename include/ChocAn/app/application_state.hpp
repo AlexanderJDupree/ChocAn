@@ -21,6 +21,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_APPLICATION_STATE_H
 
 #include <variant>
+#include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/transaction.hpp>
 #include <ChocAn/core/entities/account_report.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
@@ -92,6 +93,12 @@ public:
     Summary_Report report;
 };
 
+class View_Service_Directory
+{
+public:
+    Data_Gateway::Database_Ptr db;
+};
+
 using Application_State = std::variant< Login
                                       , Exit
                                       , Provider_Menu
@@ -103,6 +110,7 @@ using Application_State = std::variant< Login
                                       , View_Account
                                       , Generate_Report
                                       , View_Summary_Report
+                                      , View_Service_Directory
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;
