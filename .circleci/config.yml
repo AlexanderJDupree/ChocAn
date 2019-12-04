@@ -16,6 +16,11 @@ _run:
       command: |
         sudo apt install g++-7 -y
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60
+  - install-valgrind: &install-valgrind
+      name: Install Valgrind
+      command: |
+        sudo apt install valgrind -y
+        sudo yum install valgrind
   - install-clang-8: &install-clang-8
       name: Install Clang-8
       command: |
