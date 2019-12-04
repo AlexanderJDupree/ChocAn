@@ -204,35 +204,41 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 Application_State State_Controller::operator()(const Create_Account& state)
 {
     std::string input;
-
-    state.builder->initiate_new_build_process();
-
+    std::shared_ptr<Account> temp_account;
+    
     do{
-
-        state_viewer->render_state(state);
-
-        input = input_controller->read_input();
+        state.builder->initiate_new_build_process();
         
-        if(input == "exit")   { return Exit(); }
-        if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-        
-        chocan->account_builder.set_field(input);
+        do{
+            
+            state_viewer->render_state(state);
 
-    }while(!state.builder->buildable());
+            input = input_controller->read_input();
 
-    try{
+            if(input == "exit")   { return Exit(); }
+            if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
 
-        Account temp(chocan->account_builder.build_new_account(chocan->db));
+            state.builder->set_field(input);
 
-        state_viewer->render_state(View_Account{temp,View_Account::Status::Confirm_Creation});
+        }while(!state.builder->buildable());
 
-        chocan->db->create_account(temp);
+        try{
+    
+            temp_account = std::make_unique<Account>(chocan->account_builder.build_new_account(chocan->db));
 
-    }catch(const chocan_user_exception& err){
+            state_viewer->render_state(View_Account{*temp_account,View_Account::Status::Confirm_Creation});
 
-        //TODO anything would be better than this as far as error reporting goes.
-        return Application_State{ state };
-    }
+            input = input_controller->read_input();
+
+        }catch(const chocan_user_exception& err){
+
+            //TODO literally anything would be better than this as far as error reporting goes.
+            return Application_State{ state };
+        }
+    
+    }while(input == "N" || input == "n");
+    
+    chocan->db->create_account(*temp_account);
 
     return Manager_Menu{{"Account Successfully Created"}};
 }

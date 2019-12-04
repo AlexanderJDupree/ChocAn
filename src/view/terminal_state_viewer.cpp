@@ -29,11 +29,13 @@ Terminal_State_Viewer::Terminal_State_Viewer( bool compact_output
     , command_table  ( {
           { "header",       [&](){ return render_view("header");  } }
         , { "footer",       [&](){ return render_view("footer");  } }
+        , { "clear_screen", [&](){ return clear_screen();  } }
         , { "prompt",       [&](){ event_callback(); } }
     } )
     , resources ({})
     , compact_output( compact_output )
     {}
+
 
 void Terminal_State_Viewer::render_state(const Application_State& state, Callback handler)
 {
@@ -131,7 +133,7 @@ void Terminal_State_Viewer::execute_command(const std::string& command)
     return;
 }
 
-void Terminal_State_Viewer::clear_screen() const
+std::string Terminal_State_Viewer::clear_screen() const
 {
-    out_stream << std::string(100, '\n');
+    return std::string(100, '\n');
 }

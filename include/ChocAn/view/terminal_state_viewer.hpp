@@ -54,7 +54,7 @@ private:
     std::string read_command(std::ifstream& file);
     void execute_command(const std::string& command);
 
-    void clear_screen() const;
+    std::string clear_screen() const;
 
     // Relative file location where view files are located
     // TODO Update view_location to use absolute paths
