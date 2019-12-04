@@ -25,14 +25,24 @@ const std::set<std::string> Account_Builder::US_states
 , "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC"
 , "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" };
 
+Account_Builder::Account_Builder(Database_Ptr db) 
+: id_generator(db), build_state({Zip(),State(),City(),Street(),Last(),First(),Type()})
+{
+    
+}
+Account_Builder::Account_Builder(Account& account_to_update, const Build_Stack& updates_requested) 
+: account(account_to_update), build_state(updates_requested)
+{
+
+}
 bool Account_Builder::buildable() const
 {
-    return build_state == Build_State::Buildable;
+    return std::holds_alternative<Buildable>(build_state.top());
 }
 
-Account Account_Builder::build()
+const Account& Account_Builder::build_new_account()
 {
-    if (build_state != Build_State::Buildable)
+    if (!buildable())
     {
         throw invalid_account_build("Attempt made to build prematurely", errors);
     }
@@ -47,7 +57,7 @@ Account Account_Builder::build()
                         ,fields.state.value()
                         ,fields.zip.value()), 
                 yield_account_type(), 
-                id_generator);
+                id_generator.value());
     }
     catch (...)
     {
@@ -56,31 +66,14 @@ Account Account_Builder::build()
     }
 }
 
-Account_Builder &Account_Builder::reset()
-{
-    fields.type.reset();
-    fields.first.reset();
-    fields.last.reset();
-    fields.street.reset();
-    fields.city.reset();
-    fields.state.reset();
-    fields.zip.reset();
-
-    errors.clear();
-    
-    build_state = Build_State::Type;
-
-    return *this;
-}
-
 const std::string Account_Builder::get_status()
 {
     return "here goes the status";
 }
 
-const Build_State& Account_Builder::get_state() const
+const Account_Builder::Build_State& Account_Builder::builder_state() const
 {
-    return build_state;   
+    return build_state.top();   
 }
 
 std::optional<const chocan_user_exception> Account_Builder::get_errors() const
@@ -94,24 +87,7 @@ std::optional<const chocan_user_exception> Account_Builder::get_errors() const
 
 void Account_Builder::accept_input(const std::string &input)
 {
-    switch(build_state){
-            
-            case Build_State::Type: deriveType(input);
-            break;
-            case Build_State::First: deriveFirst(input);
-            break;
-            case Build_State::Last: deriveLast(input);
-            break;
-            case Build_State::Street: deriveStreet(input);
-            break;
-            case Build_State::City: deriveCity(input);
-            break;
-            case Build_State::State: deriveState(input);
-            break;
-            case Build_State::Zip: deriveZip(input);
-            break;
-            default:;
-    }
+    //visitor pattern here
 }
 
 void Account_Builder::set_field(const std::string &input)
@@ -121,50 +97,7 @@ void Account_Builder::set_field(const std::string &input)
 
     errors.clear();
 
-    std::visit
-
     accept_input(input);
-    
-    transition_state();
-}
-
-void Account_Builder::transition_state(){
-
-    if (buildable())
-        return;
-
-    if (!fields.type)
-    {
-        build_state = Build_State::Type;
-    }
-    else if (!fields.first)
-    {
-        build_state = Build_State::First;
-    }
-    else if (!fields.last)
-    {
-        build_state = Build_State::Last;
-    }
-    else if (!fields.street)
-    {
-        build_state = Build_State::Street;
-    }
-    else if (!fields.city)
-    {
-        build_state = Build_State::City;
-    }
-    else if (!fields.state)
-    {
-        build_state = Build_State::State;
-    }
-    else if (!fields.zip)
-    {
-        build_state = Build_State::Zip;
-    }
-    else
-    {
-        build_state = Build_State::Buildable;
-    }
 }
 
 bool Account_Builder::full_name_valid()const

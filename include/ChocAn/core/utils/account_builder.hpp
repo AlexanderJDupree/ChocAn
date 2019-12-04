@@ -54,8 +54,8 @@ public:
     using Build_State = std::variant<Type,First,Last,Street,City,State,Zip,Buildable>;
     using Build_Stack = std::stack<Build_State>;
 
-    Account_Builder(Database_Ptr db) : id_generator(db) {};
-    Account_Builder(const Account& account_to_update, const Build_Stack& updates_requested);
+    Account_Builder(Database_Ptr db);
+    Account_Builder(Account& account_to_update, const Build_Stack& updates_requested);
 
 
     const Account &build_new_account();
@@ -81,7 +81,8 @@ private:
     
     Account::Account_Type yield_account_type()const;
 
-    ID_Generator id_generator;
+    std::optional<Account&> account;
+    std::optional<ID_Generator> id_generator;
     Fields       fields;
     Build_Stack  build_state;
     
