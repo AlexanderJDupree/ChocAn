@@ -86,6 +86,12 @@ public:
     Summary_Report report;
 };
 
+class Delete_Account
+{
+public:
+    Account account;
+};
+
 class View_Service_Directory
 {
 public:
@@ -102,6 +108,7 @@ using Application_State = std::variant< Login
                                       , View_Account
                                       , Generate_Report
                                       , View_Summary_Report
+                                      , Delete_Account
                                       , View_Service_Directory
                                       >;
 

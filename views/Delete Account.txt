@@ -1,0 +1,11 @@
+<header>
+
+ChocAn ID: <@account.id> | <@account.type>
+
+Name: <@account.name.last>, <@account.name.first>
+
+Address: <@account.address.street>
+         <@account.address.city> <@account.address.state>, <@account.address.zip>
+
+Press 'Y' to confirm account deletion:
+<prompt>

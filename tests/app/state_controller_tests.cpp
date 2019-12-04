@@ -249,6 +249,14 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
         
         REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
+    SECTION("Manager menu transitions to Delete Account on input '4'")
+    {
+        Application_State expected_state {Manager_Menu() };
+
+        mocks.in_stream << "2\n";
+
+        REQUIRE(controller.interact().current_state().index() == expected_state.index());
+    }
     SECTION("Manager menu transitions to Generate Report input '5'")
     {
         mocks.in_stream << "5\n";
