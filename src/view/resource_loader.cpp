@@ -118,10 +118,10 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account
     
         {"builder.status", state.builder->get_status()},
    
-        {"builder.issues", [&]() {
-             if (std::optional<const chocan_user_exception> issues = state.builder->get_errors())
+        {"builder.errors", [&]() {
+             if (std::optional<const chocan_user_exception> errors = state.builder->get_errors())
              {
-                return render_user_error(issues.value());
+                return render_user_error(errors.value());
 
              }
              return std::string("");
@@ -130,11 +130,13 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account
         { "builder.current_field", [&]() -> std::string
         {
             return std::visit( overloaded {
-                [&](const )  { return "Enter First Name:"; },
-                [&](const ){ return "Enter :"; },
-                [&](const ) { return "Enter:"; },
-                [&](const )      { return "Enter:"; },
-                [&](const )     { return "Enter :"; }
+                [&](const Account_Builder::Type)  { return "Enter Account Type: "; },
+                [&](const Account_Builder::First) { return "Enter First Name: "; },
+                [&](const Account_Builder::Last)  { return "Enter Last Name: "; },
+                [&](const Account_Builder::Street){ return "Enter Street: "; },
+                [&](const Account_Builder::City)  { return "Enter City: "; },
+                [&](const Account_Builder::State) { return "Enter State: "; },
+                [&](const Account_Builder::Zip)   { return "Enter Zip: "; }
             }, state.builder->builder_state() );
         }() }
     };

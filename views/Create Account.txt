@@ -3,4 +3,5 @@
 <footer>
 ( Entering 'cancel' will abort the account build )
 <@builder.status>
-<@builder.issues>
+<@builder.errors>
+<@builder.current_field> <prompt>

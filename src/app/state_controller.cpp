@@ -146,7 +146,7 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-        { "2"   , [&](){ return Create_Account{ &chocan->account_builder.build_new_account()}; } },
+        { "2"   , [&](){ return Create_Account{ &chocan->account_builder.reset()}; } },
         { "5"   , [&](){ return Generate_Report(); } }
     };
 
@@ -203,37 +203,39 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 
 Application_State State_Controller::operator()(const Create_Account& state)
 {
-    state_viewer->render_state(state);
-    
-    std::string input = input_controller->read_input();
-    
-    const Build_State& state_index = chocan->account_builder.get_state();
+    std::string input;
 
-    if(input == "exit")   { return Exit(); }
-    if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
-    
-    chocan->account_builder.set_field(input);
-    
-    if(chocan->account_builder.buildable()){
+    state.builder->initiate_new_build_process();
 
-        try{
- 
-            Account temp(chocan->account_builder.build());
+    do{
 
-            state_viewer->render_state(View_Account{temp,View_Account::Status::Confirm_Creation});
+        state_viewer->render_state(state);
 
-            chocan->db->create_account(temp);
+        input = input_controller->read_input();
+        if(input == "exit")   { return Exit(); }
+        if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
         
-        }catch(const chocan_user_exception& err){
+        chocan->account_builder.set_field(input);
 
-            return Application_State{ state };
-        }
-        
-        return Manager_Menu{{"Account Successfully Created"}};
+    }while(!state.builder->buildable());
+
+    try{
+
+        Account temp(chocan->account_builder.build_new_account(chocan->db));
+
+        state_viewer->render_state(View_Account{temp,View_Account::Status::Confirm_Creation});
+
+        chocan->db->create_account(temp);
+
+    }catch(const chocan_user_exception& err){
+
+        //TODO anything would be better than this as far as error reporting goes.
+        return Application_State{ state };
     }
 
-    return Application_State{ state };
+    return Manager_Menu{{"Account Successfully Created"}};
 }
+
 Application_State State_Controller::operator()(View_Account& state)
 {
     std::string input;

@@ -42,7 +42,6 @@ public:
         , id_generator  ( db )
         , login_manager ( db )
         , transaction_builder ( db )
-        , account_builder ( db )
         { }
     
     /* Service Objects */

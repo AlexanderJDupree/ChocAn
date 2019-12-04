@@ -57,26 +57,9 @@ class mock_dependencies
 
 
 //will need to be updated if changes are made to the address, name, or account_builder error messages
-struct mock_errors{
-
-        const std::string get_state_error(const std::string st)const{ return "State must be in abbreviated 2 character format\n \"" 
-                                                          + st + " \" is not a U.S. state";};
-        const std::string get_street_error()   const{return "Street address must be less than 25 characters";};
-        const std::string get_city_error()     const{return "Cities must be less than 14 character";};
-        const std::string get_zip_error()      const{return "Zip code must be 5 digit number";};
-        const std::string get_invalid_address()const{ return "Invalid address values";};
-        const std::string get_invalid_first()  const{ return "First Name must be 1 to 24 characters long";};
-        const std::string get_invalid_last()   const{return "Last Name must be 1 to 24 characters long";};
-        const std::string get_invalid_full()   const{return "Full Name must be 1 to 25 characters long";};
-        const std::string get_invalid_name()   const{ return "Invalid name length";};
-        const std::string get_build_premature()const{ return "Attempt made to build prematurely";};
-        const std::string get_build_failed()   const{return "Failed to build account";};
-        const std::string get_build_()         const{return "Issues with account";};
-};
 
 Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
-mock_errors error;
- 
+
 TEST_CASE("Account builds with valid inputs", "[account_builder]")
 {
 

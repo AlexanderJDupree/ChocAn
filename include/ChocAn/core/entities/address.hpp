@@ -38,6 +38,11 @@ public:
     const std::string& state()  const { return _state;  }
     unsigned zip() const { return _zip;    }
 
+    void update_street(const std::string& new_street) {_street = new_street;}
+    void update_city(const std::string& new_city)     {_city = new_city;}
+    void update_state(const std::string& new_state)   {_state = new_state;}
+    void update_zip(unsigned new_zip)                 {_zip = new_zip;}
+
 private:
 
     std::string _street;
