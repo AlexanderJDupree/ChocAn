@@ -212,6 +212,7 @@ Application_State State_Controller::operator()(const Create_Account& state)
         state_viewer->render_state(state);
 
         input = input_controller->read_input();
+        
         if(input == "exit")   { return Exit(); }
         if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
         

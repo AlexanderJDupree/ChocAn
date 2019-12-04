@@ -60,28 +60,25 @@ class mock_dependencies
 
 Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
 
-TEST_CASE("Account builds with valid inputs", "[account_builder]")
+TEST_CASE("Account builder builds new account", "[account_builder]")
 {
-
     mock_dependencies mocks;
-
-    State_Controller controller( mocks.chocan
-            , mocks.state_viewer
-            , mocks.input_controller
-            , Create_Account{ &mocks.chocan->account_builder.reset() } );
-    
+    Account_Builder account_builder;
 
     SECTION("Builds an account with valid input", "[account_builder][use_case][happy_path]")
     {
-        mocks.in_stream << "member\nfirst\nlast\nstreet\ncity\nor\n97080";
 
-        // Controller must eat all the input from the stream
-        for (int i = 0; i < 7; ++i)
+        account_builder.initiate_new_build_process();
+
+        std::string input = "member";
+
+        SECTION("Builder accepts valid account type and makes transition")
         {
-            controller.interact();
+            REQUIRE(std::holds_alternative<Account_Builder::Type>(account_builder.builder_state()));
+            account_builder.set_field(input);
+            REQUIRE(std::holds_alternative<Account_Builder::First>(account_builder.builder_state()));
         }
     
-        REQUIRE(std::holds_alternative<Manager_Menu>(controller.current_state()));
     }
     
 }
