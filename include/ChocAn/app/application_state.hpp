@@ -24,6 +24,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/entities/transaction.hpp>
 #include <ChocAn/core/entities/account_report.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
+#include <ChocAn/core/utils/account_builder.hpp>
 
 class Menu 
 {
@@ -57,7 +58,10 @@ public:
 class Find_Account 
 {
 public:
+    // Represents the next state find account will proceed to
+    enum class Next { View_Account, Delete_Account, Update_Account };
     std::string status;
+    Next next = Next::View_Account;
 };
 
 class View_Account
@@ -66,6 +70,12 @@ public:
     enum class Status { Wait, Confirm_Creation, Confirm_Deletion };
     Account account;
     Status status = Status::Wait;
+};
+
+class Create_Account
+{
+public:
+    Account_Builder* builder; 
 };
 
 class Generate_Report 
@@ -94,6 +104,7 @@ using Application_State = std::variant< Login
                                       , Manager_Menu
                                       , Add_Transaction
                                       , Confirm_Transaction
+                                      , Create_Account
                                       , Find_Account
                                       , View_Account
                                       , Generate_Report

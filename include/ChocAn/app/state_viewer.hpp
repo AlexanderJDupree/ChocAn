@@ -22,6 +22,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <memory>
 #include <functional>
 #include <ChocAn/app/application_state.hpp>
+#include <ChocAn/core/utils/account_builder.hpp>
 
 class State_Viewer
 {
@@ -36,6 +37,7 @@ public:
     virtual void update() = 0;
     // Store callback handler, render current state
     virtual void render_state(const Application_State& state, Callback event = [](){}) = 0;
+
 };
 
 #endif // CHOCAN_STATE_VIEWER_H

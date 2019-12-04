@@ -40,14 +40,6 @@ TEST_CASE("Constructors for address classes", "[constructors], [address]")
                                   , valid_zip )
                                   , invalid_address );
     }
-    SECTION("Street address too long")
-    {
-        REQUIRE_THROWS_AS( Address( std::string ('c', 26)
-                                  , valid_city
-                                  , valid_state
-                                  , valid_zip )
-                                  , invalid_address );
-    }
     SECTION("Missing city")
     {
         REQUIRE_THROWS_AS( Address( valid_street
@@ -56,15 +48,7 @@ TEST_CASE("Constructors for address classes", "[constructors], [address]")
                                   , valid_zip )
                                   , invalid_address );
     }
-    SECTION("City is too long")
-    {
-        REQUIRE_THROWS_AS( Address( valid_street
-                                  , std::string ('c', 15)
-                                  , valid_state
-                                  , valid_zip )
-                                  , invalid_address );
-    }
-    SECTION("State must be in abbreviated 2 character format")
+    SECTION("Missing State")
     {
         REQUIRE_THROWS_AS( Address( valid_street
                                   , valid_city
@@ -72,28 +56,12 @@ TEST_CASE("Constructors for address classes", "[constructors], [address]")
                                   , valid_zip )
                                   , invalid_address );
     }
-    SECTION("State must be in abbreviated 2 character format")
-    {
-        REQUIRE_THROWS_AS( Address( valid_street
-                                  , valid_city
-                                  , "ABC"
-                                  , valid_zip )
-                                  , invalid_address );
-    }
-    SECTION("Zip code must be 5 digits")
+    SECTION("Missing Zip")
     {
         REQUIRE_THROWS_AS( Address( valid_street
                                   , valid_city
                                   , valid_state
-                                  , 1234 )
-                                  , invalid_address );
-    }
-    SECTION("Zip code must be 5 digits")
-    {
-        REQUIRE_THROWS_AS( Address( valid_street
-                                  , valid_city
-                                  , valid_state
-                                  , 123456 )
+                                  , 0 )
                                   , invalid_address );
     }
 }
@@ -139,7 +107,7 @@ TEST_CASE("Invalid Address Exception", "[address], [exceptions]")
             info = err.info();
             REQUIRE(std::string(err.what()) == "Invalid address values");
         }
-        REQUIRE(info.size() == 5);
+        REQUIRE(info.size() == 4);
     }
 
 }

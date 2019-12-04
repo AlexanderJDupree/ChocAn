@@ -25,6 +25,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/id_generator.hpp>
 #include <ChocAn/core/login_manager.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
+#include <ChocAn/core/utils/account_builder.hpp>
 
 class ChocAn
 {
@@ -52,6 +53,7 @@ public:
     ID_Generator  id_generator;
     Login_Manager login_manager;
     Transaction_Builder transaction_builder;
+    Account_Builder account_builder;
 
 protected:
 

@@ -17,6 +17,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <functional>
+#include <ChocAn/app/application_state.hpp>
 #include <ChocAn/core/utils/parsers.hpp>
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
@@ -142,10 +143,11 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
 
     const Transition_Table manager_menu
     {
+        { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-        { "5"   , [&](){ return Generate_Report(); } },
-        { "exit", [&](){ return Exit();  } }
+        { "2"   , [&](){ return Create_Account{ &chocan->account_builder.reset()}; } },
+        { "5"   , [&](){ return Generate_Report(); } }
     };
 
     try
@@ -199,11 +201,56 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
     return state;
 }
 
+Application_State State_Controller::operator()(const Create_Account& state)
+{
+    std::string input;
+    std::shared_ptr<Account> temp_account;
+    
+    do{
+        state.builder->initiate_new_build_process();
+        
+        do{
+            
+            state_viewer->render_state(state);
+
+            input = input_controller->read_input();
+
+            if(input == "exit")   { return Exit(); }
+            if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
+
+            state.builder->set_field(input);
+
+        }while(!state.builder->buildable());
+
+        try{
+    
+            temp_account = std::make_unique<Account>(chocan->account_builder.build_new_account(chocan->db));
+
+            state_viewer->render_state(View_Account{*temp_account,View_Account::Status::Confirm_Creation});
+
+            input = input_controller->read_input();
+
+        }catch(const chocan_user_exception& err){
+
+            //TODO literally anything would be better than this as far as error reporting goes.
+            return Manager_Menu{{"Somthing went wrong when creating your account" }};
+        }
+    
+    }while(input == "N" || input == "n");
+    
+    chocan->db->create_account(*temp_account);
+
+    return Manager_Menu{{"Account Successfully Created"}};
+}
+
 Application_State State_Controller::operator()(View_Account& state)
 {
+    std::string input;
+
     state_viewer->render_state(state, [&](){
-        input_controller->read_input();
+        input = input_controller->read_input();
     }) ;
+    
     return pop_runtime();
 }
 
@@ -230,9 +277,15 @@ Application_State State_Controller::operator()(Find_Account& state)
 
     if( auto maybe_account = get_account(input))
     {
-        return View_Account { maybe_account.value() };
+        switch (state.next)
+        {
+        case Find_Account::Next::Delete_Account : void();
+        case Find_Account::Next::Update_Account : void();
+        default: return View_Account { maybe_account.value() };
+        }
     }
-    return Find_Account { "Invalid ID" };
+    state.status = "Invalid ID: " + input;
+    return state;
 }
 
 Application_State State_Controller::operator()(Generate_Report& state)

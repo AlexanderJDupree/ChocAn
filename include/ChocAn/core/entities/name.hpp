@@ -33,6 +33,9 @@ public:
     const std::string& first() const { return _first; }
     const std::string& last() const  { return _last;  }
 
+    void update_first(const std::string& new_first) {_first = new_first;}
+    void update_last(const std::string& new_last) {_last = new_last;}
+
 private:
 
     std::string _first;
@@ -45,5 +48,6 @@ struct invalid_name : public chocan_user_exception
         : chocan_user_exception(err, info)
         { }
 };
+
 
 #endif // CHOCAN_NAME_HPP

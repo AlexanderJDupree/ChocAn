@@ -4,11 +4,11 @@ File: state_controller_tests.cpp
 Brief: Unit tests for State Controller machine
 
 Authors: Daniel Mendez 
-         Alex Salazar
-         Arman Alauizadeh 
-         Alexander DuPree
-         Kyle Zalewski
-         Dominique Moore
+Alex Salazar
+Arman Alauizadeh 
+Alexander DuPree
+Kyle Zalewski
+Dominique Moore
 
 https://github.com/AlexanderJDupree/ChocAn
 
@@ -27,13 +27,12 @@ https://github.com/AlexanderJDupree/ChocAn
 class mock_state_viewer : public State_Viewer
 {
 public:
-
     void update()
     {
         handler();
     }
 
-    void render_state(const Application_State&, Callback event)
+    void render_state(const Application_State &, Callback event)
     {
         handler = event;
 
@@ -49,7 +48,7 @@ public:
     std::stringstream in_stream;
 
     Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
-    ChocAn::ChocAn_Ptr chocan     = std::make_unique<ChocAn>(db);
+    ChocAn::ChocAn_Ptr chocan = std::make_unique<ChocAn>(db);
 
     State_Viewer::State_Viewer_Ptr state_viewer = std::make_unique<mock_state_viewer>();
 
@@ -62,9 +61,7 @@ TEST_CASE("State Controller construction", "[constructors], [state_controller]")
 
     SECTION("State Controller requires a constructed Chocan instance, state viewer, and input controller")
     {
-        REQUIRE_NOTHROW(State_Controller( mocks.chocan
-                                        , mocks.state_viewer
-                                        , mocks.input_controller ));
+        REQUIRE_NOTHROW(State_Controller(mocks.chocan, mocks.state_viewer, mocks.input_controller));
     }
     SECTION("State Controller throws if any dependency is null")
     {
@@ -75,26 +72,18 @@ TEST_CASE("State Controller construction", "[constructors], [state_controller]")
 TEST_CASE("Shared State Behavior", "[state], [state_controller]")
 {
     mock_dependencies mocks;
-    std::vector<Application_State> states { Login()
-                                          , Exit()
-                                          , Provider_Menu()
-                                          , Manager_Menu()
-                                          };
+    std::vector<Application_State> states{Login(), Exit(), Provider_Menu(), Manager_Menu()};
 
     SECTION("State Controller does not transition state on invalid input")
     {
-        std::for_each(states.begin(), states.end(), 
-        [&](const Application_State& state)
-        {
-            mocks.in_stream << "Bad Input\n";
+        std::for_each(states.begin(), states.end(),
+                      [&](const Application_State &state) {
+                          mocks.in_stream << "Bad Input\n";
 
-            State_Controller controller( mocks.chocan
-                                       , mocks.state_viewer
-                                       , mocks.input_controller
-                                       , state);
+                          State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, state);
 
-            REQUIRE(controller.interact().current_state().index() == state.index());
-        } );
+                          REQUIRE(controller.interact().current_state().index() == state.index());
+                      });
     }
 }
 
@@ -102,45 +91,24 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
 {
     mock_dependencies mocks;
 
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Login() );
-    
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Login());
+
     /* Ensure A manager and provider account exist in mock db */
-    Account provider( Name("John", "Doe")
-                    , Address( "1234 Cool St."
-                             , "Portland"
-                             , "OR"
-                             , 97030 )
-                    , Provider()
-                    , mocks.chocan->id_generator );
+    Account provider(Name("John", "Doe"), Address("1234 Cool St.", "Portland", "OR", 97030), Provider(), mocks.chocan->id_generator);
 
     mocks.chocan->db->create_account(provider);
 
-    Account manager( Name("Jane", "Doe")
-                    , Address( "1234 Meh St."
-                             , "Portland"
-                             , "OR"
-                             , 97030 )
-                    , Manager()
-                    , mocks.chocan->id_generator );
+    Account manager(Name("Jane", "Doe"), Address("1234 Meh St.", "Portland", "OR", 97030), Manager(), mocks.chocan->id_generator);
 
     mocks.chocan->db->create_account(manager);
 
-    Account member( Name("Bob", "Doe")
-                    , Address( "1234 lame St."
-                             , "Portland"
-                             , "OR"
-                             , 97030 )
-                    , Member()
-                    , mocks.chocan->id_generator );
+    Account member(Name("Bob", "Doe"), Address("1234 lame St.", "Portland", "OR", 97030), Member(), mocks.chocan->id_generator);
 
     mocks.chocan->db->create_account(member);
 
     SECTION("Login transitions to provider menu when given a valid provider ID")
     {
-        Application_State expected_state { Provider_Menu() };
+        Application_State expected_state{Provider_Menu()};
 
         mocks.in_stream << provider.id() << '\n';
 
@@ -148,7 +116,7 @@ TEST_CASE("Login state behavior", "[login], [state_controller]")
     }
     SECTION("Login transitions to manager menu when given a valid manager ID")
     {
-        Application_State expected_state { Manager_Menu() };
+        Application_State expected_state{Manager_Menu()};
 
         mocks.in_stream << manager.id() << '\n';
 
@@ -172,16 +140,13 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 {
     mock_dependencies mocks;
 
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Provider_Menu() );
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Provider_Menu());
 
     mocks.chocan->login_manager.login(1234);
 
     SECTION("Provider menu transitions to login on input '0'")
     {
-        Application_State expected_state { Login() };
+        Application_State expected_state{Login()};
 
         mocks.in_stream << "0\n";
 
@@ -189,7 +154,7 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
     }
     SECTION("Provider menu transitions to Add Transaction on input '5'")
     {
-        Application_State expected_state { Add_Transaction { &mocks.chocan->transaction_builder } };
+        Application_State expected_state{Add_Transaction{&mocks.chocan->transaction_builder}};
 
         mocks.in_stream << "5\n";
 
@@ -197,7 +162,7 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
     }
     SECTION("Provider menu transition to exit on input 'exit'")
     {
-        Application_State expected_state { Exit() };
+        Application_State expected_state{Exit()};
 
         mocks.in_stream << "exit\n";
 
@@ -206,15 +171,15 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
     SECTION("Provider menu transitions to Find Account on input '4'")
     {
         mocks.in_stream << "4\n";
-        
+
         REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
     SECTION("Provider menu transitions to View Account on input '1'")
     {
-      mocks.chocan->login_manager.login(1234);
-      mocks.in_stream << "1\n";
+        mocks.chocan->login_manager.login(1234);
+        mocks.in_stream << "1\n";
 
-      REQUIRE(std::holds_alternative<View_Account>(controller.interact().current_state()));
+        REQUIRE(std::holds_alternative<View_Account>(controller.interact().current_state()));
     }
 }
 
@@ -222,14 +187,11 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 {
     mock_dependencies mocks;
 
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Manager_Menu() );
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Manager_Menu());
 
     SECTION("Manager menu transitions to login on input '0'")
     {
-        Application_State expected_state { Login() };
+        Application_State expected_state{Login()};
 
         mocks.in_stream << "0\n";
 
@@ -237,7 +199,7 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
     }
     SECTION("Manager menu transition to exit on input 'exit'")
     {
-        Application_State expected_state { Exit() };
+        Application_State expected_state{Exit()};
 
         mocks.in_stream << "exit\n";
 
@@ -246,13 +208,21 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
     SECTION("Manager  menu transitions to Find Account on input '1'")
     {
         mocks.in_stream << "1\n";
-        
+
         REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
+    }
+    SECTION("Manager menu transitions to create account on input '2'")
+    {
+
+        mocks.in_stream << "2\n";
+
+        REQUIRE(std::holds_alternative<Create_Account>(controller.interact().current_state()));
+
     }
     SECTION("Manager menu transitions to Generate Report input '5'")
     {
         mocks.in_stream << "5\n";
-        
+
         REQUIRE(std::holds_alternative<Generate_Report>(controller.interact().current_state()));
     }
 }
@@ -261,10 +231,7 @@ TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controlle
 {
     mock_dependencies mocks;
 
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Add_Transaction{ &mocks.chocan->transaction_builder.reset() } );
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Add_Transaction{&mocks.chocan->transaction_builder.reset()});
 
     SECTION("Add transaction transitions to Confrim Transaction when a transaction is built")
     {
@@ -304,13 +271,9 @@ TEST_CASE("Confirm Transaction State Behavior", "[confirm_transaction], [state_c
         mocks.db->get_member_account("6789").value(),
         DateTime(Month(9), Day(1), Year(2019)),
         mocks.db->lookup_service("123456").value(),
-        "comments"
-    );
+        "comments");
 
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Confirm_Transaction { transaction } );
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Confirm_Transaction{transaction});
 
     SECTION("Confrim transaction transitions to provider menu when transaction is confirmed")
     {
@@ -340,10 +303,7 @@ TEST_CASE("Exit State Behavior", "[exit], [state_controller]")
 
     mocks.chocan->login_manager.login(1234);
 
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Exit() );
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Exit());
 
     SECTION("end_state() returns true when controller is at exit state")
     {
@@ -356,14 +316,32 @@ TEST_CASE("Exit State Behavior", "[exit], [state_controller]")
         REQUIRE_FALSE(mocks.chocan->login_manager.logged_in());
     }
 }
+
+TEST_CASE("Create_Account State Behavior", "[create_account], [state_controller]")
+{
+    mock_dependencies mocks;
+
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Create_Account{&mocks.chocan->account_builder.reset()});
+
+    SECTION("Create account does not transition if account it rejected by user")
+    {
+    }
+
+    SECTION("Create account transitions to manager menu once account is built")
+    {
+    }
+    SECTION("Create account transitions back to manager menu on input 'cancel'")
+    {
+    }
+    SECTION("Create account transitions to Exit on input 'exit'")
+    {
+    }
+}
 TEST_CASE("Find Account State behavior", "[find_account], [state_controller]")
 {
     mock_dependencies mocks;
 
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Provider_Menu() );
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Provider_Menu());
 
     mocks.chocan->login_manager.login(1234);
 
@@ -395,10 +373,7 @@ TEST_CASE("Generate Report state behavior", "[generate_report], [state_controlle
 {
     mock_dependencies mocks;
 
-    State_Controller controller( mocks.chocan
-                               , mocks.state_viewer
-                               , mocks.input_controller
-                               , Manager_Menu() );
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Manager_Menu());
 
     mocks.chocan->login_manager.login(5678);
 

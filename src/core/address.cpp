@@ -17,14 +17,6 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <ChocAn/core/entities/address.hpp>
-#include <ChocAn/core/utils/validators.hpp>
-
-const std::set<std::string> Address::US_states
-{ "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA"
-, "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD"
-, "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ"
-, "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC"
-, "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" };
 
 Address::Address( const std::string& street 
                 , const std::string& city 
@@ -37,24 +29,26 @@ Address::Address( const std::string& street
 {
     chocan_user_exception::Info errors;
 
-    // Capitalize state
-    for(char& c : _state) { c = std::toupper(c); }
+    //Grants access to class specific errors messages
+    invalid_address error_msg("",{});
 
-    ( !Validators::length(street, 1, 25) ) 
-        ? errors.push_back("Street address must be less than 25 characters")
-        : void();
-    ( !Validators::length(city, 1, 14) ) 
-        ? errors.push_back("City must be less than 14 character")
-        : void();
-    ( !Validators::length(state, 2, 2) ) 
-        ? errors.push_back("State must be in abbreviated 2 character format")
-        : void();
-    ( US_states.find(_state) == US_states.end() )
-        ? errors.push_back(state + " is not a U.S. state")
-        : void();
-    ( !Validators::length(std::to_string(zip), 5, 5) ) 
-        ? errors.push_back("Zip code must be 5 digits")
-        : void();
+    if( street == "" ) {
+
+        errors["Street"] = Invalid_Value { street, "Cannot be empty" };
+
+    }
+
+    if( city == "" ) {
+
+        errors["City"] = Invalid_Value { city, "Cannot be empty" };
+    }
+    if( state == "" ) {
+
+        errors["State"] = Invalid_Value { state, "Cannot be empty" };
+    }
+    if( !zip ) 
+        errors["Zip"] = Invalid_Value {std::to_string(zip),"Cannot be empty"};
+
     ( !errors.empty() ) 
         ? throw invalid_address("Invalid address values", errors)
         : void();

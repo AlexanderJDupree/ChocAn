@@ -1,6 +1,6 @@
 /* 
  
-File: name.hpp
+File: name.cpp
 
 Brief: Implementation for Name utility class
 
@@ -16,26 +16,22 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <ChocAn/core/entities/name.hpp>
-#include <ChocAn/core/utils/validators.hpp>
 
 Name::Name(const std::string& first, const std::string& last)
         : _first ( first ) , _last ( last ) 
 {
     chocan_user_exception::Info errors;
 
-    ( !Validators::length(first, 1, 25) ) 
-        ? errors.push_back("First name cannot be empty")
-        : void();
-    ( !Validators::length(last, 1, 25) ) 
-        ? errors.push_back("Last name cannot be empty")
-        : void();
-    ( !Validators::length(first + last, 1, 25) ) 
-        ? errors.push_back("Full name must be less than 25 characters")
-        : void();
+    invalid_name name_errors("", {});
 
-    ( !errors.empty() ) 
-        ? throw invalid_name("Invalid name length", errors)
-        : void();
+    if (first == "")
+        errors["First Name"] = Invalid_Value { first, "Cannot be empty" }; 
+
+    if (last == "")
+        errors["Last Name"] = Invalid_Value { last, "Cannot be empty" }; 
+
+    if (!errors.empty())
+        throw invalid_name("Invalid name length", errors);
 }
 
 bool Name::operator==(const Name& rhs) const
