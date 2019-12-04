@@ -29,7 +29,7 @@ Name::Name(const std::string& first, const std::string& last)
     }
     if(!Validators::length(last, 1, 25)) 
     { 
-        errors["Last Name"] = Invalid_Length { first, 1, 25 }; 
+        errors["Last Name"] = Invalid_Length { last, 1, 25 }; 
     }
     if(!Validators::length(first + last, 1, 25))
     {

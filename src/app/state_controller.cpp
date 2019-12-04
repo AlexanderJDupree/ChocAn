@@ -115,9 +115,17 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
     const Transition_Table provider_menu
     {
         { "exit", [&](){ return Exit();  } },
+
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
+
         { "1"   , [&](){ return View_Account {chocan->login_manager.session_owner() }; } },
+
+        { "2"   , [&](){ return Update_Account { chocan->login_manager.session_owner() };  } },
+
+        { "3"   , [&](){ return Find_Account { Find_Account::Next::Update_Account };  } },
+
         { "4"   , [&](){ return Find_Account(); } },
+
         { "5"   , [&](){ 
             chocan->transaction_builder.reset();
             chocan->transaction_builder.set_provider_acct_field(chocan->login_manager.session_owner());
@@ -144,7 +152,8 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
     {
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-        { "5"   , [&](){ return Generate_Report(); } },
+        { "2"   , [&](){ return Create_Account(); } },
+        { "4"   , [&](){ return Generate_Report(); } },
         { "exit", [&](){ return Exit();  } }
     };
 
@@ -243,11 +252,129 @@ Application_State State_Controller::operator()(Find_Account& state)
         switch (state.next)
         {
         case Find_Account::Next::Delete_Account : void();
-        case Find_Account::Next::Update_Account : void();
+        case Find_Account::Next::Update_Account : return Update_Account{ maybe_account.value() };
         default: return View_Account { maybe_account.value() };
         }
     }
     state.status = "Invalid ID: " + input;
+    return state;
+}
+
+Application_State State_Controller::operator()(Update_Account& state)
+{
+    std::string input;
+    if (state.status != Update_Account::Status::Confirm)
+    {
+        state_viewer->render_state(state, [&]()
+        {
+            input = input_controller->read_input();
+        } ) ;
+    }
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return pop_runtime(); }
+
+    std::map<Update_Account::Status, std::function<Application_State()>> transition_table
+    {
+        { Update_Account::Status::Choose, [&]() -> Application_State
+        {
+            if(input == "name")
+            {
+                state.msg.clear();
+                state.builder = Account_Builder( Builder_Mode::Update, Account_Builder::set_name_sequence);
+                state.status = Update_Account::Status::Update_Field;
+            }
+            else if(input == "address")
+            {
+                state.msg.clear();
+                state.builder = Account_Builder( Builder_Mode::Update, Account_Builder::set_address_sequence);
+                state.status = Update_Account::Status::Update_Field;
+            }
+            else
+            {
+                state.msg = "Unrecognized Input";
+            }
+            return state;
+        } },
+
+        { Update_Account::Status::Update_Field, [&]() -> Application_State
+        {
+            state.builder.set_current_field(input);
+
+            if(state.builder.can_update())
+            {
+                state.builder.update(state.account);
+                state.status = Update_Account::Status::Confirm;
+            }
+            return state;
+        } },
+        { Update_Account::Status::Confirm, [&]() -> Application_State
+        {
+            View_Account view_state { state.account, View_Account::Status::Confirm_Update };
+
+            std::optional<bool> confirmed;
+            while(!confirmed)
+            {
+                state_viewer->render_state(view_state, [&]()
+                {
+                    confirmed = input_controller->confirm_input();
+                } ) ;
+            }
+            if(confirmed.value()) 
+            { 
+                state.msg.clear();
+                state.status = Update_Account::Status::Choose;
+                return state;
+            }
+            else
+            {
+                chocan->db->update_account(state.account);
+                return Provider_Menu {{ "Account Updated!" }}; 
+            }
+        } },
+    };
+
+    return transition_table.at(state.status)();
+}
+
+Application_State State_Controller::operator()(Create_Account& state)
+{
+    std::string input;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return Manager_Menu {{ "Account creation cancelled!" }}; }
+
+    state.builder.set_current_field(input);
+
+    if(state.builder.buildable())
+    {
+        Account account = state.builder.build(chocan->id_generator).value();
+
+        View_Account view_state { account, View_Account::Status::Confirm_Creation };
+
+        std::optional<bool> confirmed;
+        while(!confirmed)
+        {
+            state_viewer->render_state(view_state, [&]()
+            {
+                confirmed = input_controller->confirm_input();
+            } ) ;
+        }
+        if(confirmed.value()) 
+        { 
+            chocan->db->create_account(account);
+            return Manager_Menu {{ "Account Created! ID: " + std::to_string(account.id()) }};
+        }
+        else
+        {
+            // Start Over
+            return Create_Account();
+        }
+    }
     return state;
 }
 

@@ -39,6 +39,8 @@ struct Resource_Loader
     Resource_Table operator()(const Find_Account& state);
     Resource_Table operator()(const Provider_Menu& menu);
     Resource_Table operator()(const Manager_Menu& menu);
+    Resource_Table operator()(const Update_Account& state);
+    Resource_Table operator()(const Create_Account& state);
     Resource_Table operator()(const Generate_Report& state);
     Resource_Table operator()(const View_Summary_Report& state);
     Resource_Table operator()(const Confirm_Transaction& state);
@@ -52,6 +54,8 @@ struct Resource_Loader
 
     /* Special Rendering Methods */
     std::string render_user_error(const std::optional<chocan_user_exception>& maybe_err) const;
+
+    std::string render_builder_prompt(Account_Build_State state) const;
 
     std::string render_provider_activity(const Provider_Activity& activity) const;
 

@@ -30,8 +30,8 @@ public:
     // Key is the field name, Error Type holds specific error info
     using Info = std::map<std::string, Error_Type>;
 
-    const Info error_info;
-    const std::string error_msg;
+    Info error_info;
+    std::string error_msg;
 
     chocan_user_exception(std::string err, Info info)
         : error_info ( std::move(info) )

@@ -103,6 +103,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
         {
             case View_Account::Status::Confirm_Creation : return "Is this correct? (Y/N):";
             case View_Account::Status::Confirm_Deletion : return "Delete account? (Y/N):";
+            case View_Account::Status::Confirm_Update   : return "Update another field? (Y/N):";
             default : return "Press 'Enter' to continue:";
         };
     }() });
@@ -140,6 +141,60 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Service_D
         { "state_name", "Service Directory" },
         { "directory", render_directory(state.db->service_directory()) }
     };
+}
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account& state)
+{
+    return
+    {
+        { "state_name", "Create Account" },
+        { "builder.user_error", render_user_error(state.builder.get_last_error()) },
+        { "current_field", render_builder_prompt(state.builder.status()) }
+    };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Update_Account& state)
+{
+    return
+    {
+        { "state_name", "Update Account" },
+        { "builder.user_error", [&]() -> std::string
+        {
+            if(state.status == Update_Account::Status::Choose)
+            {
+                return state.msg;
+            }
+            else
+            {
+                return render_user_error(state.builder.get_last_error());
+            }
+        }() },
+        { "state_prompt", [&]() -> std::string 
+        {
+            switch (state.status)
+            {
+            case Update_Account::Status::Choose : 
+                return "Enter 'name' or 'address' to update the corresponding field:";
+            case Update_Account::Status::Update_Field : 
+                return render_builder_prompt(state.builder.status());
+            default: return "";
+            }
+        }() }
+    };
+}
+
+std::string Resource_Loader::render_builder_prompt(Account_Build_State state) const
+{
+    switch (state)
+    {
+    case Account_Build_State::Set_Type   : return "Enter Account type ( Member, Provider, Manager ):";
+    case Account_Build_State::Set_FName  : return "Enter First Name:";
+    case Account_Build_State::Set_LName  : return "Enter Last Name:";
+    case Account_Build_State::Set_Street : return "Enter Street:";
+    case Account_Build_State::Set_City   : return "Enter City:";
+    case Account_Build_State::Set_State  : return "Enter State:";
+    case Account_Build_State::Set_Zip    : return "Enter Zip:";
+    default : return "";
+    }
 }
 
 std::string Resource_Loader::render_directory(const Data_Gateway::Service_Directory& directory)

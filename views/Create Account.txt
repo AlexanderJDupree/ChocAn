@@ -1,0 +1,8 @@
+
+<header>
+
+<footer>
+( Entering 'cancel' will cancel the transaction )
+
+<@builder.user_error>
+<@current_field> <prompt>

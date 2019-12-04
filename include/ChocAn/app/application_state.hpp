@@ -23,6 +23,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <variant>
 #include <ChocAn/core/data_gateway.hpp>
 #include <ChocAn/core/entities/transaction.hpp>
+#include <ChocAn/core/utils/account_builder.hpp>
 #include <ChocAn/core/entities/account_report.hpp>
 #include <ChocAn/core/utils/transaction_builder.hpp>
 
@@ -60,14 +61,14 @@ class Find_Account
 public:
     // Represents the next state find account will proceed to
     enum class Next { View_Account, Delete_Account, Update_Account };
-    std::string status;
     Next next = Next::View_Account;
+    std::string status = {};
 };
 
 class View_Account
 {
 public:
-    enum class Status { Wait, Confirm_Creation, Confirm_Deletion };
+    enum class Status { Wait, Confirm_Creation, Confirm_Deletion, Confirm_Update };
     Account account;
     Status status = Status::Wait;
 };
@@ -92,6 +93,23 @@ public:
     Data_Gateway::Database_Ptr db;
 };
 
+class Update_Account
+{
+public:
+    enum class Status { Choose, Update_Field, Confirm };
+
+    Account account;
+    std::string msg = {};
+    Account_Builder builder = {};
+    Status status = Status::Choose;
+};
+
+class Create_Account
+{
+public:
+    Account_Builder builder;
+};
+
 using Application_State = std::variant< Login
                                       , Exit
                                       , Provider_Menu
@@ -103,6 +121,8 @@ using Application_State = std::variant< Login
                                       , Generate_Report
                                       , View_Summary_Report
                                       , View_Service_Directory
+                                      , Update_Account
+                                      , Create_Account
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;

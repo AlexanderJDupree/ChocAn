@@ -249,9 +249,9 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
         
         REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
-    SECTION("Manager menu transitions to Generate Report input '5'")
+    SECTION("Manager menu transitions to Generate Report input '4'")
     {
-        mocks.in_stream << "5\n";
+        mocks.in_stream << "4\n";
         
         REQUIRE(std::holds_alternative<Generate_Report>(controller.interact().current_state()));
     }
