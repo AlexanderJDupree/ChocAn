@@ -233,7 +233,7 @@ Application_State State_Controller::operator()(const Create_Account& state)
         }catch(const chocan_user_exception& err){
 
             //TODO literally anything would be better than this as far as error reporting goes.
-            return Application_State{ state };
+            return Manager_Menu{{"Somthing went wrong when creating your account" }};
         }
     
     }while(input == "N" || input == "n");

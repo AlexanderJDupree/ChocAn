@@ -96,7 +96,18 @@ const Account Account_Builder::build_new_account(const ID_Generator& id_generato
 
 const std::string Account_Builder::get_status()
 {
-    return "here goes the status";
+    std::string status("");
+    std::string progress_bar("[-------]");
+/*
+    if(fields.first)   
+    if(fields.last)
+    if(fields.street)
+    if(fields.city)
+    if(fields.state)
+    if(fields.zip)
+*/
+
+    return status;
 }
 
 Account_Builder::Build_State Account_Builder::builder_state() const
