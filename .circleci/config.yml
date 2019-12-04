@@ -51,6 +51,9 @@ jobs:
           name: Run System Tests, Release
           command: ./bin/release/ChocAn_release -i tests/system_tests.txt --compact-output --in-memory
       - run:
+          name: Run System Tests, Leaks
+          command: valgrind --leak-check=yes ./bin/debug/ChocAn_debug -i test/system_test.txt --compact-output --in-memory
+      - run:
           name: Upload code coverage
           command: 'bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect reports" '
   clang:
