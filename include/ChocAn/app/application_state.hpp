@@ -82,6 +82,12 @@ public:
     Summary_Report report;
 };
 
+class Update_Account
+{
+public: 
+    Account account;
+}
+
 using Application_State = std::variant< Login
                                       , Exit
                                       , Provider_Menu
@@ -92,6 +98,7 @@ using Application_State = std::variant< Login
                                       , View_Account
                                       , Generate_Report
                                       , View_Summary_Report
+                                      , Update_Account
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;

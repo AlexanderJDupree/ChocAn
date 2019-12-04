@@ -279,3 +279,115 @@ Application_State State_Controller::operator()(View_Summary_Report& state)
     }) ;
     return pop_runtime();
 }
+Application_State State_Controller::operator()(Update_Record& state)
+{
+    int keepUpdating = 1;
+    int updater = 0;
+  /* 1 for first, 2 for last, 3 for street, 4 for city, 5 for state, 6 for zip*/
+    do{
+
+    state_viewer->render_state(Update_Account_Fields);
+    updater = input_controller->read_input();
+    while(updater != 1 or updater != 2 or updater != 3 or updater != 4 or updater !=5 or updater != 6)
+    {
+        state_viewer->render_state(Incorrect_Update_Choice);
+        updater = input_controller->read_input();
+    }
+    //insert Dan function calls
+    switch(updater)
+    {
+        case 1: 
+            Account_Builder::request_updates_to_account((First()));
+            break;
+
+        case 2:  
+            Account_Builder::request_updates_to_account((Last()));
+            break;
+
+        case 3:
+            Account_Builder::request_updates_to_account((street()));
+            break;
+
+        case 4: 
+            Account_Builder::request_updates_to_account((city()));
+            break;
+
+        case 5:
+            Account_Builder::request_updates_to_account((state()));
+            break;
+
+        case 6: 
+            Account_Builder::request_updates_to_account((zip()));
+            break;
+    }
+
+    
+    state_viewer->render_state(Continue_Updating);
+    keepUpdating = input_controller->read_input();
+    while(keepUpdating != 0 or keepUpdating != 1)
+      {
+        state_viewer->render_state(Invalid_Update_Continuation);
+        nameChange = input_controller->read_input();
+     }
+    }while(keepUpdating = 1);
+    
+   /* if(nameChange == "Y")
+    {
+        ++changeFlag;
+
+        std::fname;
+        std::lname;
+
+        state_viewer->render_state(Get_First);
+        fname = input_controller->read_input();
+
+        state_viewer->render_state(Get_Last);
+        lname = input_controller->read_input();
+
+        try
+        {
+            account.name() = Name{fname, lname};
+        }
+        catch(const std::invalid_name)
+        {
+            return (Update_Record {{"Invalid name detected."}})
+        }
+    }
+
+    state_viewer->render_state(Change_Address);
+    std::addressChange;
+    addressChange = input_controller->read_input();
+    while(addressChange != "Y" or addressChange != "N")
+    {
+        state_viewer->render_state(Edit_Address);
+        addressChange = input_controller->read_input();
+    }
+
+    if(addressChange == "Y")
+    {
+        ++changeFlag;
+        std::street;
+        std::city;
+        std::state;
+        std::zip;
+
+        state_viewer->render_state(Get_Address);
+        street = input_controller->read_input();
+        city = input_controller->read_input();
+        state = input_controller->read_input();
+        zip = input_controller->read_input();
+
+        try
+        {
+            account.address() = Address{street, city, state, zip};
+        }
+        catch(const std::invalid_address)
+        {
+            return (Update_Record {{"Invalid address detected."}});
+        }
+
+    }*/
+    
+    return pop_runtime();
+
+}
