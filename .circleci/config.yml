@@ -19,7 +19,7 @@ _run:
   - install-valgrind: &install-valgrind
       name: Install Valgrind
       command: |
-        sudo apt install valgrind -y
+        sudo apt-get install valgrind -y
   - install-clang-8: &install-clang-8
       name: Install Clang-8
       command: |
@@ -42,6 +42,7 @@ jobs:
       - run: *update-repository-toolchain
       - run: *install-gcc-7
       - run: *premake
+      - run: *install-valgrind
       - run:
           name: Creating Build Files
           command: './premake5 --cc=gcc gmake'
