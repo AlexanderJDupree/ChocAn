@@ -64,20 +64,66 @@ TEST_CASE("Account builder builds new account", "[account_builder]")
 {
     mock_dependencies mocks;
     Account_Builder account_builder;
+    std::string input;
 
     SECTION("Builds an account with valid input", "[account_builder][use_case][happy_path]")
     {
-
         account_builder.initiate_new_build_process();
-
-        std::string input = "member";
-
-        SECTION("Builder accepts valid account type and makes transition")
+        SECTION("Builder initiates to Type state when initiate_new_build_process() is called","[account_builder][use_case][happy_path]")
         {
             REQUIRE(std::holds_alternative<Account_Builder::Type>(account_builder.builder_state()));
-            account_builder.set_field(input);
+        }
+
+        input = "member";
+        account_builder.set_field(input);
+        SECTION("Builder transition to First state upon valid account type input","[account_builder][use_case][happy_path]")
+        {
             REQUIRE(std::holds_alternative<Account_Builder::First>(account_builder.builder_state()));
         }
+        
+        input = "first";
+        account_builder.set_field(input);
+        SECTION("Builder transition to Last state upon valid first name input","[account_builder][use_case][happy_path]")
+        {
+            REQUIRE(std::holds_alternative<Account_Builder::Last>(account_builder.builder_state()));
+        }
+        
+        input = "last";
+        account_builder.set_field(input);
+        SECTION("Builder transition to Street state upon valid last name input","[account_builder][use_case][happy_path]")
+        {
+            REQUIRE(std::holds_alternative<Account_Builder::Street>(account_builder.builder_state()));
+        }
+        
+        input = "street";
+        account_builder.set_field(input);
+        SECTION("Builder transition to City state upon valid street input","[account_builder][use_case][happy_path]")
+        {
+            REQUIRE(std::holds_alternative<Account_Builder::City>(account_builder.builder_state()));
+        }
+    
+        input = "city";
+        account_builder.set_field(input);
+        SECTION("Builder transition to State state upon valid city input","[account_builder][use_case][happy_path]")
+        {
+            REQUIRE(std::holds_alternative<Account_Builder::State>(account_builder.builder_state()));
+        }
+        
+        input = "OR";
+        account_builder.set_field(input);
+        SECTION("Builder transition to Zip state upon valid state input","[account_builder][use_case][happy_path]")
+        {
+            REQUIRE(std::holds_alternative<Account_Builder::Zip>(account_builder.builder_state()));
+        }
+    
+        input = "97080";
+        account_builder.set_field(input);
+        SECTION("Builder is in a buildable state after recieving valid zip input","[account_builder][use_case][happy_path]")
+        {
+            REQUIRE(account_builder.buildable());
+        }
+        
+        REQUIRE_NOTHROW(Account(account_builder.build_new_account(db)));
     
     }
     
