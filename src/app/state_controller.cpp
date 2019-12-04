@@ -168,7 +168,7 @@ Application_State State_Controller::operator()(Add_Transaction& state)
 
     if(input == "exit")   { return Exit(); }
     if(input == "cancel") { return Provider_Menu {{ "Transaction Request Cancelled!" }}; }
-    // TODO allow user to print out provider directory
+    if(input == "help")   { runtime.push(state); return View_Service_Directory { chocan->db }; }
 
     chocan->transaction_builder.set_current_field(input);
 
@@ -176,6 +176,14 @@ Application_State State_Controller::operator()(Add_Transaction& state)
     return (chocan->transaction_builder.buildable()) 
            ? Confirm_Transaction { chocan->transaction_builder.build() }
            : Application_State   { state };
+}
+
+Application_State State_Controller::operator()(View_Service_Directory& state)
+{
+    state_viewer->render_state(state, [&](){
+        input_controller->read_input();
+    }) ;
+    return pop_runtime();
 }
 
 Application_State State_Controller::operator()(Confirm_Transaction& state)

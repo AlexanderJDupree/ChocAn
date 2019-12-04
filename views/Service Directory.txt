@@ -1,0 +1,8 @@
+<header>
+
++--------------------+--------------------+--------------------+
+|   Service Name     |    Service Code    |    Service Cost    |
++--------------------+--------------------+--------------------+
+<@directory>
+
+Press 'Enter' to continue: <prompt>

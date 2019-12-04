@@ -15,6 +15,8 @@ yes
 987654321
 123412345
 11-23-2019
+help
+at the view service directory
 123123
 Added second transaction
 y
