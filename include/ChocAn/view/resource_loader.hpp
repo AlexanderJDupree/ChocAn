@@ -36,6 +36,7 @@ struct Resource_Loader
     Resource_Table operator()(const Exit&);
     Resource_Table operator()(const Login& login);
     Resource_Table operator()(const View_Account&);
+    Resource_Table operator()(const Delete_Account& state);
     Resource_Table operator()(const Find_Account& state);
     Resource_Table operator()(const Provider_Menu& menu);
     Resource_Table operator()(const Manager_Menu& menu);

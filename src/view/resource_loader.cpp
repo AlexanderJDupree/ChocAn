@@ -109,6 +109,14 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
     return table;
 }
 
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Delete_Account&)
+{
+    return
+    {
+
+    };
+}
+
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Generate_Report& state)
 {
     return 
