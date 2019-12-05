@@ -227,6 +227,8 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
                                , mocks.input_controller
                                , Manager_Menu() );
 
+    mocks.chocan->login_manager.login(5678);
+
     SECTION("Manager menu transitions to login on input '0'")
     {
         Application_State expected_state { Login() };
@@ -251,9 +253,16 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
     }
     SECTION("Manager menu transitions to Delete Account on input '4'")
     {
-        mocks.in_stream << "2\n";
+        mocks.in_stream << "4\n";
 
-        REQUIRE(std::holds_alternative<Delete_Account>(controller.current_state()));
+        REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
+
+        SECTION("Find_Account transitions to Delete_Account on entry of valid id")
+        {
+            mocks.in_stream << "1234\n";
+
+            REQUIRE(std::holds_alternative<Delete_Account>(controller.interact().current_state()));
+        }
     }
     SECTION("Manager menu transitions to Generate Report input '5'")
     {
@@ -429,5 +438,35 @@ TEST_CASE("Generate Report state behavior", "[generate_report], [state_controlle
         mocks.in_stream << "cancel\n";
 
         REQUIRE(std::holds_alternative<Manager_Menu>(controller.interact().current_state()));
+    }
+}
+
+TEST_CASE("Delete account state behavior", "[delete_account], [state_controller]")
+{
+    mock_dependencies mocks;
+
+    Account account = mocks.db->get_account(1234).value();
+
+    State_Controller controller( mocks.chocan
+                               , mocks.state_viewer
+                               , mocks.input_controller
+                               , Delete_Account{ account } );
+
+    SECTION("Delete account was given 'yes' and account was actually removed from db")
+    {
+        mocks.in_stream << "yes\n";
+
+        controller.interact();
+
+        REQUIRE_FALSE(mocks.db->get_account(1234));
+    }
+
+    SECTION("Delete account was given 'no' and account was not removed from db")
+    {
+        mocks.in_stream << "no\n";
+
+        controller.interact();
+
+        REQUIRE(mocks.db->get_account(1234));
     }
 }

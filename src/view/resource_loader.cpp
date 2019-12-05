@@ -109,27 +109,11 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
     return table;
 }
 
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Delete_Account& state)
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Delete_Account&)
 {
     return
     {
-        { "state_name",   [&](){ return "Delete Account"; } },
-        { "account.id",   [&](){ return std::to_string(state.account.id()); } },
-        { "account.type", [&]()
-            { 
-                return std::visit( overloaded {
-                    [](const Member&)   { return  "Member"; },
-                    [](const Manager&)  { return "Manager"; },
-                    [](const Provider&) { return  "Provider"; }
-                }, state.account.type() );
-            } },
-        { "account.name.last",  [&](){ return state.account.name().last();  } },
-        { "account.name.first", [&](){ return state.account.name().first(); } },
 
-        { "account.address.street", [&](){ return state.account.address().street(); } },
-        { "account.address.city",   [&](){ return state.account.address().city();   } },
-        { "account.address.state",  [&](){ return state.account.address().state();  } },
-        { "account.address.zip",    [&](){ return std::to_string(state.account.address().zip()); } }
     };
 }
 

@@ -60,8 +60,8 @@ class Find_Account
 public:
     // Represents the next state find account will proceed to
     enum class Next { View_Account, Delete_Account, Update_Account };
-    std::string status;
     Next next = Next::View_Account;
+    std::string status = "";
 };
 
 class View_Account
