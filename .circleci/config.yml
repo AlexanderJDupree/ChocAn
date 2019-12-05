@@ -19,7 +19,7 @@ _run:
   - install-valgrind: &install-valgrind
       name: Install Valgrind
       command: |
-        sudo apt install valgrind -y
+        sudo apt-get install valgrind -y
   - install-clang-8: &install-clang-8
       name: Install Clang-8
       command: |
@@ -42,6 +42,7 @@ jobs:
       - run: *update-repository-toolchain
       - run: *install-gcc-7
       - run: *premake
+      - run: *install-valgrind
       - run:
           name: Creating Build Files
           command: './premake5 --cc=gcc gmake'
@@ -56,7 +57,7 @@ jobs:
           command: ./bin/release/ChocAn_release -i tests/system_tests.txt --compact-output --in-memory
       - run:
           name: Run System Tests, Leaks
-          command: valgrind --leak-check=yes ./bin/debug/ChocAn_debug -i test/system_test.txt --compact-output --in-memory
+          command: valgrind --leak-check=yes --show-leak-kinds=all ./bin/debug/ChocAn_debug -i test/system_test.txt --compact-output --in-memory
       - run:
           name: Upload code coverage
           command: 'bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect reports" '
