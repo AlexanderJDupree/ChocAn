@@ -234,11 +234,11 @@ Application_State State_Controller::operator()(Delete_Account& state)
     if(confirmed.value())
     {
         chocan->db->delete_account(state.account.id());
-        return Manager_Menu { "Account deleted!" };
+        return Manager_Menu {{ "Account deleted!" }};
     }
 
     //the user entered no
-    return Manager_Menu { "Account not deleted" };
+    return Manager_Menu {{ "Account not deleted" }};
 }
 
 Application_State State_Controller::operator()(Find_Account& state)
