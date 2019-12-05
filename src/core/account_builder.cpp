@@ -65,7 +65,8 @@ void Account_Builder::apply_updates_to_account(Account& account)
         throw invalid_account_build("Attempt made to update prematurely", errors);
     }
     
-    account.name() = Name(fields.first.value_or(account.name.first());
+    account.name() = Name(fields.first.value_or(account.name.first(),
+                );
     account.address() = address.value();
 }
 
