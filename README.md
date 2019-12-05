@@ -10,11 +10,11 @@
 
 Chocoholics Anonymous is an organization commited to treating those afflicted with addictions to chocolate in all of its glorious forms. The software contained in this repository assists in the delivery and accountability of ChocAn services to Members of the ChocAn network. 
 
-( It's a group software project for CS300 - Elements of Software Engineer, at Portland State University )
+( It's a group software project for CS300 - Elements of Software Engineering, at Portland State University )
 
 ## Project Goals
 
-For detailed analysis of the ChocAn project please see the following documents. 
+For a detailed analysis of the ChocAn project please see the following documents. 
 
 * [Requirements](docs/ChocAn-Requirements.pdf)
 * [Design](docs/ChocAn-Design.pdf)
@@ -22,7 +22,7 @@ For detailed analysis of the ChocAn project please see the following documents.
 
 ## Prerequisites
 
-This project uses C++17 language features and requires a compiler that supports those features. The ChocAn project is built and tested with GCC version 7.0 and Clang version 4.0. For a list of C++17 supported compilers see [here](https://en.cppreference.com/w/cpp/compiler_support). 
+This project uses C++17 language features and requires a compiler that supports those features. The ChocAn project is built and tested with GCC 7.0 and Clang 4.0. For a list of C++17 supported compilers see [here](https://en.cppreference.com/w/cpp/compiler_support). 
 
 This project also utilizes the [Catch2](https://github.com/catchorg/Catch2) unit test library and the [Clara](https://github.com/catchorg/Clara) command line parser. You do not need to download these libraries, they are included in the `third_party` folder of the project repository. 
 
