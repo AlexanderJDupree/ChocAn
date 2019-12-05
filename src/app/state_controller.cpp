@@ -218,10 +218,9 @@ Application_State State_Controller::operator()(const Create_Account& state)
     
     do{
         state.builder->initiate_new_build_process();
+        state_viewer->render_state(state);
         
         do{
-            
-            state_viewer->render_state(state);
 
             input = input_controller->read_input();
 
@@ -229,6 +228,8 @@ Application_State State_Controller::operator()(const Create_Account& state)
             if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
 
             state.builder->set_field(input);
+            
+            state_viewer->render_state(state);
 
         }while(!state.builder->buildable());
 
@@ -246,7 +247,7 @@ Application_State State_Controller::operator()(const Create_Account& state)
             return Manager_Menu{{"Somthing went wrong when creating your account" }};
         }
     
-    }while(input == "N" || input == "n");
+    }while(!state.builder->approve_build(input[0]));
     
     chocan->db->create_account(*temp_account);
 

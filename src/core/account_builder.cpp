@@ -31,6 +31,15 @@ bool Account_Builder::buildable() const
     return build_state.empty();
 }
 
+bool Account_Builder::approve_build(char input)
+{
+    if(input == 'Y' || input == 'y') return true;
+
+    reset();
+    
+    return false;
+}
+
 Account_Builder& Account_Builder::reset()
 {
     fields.type.reset();
@@ -96,22 +105,28 @@ const Account Account_Builder::build_new_account(const ID_Generator& id_generato
 
 const std::string Account_Builder::get_status()
 {
-    std::string status("");
-    std::string progress_bar("[-------]");
-/*
-    if(fields.first)   
-    if(fields.last)
-    if(fields.street)
-    if(fields.city)
-    if(fields.state)
-    if(fields.zip)
-*/
+    std::string status("\n");
+    
+    status += "Account Type   [" + fields.type.value_or("Manager?, Provider?, Member?") + "]\n\n";
+
+    status += "Name on Account:\n\t";
+    status += "First [" + fields.first.value_or(std::string(24,'_')) + "]\t";
+    status += "Last [" + fields.last.value_or(std::string(24, '_')) + "]\n";
+    
+    status += "Address for Account:\n\t";
+    status += "Street [" + fields.street.value_or(std::string(25,'_')) + "]\n\t";
+    status += "City [" + fields.city.value_or(std::string(14,'_')) + "]\t";
+    status += "State [" + fields.state.value_or(std::string(2,'_')) + "]\t";
+
+    if(fields.zip)    status += "Zip [" + std::to_string(fields.zip.value()) + "]" + "\nBuild Complete";
+    else              status += "Zip [" + std::string(5,'_') + "]";
 
     return status;
 }
 
 Account_Builder::Build_State Account_Builder::builder_state() const
 {
+    if(build_state.empty()) return Idle();
     return build_state.top();   
 }
 
@@ -121,7 +136,7 @@ std::optional<const chocan_user_exception> Account_Builder::get_errors() const
     if (errors.empty())
         return std::optional<const invalid_account_build>();
 
-    return invalid_account_build("Issues with account", errors);
+    return invalid_account_build("Error:", errors);
 }
 
 void Account_Builder::accept_input(const std::string &input)
@@ -135,7 +150,8 @@ void Account_Builder::accept_input(const std::string &input)
             [&] (const Street&){deriveStreet(input);},
             [&] (const City&)  {deriveCity(input);},
             [&] (const State&) {deriveState(input);},
-            [&] (const Zip&)   {deriveZip(input);}
+            [&] (const Zip&)   {deriveZip(input);},
+            [&] (const Idle&)  {;}
             }, build_state.top());
 }
 
@@ -256,7 +272,7 @@ void Account_Builder::deriveZip(const std::string &input)
 {
     if( !Validators::length(input, 5, 5) ) 
     {
-        errors["State"] = Invalid_Length {input,5,5};
+        errors["Zip"] = Invalid_Length {input,5,5};
     }
     else{
 
@@ -269,7 +285,7 @@ void Account_Builder::deriveZip(const std::string &input)
         catch (...)
         {
 
-            errors["State"] = Incompatible_Values {input,"Number"};
+            errors["Zip"] = Incompatible_Values {input,"Number"};
         }
     }
 }

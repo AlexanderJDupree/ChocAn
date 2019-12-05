@@ -48,10 +48,10 @@ public:
     struct City{};
     struct State{};
     struct Zip{};
-    struct Buildable{};
+    struct Idle{};
     
     using Database_Ptr = Data_Gateway::Database_Ptr;
-    using Build_State = std::variant<Type,First,Last,Street,City,State,Zip>;
+    using Build_State = std::variant<Type,First,Last,Street,City,State,Zip,Idle>;
     using Build_Stack = std::stack<Build_State>;
 
     Account_Builder(){reset();}
@@ -67,6 +67,7 @@ public:
     void set_field(const std::string &input);
 
     bool buildable()const;
+    bool approve_build(char input);
     const std::string get_status();
     Build_State builder_state() const;
     std::optional<const chocan_user_exception> get_errors() const;
