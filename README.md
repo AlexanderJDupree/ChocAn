@@ -46,7 +46,7 @@ That's it!
 
 The provided build script will build the project in debug and release configurations and runs their respective unit tests. The build script uses the provided GNU Makefiles in the `gmake/` folder and will store the compiled binaries in the `bin/` folder. If you need specific project files (Visual Studio, Xcode) or need to change the compiler, I have provided a premake5 script that can generate this files for you. If you don't have premake5 you can download it [here](https://premake.github.io/download.html).
 
-The build script will also attempt to download the [Lib-bash](https://github.com/pioneerworks/lib-bash) utility to prettify the output. Currently, if this download fails the build scrip aborts, we are working on making the process never fail in [issue #13](https://github.com/AlexanderJDupree/ChocAn/issues/13). If the process fails you can still build the project manually like this:
+The build script will also attempt to download the [Lib-bash](https://github.com/pioneerworks/lib-bash) utility to prettify the output. ~~Currently, if this download fails the build scrip aborts, we are working on making the process never fail in [issue #13](https://github.com/AlexanderJDupree/ChocAn/issues/13)~~. Fixed in [PR #44](https://github.com/AlexanderJDupree/ChocAn/pull/44). If the process fails you can still build the project manually like this:
 
 To build using Make. 
 ```bash
