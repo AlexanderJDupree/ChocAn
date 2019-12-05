@@ -51,6 +51,9 @@ void Account_Builder::reset()
 
 void Account_Builder::request_update_to_account(Build_State update_needed)
 {
+    //TODO maybe throw an exception to gaurd against attemts to change account
+    if(std::holds_alternative<Type>(update_needed)) return;
+
     reset();
     
     build_state.push(update_needed);

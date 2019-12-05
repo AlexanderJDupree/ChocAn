@@ -84,16 +84,36 @@ struct valid_inputs{
     Account::Account_Type account_type;
 };
 
+struct updates{
 
-//will need to be updated if changes are made to the address, name, or account_builder error messages
+    updates() : new_first("bob")
+              , new_last("davidson")
+              , new_street("cool street")
+              , new_city("portland")
+              , new_state("AK")
+              , new_zip(97313)
+              {};
+
+    const std::string new_first;
+    const std::string new_last;
+    const std::string new_street;
+    const std::string new_city;
+    const std::string new_state;
+    const unsigned new_zip;
+};
+
+const std::vector<std::string> bad_inputs({"charactor limit grosssly exceeeedd by thiss verrry longg string of charactersssfdsafadsf",
+                                            std::string(1000,'*'),
+                                            std::string(1000,'0')});
 
 Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
 valid_inputs good_input;
+updates updated;
+mock_dependencies mocks;
+Account_Builder account_builder;
 
 TEST_CASE("Account builder can build new accounts", "[account_builder]")
 {
-    mock_dependencies mocks;
-    Account_Builder account_builder;
 
     SECTION("Builds an account with valid input", "[account_builder][use_case][happy_path]")
     {
@@ -159,13 +179,6 @@ TEST_CASE("Account builder can build new accounts", "[account_builder]")
     
     SECTION("Builds an account despite persitantly bad user input", "[account_builder][user_errors]")
     {
-        mock_dependencies mocks;
-        Account_Builder account_builder;
-
-            
-        const std::vector<std::string> bad_inputs({"charactor limit grosssly exceeeedd by thiss verrry longg string of charactersssfdsafadsf",
-                                            std::string(1000,'*'),
-                                            std::string(1000,'0')});
         
         const Account expected_account(Name(good_input.first,good_input.last)
                                 ,Address(good_input.street,good_input.city,good_input.state,good_input.zip)
@@ -216,4 +229,97 @@ TEST_CASE("Account builder can build new accounts", "[account_builder]")
         REQUIRE(account_built.address() == expected_account.address());
 
     }
+}
+TEST_CASE("Account builder updates accounts as needed", "[account_builder],[update_account]")
+{
+    Account account_to_update(good_input.name,good_input.address,good_input.account_type,mocks.chocan->id_generator);
+
+    Account_Builder::Build_Stack updates_needed({Account_Builder::Zip()
+                                                ,Account_Builder::State()
+                                                ,Account_Builder::City()
+                                                ,Account_Builder::Street()
+                                                ,Account_Builder::Last()
+                                                ,Account_Builder::First()
+                                                });
+
+    SECTION("Account builder updates the first name as needed","[account_builder],[update_account],[first_name]"){
+
+        REQUIRE(account_to_update.name().first() != updated.new_first);
+
+        account_builder.request_update_to_account(updates_needed.top());
+        account_builder.set_field(updated.new_first);
+        account_builder.apply_updates_to_account(account_to_update);
+
+        REQUIRE(account_to_update.name().first() == updated.new_first);
+    }
+    
+    updates_needed.pop();
+
+    SECTION("Account builder updates the last name as needed","[account_builder],[update_account],[last_name]"){
+
+        REQUIRE(account_to_update.name().last() != updated.new_last);
+
+        account_builder.request_update_to_account(updates_needed.top());
+        account_builder.set_field(updated.new_last);
+        account_builder.apply_updates_to_account(account_to_update);
+
+        REQUIRE(account_to_update.name().last() == updated.new_last);
+    }
+    
+    updates_needed.pop();
+
+    SECTION("Account builder updates the street as needed","[account_builder],[update_account],[street]"){
+
+        REQUIRE(account_to_update.address().street() != updated.new_street);
+
+        account_builder.request_update_to_account(updates_needed.top());
+        account_builder.set_field(updated.new_street);
+        account_builder.apply_updates_to_account(account_to_update);
+
+        REQUIRE(account_to_update.address().street() == updated.new_street);
+    }
+
+    updates_needed.pop();
+
+    SECTION("Account builder updates the city as needed","[account_builder],[update_account],[city]"){
+
+        REQUIRE(account_to_update.address().city() != updated.new_city);
+
+        account_builder.request_update_to_account(updates_needed.top());
+        account_builder.set_field(updated.new_city);
+        account_builder.apply_updates_to_account(account_to_update);
+
+        REQUIRE(account_to_update.address().city() == updated.new_city);
+    }
+    
+    updates_needed.pop();
+
+    SECTION("Account builder updates the state as needed","[account_builder],[update_account],[state]"){
+
+        REQUIRE(account_to_update.address().state() != updated.new_state);
+
+        account_builder.request_update_to_account(updates_needed.top());
+        account_builder.set_field(updated.new_state);
+        account_builder.apply_updates_to_account(account_to_update);
+
+        REQUIRE(account_to_update.address().state() == updated.new_state);
+    }
+    
+    updates_needed.pop();
+
+    SECTION("Account builder updates the zip as needed","[account_builder],[update_account],[zip]"){
+
+        REQUIRE(account_to_update.address().zip() != updated.new_zip);
+
+        account_builder.request_update_to_account(updates_needed.top());
+        account_builder.set_field(std::to_string(updated.new_zip));
+        account_builder.apply_updates_to_account(account_to_update);
+
+        REQUIRE(account_to_update.address().zip() == updated.new_zip);
+    }
+
+}
+TEST_CASE("Account builder throws exceptions when needed", "[account_builder],[exceptions]")
+{
+
 }
