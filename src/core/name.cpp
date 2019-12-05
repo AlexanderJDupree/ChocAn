@@ -30,12 +30,12 @@ Name::Name(const std::string& first, const std::string& last)
         errors["First Name"] = Invalid_Length {first,1,24};
         name_errors.specific_errors.push_back(invalid_name::Bad_First());
     }
-    if (!Validators::length(last, 1, 24))
+    else if (!Validators::length(last, 1, 24))
     {
         errors["Last Name"] = Invalid_Length {last,1,24};
         name_errors.specific_errors.push_back(invalid_name::Bad_Last());
     }
-    if (!Validators::length(first + " " + last, 1, 25))
+    else if (!Validators::length(first + " " + last, 1, 25))
     {
         errors["Full Name"] = Invalid_Length {first + " " + last,2,25};
         name_errors.specific_errors.clear();

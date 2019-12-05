@@ -321,5 +321,17 @@ TEST_CASE("Account builder updates accounts as needed", "[account_builder],[upda
 }
 TEST_CASE("Account builder throws exceptions when needed", "[account_builder],[exceptions]")
 {
+    Account temp(good_input.name,good_input.address,good_input.account_type,mocks.chocan->id_generator);
+    account_builder.initiate_new_build_process();
 
+    REQUIRE_FALSE(account_builder.buildable());
+    
+    SECTION("Premature build request result in an exception","[account_builder],[build_exceptions]")
+    {
+        REQUIRE_THROWS_AS(account_builder.build_new_account(mocks.chocan->id_generator), invalid_account_build);
+    }
+    SECTION("Premature update request result in an exception","[account_builder],[update_exceptions]")
+    {
+        REQUIRE_THROWS_AS(account_builder.apply_updates_to_account(temp), invalid_account_build);
+    }
 }

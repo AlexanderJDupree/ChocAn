@@ -215,11 +215,11 @@ Application_State State_Controller::operator()(const Create_Account& state)
 {
     std::string input;
     std::shared_ptr<Account> temp_account;
+    bool build_approved = false;
     
     do{
         state.builder->initiate_new_build_process();
         state_viewer->render_state(state);
-        
         do{
 
             input = input_controller->read_input();
@@ -241,13 +241,17 @@ Application_State State_Controller::operator()(const Create_Account& state)
 
             input = input_controller->read_input();
 
+            input[0] = toupper(input[0]);
+            
+            build_approved = (input[0] == 'Y') ? true : false;
+
         }catch(const chocan_user_exception& err){
 
             //TODO literally anything would be better than this as far as error reporting goes.
             return Manager_Menu{{"Somthing went wrong when creating your account" }};
         }
     
-    }while(!state.builder->approve_build(input[0]));
+    }while(!build_approved);
     
     chocan->db->create_account(*temp_account);
 

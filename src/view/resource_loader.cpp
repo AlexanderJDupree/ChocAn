@@ -212,7 +212,7 @@ std::string Resource_Loader::render_user_error(const std::optional<chocan_user_e
             },
             [](const Invalid_Value& err)
             {
-                return err.value + ' ' + err.expected;
+                return "Got[" + err.value + '], Expected[' + err.expected + "]";
             },
             [](const Incompatible_Values& err)
             {

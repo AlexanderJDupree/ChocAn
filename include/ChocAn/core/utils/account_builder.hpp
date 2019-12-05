@@ -65,7 +65,6 @@ public:
     void reset();
 
     bool buildable()const;
-    bool approve_build(char input);//TODO but this functionality in the state controller
     const std::string get_status();
     Build_State builder_state() const;
     std::optional<const chocan_user_exception> get_errors() const;

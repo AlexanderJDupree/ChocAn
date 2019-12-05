@@ -19,19 +19,9 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/utils/overloaded.hpp>
 
 
-
 bool Account_Builder::buildable() const
 {
     return build_state.empty();
-}
-
-bool Account_Builder::approve_build(char input)
-{
-    if(input == 'Y' || input == 'y') return true;
-
-    reset();
-    
-    return false;
 }
 
 void Account_Builder::reset()
@@ -63,6 +53,8 @@ void Account_Builder::apply_updates_to_account(Account& account)
 {    
     if (!buildable())
     {
+        errors["Builder State at Exception"] = Invalid_Value{get_status(),""};
+        
         throw invalid_account_build("Attempt made to update prematurely", errors);
     }
     
@@ -86,6 +78,8 @@ const Account Account_Builder::build_new_account(const ID_Generator& id_generato
 {
     if (!buildable())
     {
+        errors["Builder State at Exception"] = Invalid_Value{get_status(),""};
+        
         throw invalid_account_build("Attempt made to build prematurely", errors);
     }
 
@@ -93,16 +87,9 @@ const Account Account_Builder::build_new_account(const ID_Generator& id_generato
     {
         return  Account(Name(name.value()),Address(address.value()),yield_account_type(),id_generator);
     }
-    catch (const chocan_user_exception& error)
-    {
-        throw error;
-    }
-    catch (const chocan_db_exception& error)
-    {
-        throw error;
-    }
     catch(...)
     {
+        errors["Builder State at Exception"] = Invalid_Value{get_status(),""};
 
         throw invalid_account_build("Failed to build account",errors);
     }
@@ -112,16 +99,16 @@ const std::string Account_Builder::get_status()
 {
     std::string status("\n");
     
-    status += "Account Type   [" + fields.type.value_or("Manager, Provider, Member") + "]\n\n";
+    status += "Account Type[" + fields.type.value_or("Manager, Provider, Member") + "]\n\n";
 
     status += "Name on Account:\n\t";
-    status += "First [" + fields.first.value_or(std::string(24,'_')) + "]\t";
-    status += "Last [" + fields.last.value_or(std::string(24, '_')) + "]\n";
+    status += "First[" + fields.first.value_or(std::string(24,'_')) + "]\t";
+    status += "Last[" + fields.last.value_or(std::string(24, '_')) + "]\n";
     
     status += "Address for Account:\n\t";
-    status += "Street [" + fields.street.value_or(std::string(25,'_')) + "]\n\t";
-    status += "City [" + fields.city.value_or(std::string(14,'_')) + "]\t";
-    status += "State [" + fields.state.value_or(std::string(2,'_')) + "]\t";
+    status += "Street[" + fields.street.value_or(std::string(25,'_')) + "]\n\t";
+    status += "City[" + fields.city.value_or(std::string(14,'_')) + "]\t";
+    status += "State[" + fields.state.value_or(std::string(2,'_')) + "]\t";
 
     if(fields.zip)    status += "Zip [" + std::to_string(fields.zip.value()) + "]" + "\nBuild Complete";
     else              status += "Zip [" + std::string(5,'_') + "]";
@@ -271,7 +258,7 @@ void Account_Builder::deriveZip(const std::string &input)
     catch (...)
     {
 
-        errors["Zip"] = Incompatible_Values {input,"Number"};
+        errors["Zip"] = Incompatible_Values {input,"[five digit number]"};
         fields.zip.reset();
     }
 }
