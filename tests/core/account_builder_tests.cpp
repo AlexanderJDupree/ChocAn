@@ -60,7 +60,7 @@ class mock_dependencies
 
 Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
 
-TEST_CASE("Account builder builds new account", "[account_builder]")
+TEST_CASE("Account builder can build new accounts", "[account_builder]")
 {
     mock_dependencies mocks;
     Account_Builder account_builder;
@@ -127,4 +127,12 @@ TEST_CASE("Account builder builds new account", "[account_builder]")
     
     }
     
+    SECTION("Builds an account despite persitantly bad user input", "[account_builder][use_case][user_errors]")
+    {
+        mock_dependencies mocks;
+        Account_Builder account_builder;
+        std::vector<std::string> inputs;
+
+
+    }
 }
