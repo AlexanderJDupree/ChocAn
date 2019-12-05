@@ -1,3 +1,4 @@
+<clear_screen>
 <header>
 
 ChocAn ID: <@chocan_id> | <@type> | <@status>
