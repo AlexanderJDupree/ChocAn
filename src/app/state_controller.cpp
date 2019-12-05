@@ -146,7 +146,7 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-        { "2"   , [&](){ return Create_Account{ &chocan->account_builder.reset()}; } },
+        { "2"   , [&](){ return Create_Account{ &chocan->account_builder}; } },
         { "5"   , [&](){ return Generate_Report(); } }
     };
 

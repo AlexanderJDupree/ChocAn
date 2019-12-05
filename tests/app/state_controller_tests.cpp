@@ -327,7 +327,7 @@ TEST_CASE("Create_Account State Behavior", "[create_account], [state_controller]
 {
     mock_dependencies mocks;
 
-    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Create_Account{&mocks.chocan->account_builder.reset()});
+    State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Create_Account{&mocks.chocan->account_builder});
 
     SECTION("Create account does not transition if account it rejected by user")
     {

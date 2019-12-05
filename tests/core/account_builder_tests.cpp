@@ -21,6 +21,8 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/view/terminal_input_controller.hpp>
 #include <ChocAn/core/utils/account_builder.hpp>
+#include <ChocAn/core/entities/name.hpp>
+#include <ChocAn/core/entities/address.hpp>
 #include <sstream>
 
 class mock_state_viewer : public State_Viewer
@@ -55,69 +57,97 @@ class mock_dependencies
         Input_Controller::Input_Control_Ptr input_controller = std::make_unique<Terminal_Input_Controller>(in_stream);
 };
 
+struct valid_inputs{
+
+    valid_inputs() : type("Member")
+                    ,first("first")
+                    ,last("last")
+                    ,street("1010 cool street")
+                    ,city("Portland")
+                    ,state("OR")
+                    ,zip(97080)
+                    ,name(first,last)
+                    ,address(street,city,state,zip) 
+                    ,account_type(Member())
+                    {};
+
+    
+    const std::string type;
+    const std::string first;
+    const std::string last;
+    const std::string street;
+    const std::string city;
+    const std::string state;
+    const unsigned zip;
+    const Name name;
+    const Address address;
+    Account::Account_Type account_type;
+};
+
 
 //will need to be updated if changes are made to the address, name, or account_builder error messages
 
 Data_Gateway::Database_Ptr db = std::make_unique<Mock_DB>();
+valid_inputs good_input;
 
 TEST_CASE("Account builder can build new accounts", "[account_builder]")
 {
     mock_dependencies mocks;
     Account_Builder account_builder;
-    std::string input;
 
     SECTION("Builds an account with valid input", "[account_builder][use_case][happy_path]")
     {
         account_builder.initiate_new_build_process();
+        
         SECTION("Builder initiates to Type state when initiate_new_build_process() is called","[account_builder][use_case][happy_path]")
         {
             REQUIRE(std::holds_alternative<Account_Builder::Type>(account_builder.builder_state()));
         }
 
-        input = "member";
-        account_builder.set_field(input);
+        account_builder.set_field(good_input.type);
+        
         SECTION("Builder transition to First state upon valid account type input","[account_builder][use_case][happy_path]")
         {
             REQUIRE(std::holds_alternative<Account_Builder::First>(account_builder.builder_state()));
         }
         
-        input = "first";
-        account_builder.set_field(input);
+        account_builder.set_field(good_input.first);
+        
         SECTION("Builder transition to Last state upon valid first name input","[account_builder][use_case][happy_path]")
         {
             REQUIRE(std::holds_alternative<Account_Builder::Last>(account_builder.builder_state()));
         }
         
-        input = "last";
-        account_builder.set_field(input);
+        account_builder.set_field(good_input.last);
+        
         SECTION("Builder transition to Street state upon valid last name input","[account_builder][use_case][happy_path]")
         {
             REQUIRE(std::holds_alternative<Account_Builder::Street>(account_builder.builder_state()));
         }
         
-        input = "street";
-        account_builder.set_field(input);
+        account_builder.set_field(good_input.street);
+        
         SECTION("Builder transition to City state upon valid street input","[account_builder][use_case][happy_path]")
         {
             REQUIRE(std::holds_alternative<Account_Builder::City>(account_builder.builder_state()));
         }
     
-        input = "city";
-        account_builder.set_field(input);
+        account_builder.set_field(good_input.city);
+        
         SECTION("Builder transition to State state upon valid city input","[account_builder][use_case][happy_path]")
         {
             REQUIRE(std::holds_alternative<Account_Builder::State>(account_builder.builder_state()));
         }
         
-        input = "OR";
-        account_builder.set_field(input);
+        account_builder.set_field(good_input.state);
+        
         SECTION("Builder transition to Zip state upon valid state input","[account_builder][use_case][happy_path]")
         {
             REQUIRE(std::holds_alternative<Account_Builder::Zip>(account_builder.builder_state()));
         }
     
-        input = "97080";
-        account_builder.set_field(input);
+        account_builder.set_field(std::to_string(good_input.zip));
+        
         SECTION("Builder is in a buildable state after recieving valid zip input","[account_builder][use_case][happy_path]")
         {
             REQUIRE(account_builder.buildable());
@@ -132,42 +162,58 @@ TEST_CASE("Account builder can build new accounts", "[account_builder]")
         mock_dependencies mocks;
         Account_Builder account_builder;
 
-        
-
-        const std::vector<std::string> good_inputs({
-                                           "provider",
-                                           "first name", 
-                                           "last name", 
-                                           "1123 cool street",
-                                           "Portland",
-                                           "OR",
-                                           "90808"});
-        const std::vector<std::string> bad_inputs({"not an account",
-                                            "134053480598350",
-                                            "809348590/*/*/++6+66+21jj464``",
-                                            "!@#$%^&*()_+/*/*/",
+            
+        const std::vector<std::string> bad_inputs({"charactor limit grosssly exceeeedd by thiss verrry longg string of charactersssfdsafadsf",
                                             std::string(1000,'*'),
-                                            "mEmber",
-                                            "ManAger",
-                                            "ProViDer"});
-    
+                                            std::string(1000,'0')});
+        
+        const Account expected_account(Name(good_input.first,good_input.last)
+                                ,Address(good_input.street,good_input.city,good_input.state,good_input.zip)
+                                ,good_input.account_type
+                                ,mocks.chocan->id_generator);
 
-        SECTION("Account builder will not transition state until given valid input","[account_builder][user_errors]")
+        account_builder.initiate_new_build_process();
+
+        for (int i = 0; i < 7; ++i)
         {
-            account_builder.initiate_new_build_process();
-
-            for (const std::string &good_input : good_inputs)
+            for (const std::string &bad_input : bad_inputs)
             {
-                for (const std::string &bad_input : bad_inputs)
-                {
-                    account_builder.set_field(bad_input);
-
-
-                }
-                account_builder.set_field(good_input);
+                account_builder.set_field(bad_input);
             }
 
+            switch (i)
+            {
+            case 0:
+                account_builder.set_field(good_input.type);
+                break;
+            case 1:
+                account_builder.set_field(good_input.first);
+                break;
+            case 2:
+                account_builder.set_field(good_input.last);
+                break;
+            case 3:
+                account_builder.set_field(good_input.street);
+                break;
+            case 4:
+                account_builder.set_field(good_input.city);
+                break;
+            case 5:
+                account_builder.set_field(good_input.state);
+                break;
+            case 6:
+                account_builder.set_field(std::to_string(good_input.zip));
+                break;
+            default:
+                break;
+            }
         }
+
+        const Account account_built(account_builder.build_new_account(mocks.chocan->id_generator));
+
+        REQUIRE(account_built.name() == expected_account.name());
+
+        REQUIRE(account_built.address() == expected_account.address());
 
     }
 }

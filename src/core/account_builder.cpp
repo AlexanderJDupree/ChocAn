@@ -34,7 +34,7 @@ bool Account_Builder::approve_build(char input)
     return false;
 }
 
-Account_Builder& Account_Builder::reset()
+void Account_Builder::reset()
 {
     fields.type.reset();
     fields.first.reset();
@@ -46,8 +46,6 @@ Account_Builder& Account_Builder::reset()
 
     name.reset();
     address.reset();
-
-    return *this;
 }
 
 
@@ -76,6 +74,8 @@ void Account_Builder::apply_updates_to_account(Account& account)
 
 void Account_Builder::initiate_new_build_process()
 {
+    reset();
+
     build_state = Build_Stack({Zip(),State(),City(),Street(),Last(),First(),Type()});
 }
 
@@ -90,9 +90,18 @@ const Account Account_Builder::build_new_account(const ID_Generator& id_generato
     {
         return  Account(Name(name.value()),Address(address.value()),yield_account_type(),id_generator);
     }
-    catch (...)
+    catch (const chocan_user_exception& error)
     {
-        throw invalid_account_build("Failed to build account", errors);
+        throw error;
+    }
+    catch (const chocan_db_exception& error)
+    {
+        throw error;
+    }
+    catch(...)
+    {
+
+        throw invalid_account_build("Failed to build account",errors);
     }
 }
 
@@ -100,7 +109,7 @@ const std::string Account_Builder::get_status()
 {
     std::string status("\n");
     
-    status += "Account Type   [" + fields.type.value_or("Manager?, Provider?, Member?") + "]\n\n";
+    status += "Account Type   [" + fields.type.value_or("Manager, Provider, Member") + "]\n\n";
 
     status += "Name on Account:\n\t";
     status += "First [" + fields.first.value_or(std::string(24,'_')) + "]\t";
@@ -150,41 +159,47 @@ void Account_Builder::accept_input(const std::string &input)
 
 void Account_Builder::maybe_build_name()
 {
-    if(buildable()) return;
+    if (buildable())
+        return;
 
-    if(!name && fields.first && fields.last){
-
-        try{
-            
-            name = Name(fields.first.value(),fields.last.value());
-        }
-        catch(const invalid_name& error)
-        {
-            adapt_to_name_errors(error.specific_errors);
-        }
+    try
+    {
+        //a valid name object is maintained through out the build. only invalid user input can result in an invalid name 
+        name = Name(fields.first.value_or("Pending"), fields.last.value_or("Pending"));
     }
+    catch (const invalid_name &error_report)
+    {
+        adapt_to_name_errors(error_report.specific_errors);
 
+        errors = error_report.error_info;
+
+        name.reset();
+    }
 }
 
 void Account_Builder::maybe_build_address()
 {
-    if(buildable()) return;
-    
-    if(!address && fields.street && fields.city && fields.state && fields.zip)
+    if (buildable())
+        return;
+
+    try
     {
-        try{
-            address = Address(fields.street.value(),fields.city.value(),fields.state.value(),fields.zip.value());
-        }
-        catch(const invalid_address& errors)
-        {
-            adapt_to_address_errors(errors.specific_errors);
-        }
+        //a valid address object is maintained through out the build. only invalid user input can result in an invalid address 
+        address = Address(fields.street.value_or("Pending"), fields.city.value_or("Pending"), fields.state.value_or("AK"), fields.zip.value_or(97080));
+    }
+    catch (const invalid_address &error_report)
+    {
+        adapt_to_address_errors(error_report.specific_errors);
+
+        errors = error_report.error_info;
+
+        address.reset();
     }
 }
 
-void Account_Builder::adapt_to_name_errors(const Errors_With_Name& errors)
+void Account_Builder::adapt_to_name_errors(const Errors_With_Name& error_report)
 {
-    for(const invalid_name::Name_Errors& err : errors)
+    for(const invalid_name::Name_Errors& err : error_report)
     {
         std::visit(overloaded{
                
@@ -196,9 +211,9 @@ void Account_Builder::adapt_to_name_errors(const Errors_With_Name& errors)
     }
 }
 
-void Account_Builder::adapt_to_address_errors(const Errors_With_Address& errors)
+void Account_Builder::adapt_to_address_errors(const Errors_With_Address& error_report)
 {
-    for(const invalid_address::Address_Errors& err : errors)
+    for(const invalid_address::Address_Errors& err : error_report)
     {
         std::visit(overloaded{
             
@@ -228,11 +243,15 @@ void Account_Builder::set_field(const std::string &input)
 
 void Account_Builder::deriveType(const std::string &input)
 {
-    if(input == "Manager" || input == "manager") fields.type = "Manager";
+    std::string temp(input);
+
+    for(char& c : temp){c = toupper(c);}
     
-    else if(input == "Member" || input == "member") fields.type = "Member";
+    if(temp == "MANAGER") fields.type = "Manager";
     
-    else if(input == "Provider" || input == "provider") fields.type = "Provider";
+    else if(temp == "MEMBER") fields.type = "Member";
+    
+    else if(temp == "PROVIDER") fields.type = "Provider";
 
     else errors["Account Type"] = Invalid_Value {input, "Manager,Provder,Member"};
 
