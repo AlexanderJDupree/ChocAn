@@ -18,12 +18,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <ChocAn/core/utils/account_builder.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 
-const std::set<std::string> Account_Builder::US_states
-{ "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA"
-, "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD"
-, "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ"
-, "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC"
-, "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" };
 
 
 bool Account_Builder::buildable() const
@@ -50,11 +44,17 @@ Account_Builder& Account_Builder::reset()
     fields.state.reset();
     fields.zip.reset();
 
+    name.reset();
+    address.reset();
+
     return *this;
 }
 
+
 void Account_Builder::request_update_to_account(Build_State update_needed)
 {
+    reset();
+    
     build_state.push(update_needed);
 }
 
@@ -64,13 +64,9 @@ void Account_Builder::apply_updates_to_account(Account& account)
     {
         throw invalid_account_build("Attempt made to update prematurely", errors);
     }
-
-    if(fields.first)   account.name().update_first    (fields.first.value());
-    if(fields.last)    account.name().update_last     (fields.last.value());
-    if(fields.street)  account.address().update_street(fields.street.value());
-    if(fields.city)    account.address().update_city  (fields.city.value());
-    if(fields.state)   account.address().update_state (fields.state.value());
-    if(fields.zip)     account.address().update_zip   (fields.zip.value());
+    
+    account.name() = Name(fields.first.value_or(account.name.first());
+    account.address() = address.value();
 }
 
 void Account_Builder::initiate_new_build_process()
@@ -87,15 +83,7 @@ const Account Account_Builder::build_new_account(const ID_Generator& id_generato
 
     try
     {
-        return  Account(
-                Name(    fields.first.value()
-                        ,fields.last.value()),
-                Address( fields.street.value()
-                        ,fields.city.value()
-                        ,fields.state.value()
-                        ,fields.zip.value()), 
-                yield_account_type(), 
-                id_generator);
+        return  Account(Name(name.value()),Address(address.value()),yield_account_type(),id_generator);
     }
     catch (...)
     {
@@ -145,14 +133,77 @@ void Account_Builder::accept_input(const std::string &input)
 
     std::visit(overloaded{
             [&] (const Type&)  {deriveType(input);},
-            [&] (const First&) {deriveFirst(input);},
-            [&] (const Last&)  {deriveLast(input);},
-            [&] (const Street&){deriveStreet(input);},
-            [&] (const City&)  {deriveCity(input);},
-            [&] (const State&) {deriveState(input);},
+            [&] (const First&) {fields.first  = input;},
+            [&] (const Last&)  {fields.last   = input;},
+            [&] (const Street&){fields.street = input;},
+            [&] (const City&)  {fields.city   = input;},
+            [&] (const State&) {fields.state  = input;},
             [&] (const Zip&)   {deriveZip(input);},
             [&] (const Idle&)  {;}
             }, build_state.top());
+}
+
+void Account_Builder::maybe_build_name()
+{
+    if(buildable()) return;
+
+    if(!name && fields.first && fields.last){
+
+        try{
+            
+            name = Name(fields.first.value(),fields.last.value());
+        }
+        catch(const invalid_name& error)
+        {
+            adapt_to_name_errors(error.specific_errors);
+        }
+    }
+
+}
+
+void Account_Builder::maybe_build_address()
+{
+    if(buildable()) return;
+    
+    if(!address && fields.street && fields.city && fields.state && fields.zip)
+    {
+        try{
+            address = Address(fields.street.value(),fields.city.value(),fields.state.value(),fields.zip.value());
+        }
+        catch(const invalid_address& errors)
+        {
+            adapt_to_address_errors(errors.specific_errors);
+        }
+    }
+}
+
+void Account_Builder::adapt_to_name_errors(const Errors_With_Name& errors)
+{
+    for(const invalid_name::Name_Errors& err : errors)
+    {
+        std::visit(overloaded{
+               
+                [&](const invalid_name::Bad_First&){fields.first.reset();},
+                [&](const invalid_name::Bad_Last&) {fields.last.reset();},
+                [&](const invalid_name::Bad_Full&) {fields.last.reset();fields.first.reset();}
+                }
+                ,err);
+    }
+}
+
+void Account_Builder::adapt_to_address_errors(const Errors_With_Address& errors)
+{
+    for(const invalid_address::Address_Errors& err : errors)
+    {
+        std::visit(overloaded{
+            
+                [&](const invalid_address::Bad_Street&){fields.street.reset();},
+                [&](const invalid_address::Bad_City&)  {fields.city.reset();},
+                [&](const invalid_address::Bad_State&) {fields.state.reset();},
+                [&](const invalid_address::Bad_Zip&)   {fields.zip.reset();}
+                }
+                ,err);
+    }
 }
 
 void Account_Builder::set_field(const std::string &input)
@@ -162,13 +213,12 @@ void Account_Builder::set_field(const std::string &input)
     errors.clear();
 
     accept_input(input);
+    
+    maybe_build_name();
+    
+    maybe_build_address();
 
     if(errors.empty()) build_state.pop();
-}
-
-bool Account_Builder::full_name_valid()const
-{
-    return Validators::length(fields.last.value_or(" ") + fields.first.value_or(" "), 1, 25);
 }
 
 void Account_Builder::deriveType(const std::string &input)
@@ -183,110 +233,19 @@ void Account_Builder::deriveType(const std::string &input)
 
 }
 
-void Account_Builder::deriveFirst(const std::string &input)
-{
-
-    if (!Validators::length(input, 1, 24)){
-
-        errors["First Name"] = Invalid_Length {input,1,24};
-        
-    }
-    else if (!full_name_valid())
-    {
-        errors["Full Name"] = Invalid_Length {input,2,25};
-        fields.first.reset();
-        fields.last.reset();
-    }
-    else
-    {
-        fields.first = input;
-    }
-}
-
-void Account_Builder::deriveLast(const std::string &input)
-{
-
-    if (!Validators::length(input, 1, 24))
-    {
-        errors["Last Name"] = Invalid_Length {input,1,24};
-    }
-    else if (!full_name_valid())
-    {
-        errors["Full Name"] = Invalid_Length {input,2,25};
-        fields.first.reset();
-        fields.last.reset();
-    }
-    else
-    {
-        fields.last= input;
-    }
-}
-
-void Account_Builder::deriveStreet(const std::string &input)
-{
-    if( !Validators::length(input, 1, 25) ) 
-    {
-        errors["Street"] = Invalid_Length {input,1,25};
-    }
-    else
-    {
-        fields.street = input;
-    }
-}
-
-void Account_Builder::deriveCity(const std::string &input)
-{
-    if( !Validators::length(input, 1, 14) ) 
-    {
-        errors["City"] = Invalid_Length {input,1,14};
-    }
-    else
-    {
-        fields.city = input;
-    }
-
-}
-
-void Account_Builder::deriveState(const std::string &input)
-{
-    std::string temp = input;
-
-    for(char& c : temp) { c = std::toupper(c); }
-    
-    if( !Validators::length(temp, 2, 2) ) {
-
-        errors["State"] = Invalid_Length {input,2,2};
-    }
-    else if(US_states.find(temp) == US_states.end() )
-    {
-        errors["State"] = Invalid_Value {input,"Us state"};
-    }
-    else
-    {
-        fields.state = temp;
-    }
-    
-}
-
 void Account_Builder::deriveZip(const std::string &input)
 {
-    if( !Validators::length(input, 5, 5) ) 
+    try
     {
-        errors["Zip"] = Invalid_Length {input,5,5};
+        unsigned temp = stoul(input);
+
+        fields.zip = temp;
     }
-    else{
+    catch (...)
+    {
 
-        try
-        {
-            unsigned temp = stoul(input);
-
-            fields.zip = temp;
-        }
-        catch (...)
-        {
-
-            errors["Zip"] = Incompatible_Values {input,"Number"};
-        }
+        errors["Zip"] = Incompatible_Values {input,"Number"};
+        fields.zip.reset();
     }
 }
 Account::Account_Type Account_Builder::yield_account_type() const{

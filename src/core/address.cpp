@@ -17,6 +17,14 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <ChocAn/core/entities/address.hpp>
+#include <ChocAn/core/utils/validators.hpp>
+
+const std::set<std::string> Address::US_states
+{ "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA"
+, "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD"
+, "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ"
+, "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC"
+, "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" };
 
 Address::Address( const std::string& street 
                 , const std::string& city 
@@ -31,23 +39,38 @@ Address::Address( const std::string& street
 
     //Grants access to class specific errors messages
     invalid_address error_msg("",{});
+    
+    for(char& c : _state) { c = std::toupper(c); }
 
-    if( street == "" ) {
-
-        errors["Street"] = Invalid_Value { street, "Cannot be empty" };
-
+    if( !Validators::length(street, 1, 25) ) 
+    {
+        errors["Street"] = Invalid_Length {street,1,25};
+        error_msg.specific_errors.push_back(invalid_address::Bad_Street());
     }
 
-    if( city == "" ) {
+    if( !Validators::length(city, 1, 14) ) 
+    {
+        errors["City"] = Invalid_Length {city,1,14};
 
-        errors["City"] = Invalid_Value { city, "Cannot be empty" };
+        error_msg.specific_errors.push_back(invalid_address::Bad_City());
     }
-    if( state == "" ) {
+    
+    if( !Validators::length(_state, 2, 2) ) {
 
-        errors["State"] = Invalid_Value { state, "Cannot be empty" };
+        errors["State"] = Invalid_Length {_state,2,2};
+        error_msg.specific_errors.push_back(invalid_address::Bad_State());
     }
-    if( !zip ) 
+    else if(US_states.find(_state) == US_states.end() )
+    {
+        errors["State"] = Invalid_Value {_state,"Us state"};
+        error_msg.specific_errors.push_back(invalid_address::Bad_State());
+    }    
+
+    if( !Validators::length(std::to_string(zip), 5, 5) ) 
+    {
         errors["Zip"] = Invalid_Value {std::to_string(zip),"Cannot be empty"};
+        error_msg.specific_errors.push_back(invalid_address::Bad_Zip());
+    }
 
     ( !errors.empty() ) 
         ? throw invalid_address("Invalid address values", errors)

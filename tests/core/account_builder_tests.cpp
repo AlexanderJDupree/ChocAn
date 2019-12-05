@@ -131,7 +131,21 @@ TEST_CASE("Account builder can build new accounts", "[account_builder]")
     {
         mock_dependencies mocks;
         Account_Builder account_builder;
-        std::vector<std::string> inputs;
+        std::stack<std::string> good_input("90808",
+                                           "OR",
+                                           "Portland",
+                                           "1123 cool street",
+                                           "last name", 
+                                           "first name", 
+                                           "provider");
+        std::vector<std::string> bad_inputs("not an account",
+                                            "134053480598350",
+                                            "////***/*//*/*/*/++6+66+21jj464``",
+                                            "!@#$%^&*()_+/*/*/",
+                                            std::string(1000,'*'),
+                                            "some more nonsense");
+    
+        
 
 
     }
