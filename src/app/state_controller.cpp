@@ -149,7 +149,9 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
         { "2"   , [&](){ return Create_Account{ 
             &chocan->account_builder.initiate_new_build_process() }; } 
         },
-        { "5"   , [&](){ return Generate_Report(); } }
+        { "3"   , [&](){ return Find_Account { Find_Account::Next::Delete_Account }; }},
+        { "4"   , [&](){ return Generate_Report(); } },
+        { "exit", [&](){ return Exit();  } }
     };
 
     try
@@ -268,6 +270,29 @@ Application_State State_Controller::operator()(View_Account& state)
     return pop_runtime();
 }
 
+Application_State State_Controller::operator()(Delete_Account& state)
+{
+    std::optional<bool> confirmed;
+    while(!confirmed)
+    {
+        //render the view account state with a confirm deletion prompt
+        View_Account view_account { state.account, View_Account::Status::Confirm_Deletion };
+        state_viewer->render_state(view_account, [&](){
+            confirmed = input_controller->confirm_input();
+        }) ;
+    }
+
+    //the user entered yes
+    if(confirmed.value())
+    {
+        chocan->db->delete_account(state.account.id());
+        return Manager_Menu {{ "Account deleted!" }};
+    }
+
+    //the user entered no
+    return Manager_Menu {{ "Account not deleted" }};
+}
+
 Application_State State_Controller::operator()(Find_Account& state)
 {
     using Get_Account_Function = std::function<std::optional<Account>(const std::string&)>;
@@ -293,7 +318,7 @@ Application_State State_Controller::operator()(Find_Account& state)
     {
         switch (state.next)
         {
-        case Find_Account::Next::Delete_Account : void();
+        case Find_Account::Next::Delete_Account : return Delete_Account { maybe_account.value() };
         case Find_Account::Next::Update_Account : void();
         default: return View_Account { maybe_account.value() };
         }

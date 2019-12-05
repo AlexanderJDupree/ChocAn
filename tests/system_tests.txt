@@ -28,7 +28,30 @@ cancel
 1
 987654321
   
-5
+4
 all
  
+2
+Member
+John
+Doe
+1234 Lame St.
+Gresham
+not a state
+OR
+bad zip code
+97236
+didn't confirm
+no
+Provider
+John
+Doe
+1234 Cool St.
+Gresham
+OR
+97236
+yes
+4
+all
+Cool
 exit

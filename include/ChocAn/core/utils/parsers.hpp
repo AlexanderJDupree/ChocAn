@@ -77,11 +77,11 @@ DateTime parse_date(std::string input, const std::string& structure, const std::
     }
     catch(const std::invalid_argument&)
     {
-        throw invalid_datetime("Invalid Datetime", { { structure, Invalid_Value{ input, "unrecognized format" } }});
+        throw invalid_datetime("Invalid Datetime", { { structure, Failed_With{ input, "unrecognized format" } }});
     }
     catch(const std::out_of_range&)
     {
-        throw invalid_datetime("Invalid Datetime", { { structure, Invalid_Value{ input, "unrecognized format" } }});
+        throw invalid_datetime("Invalid Datetime", { { structure, Failed_With{ input, "unrecognized format" } }});
     }
 }
 
