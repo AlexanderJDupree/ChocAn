@@ -65,9 +65,13 @@ void Account_Builder::apply_updates_to_account(Account& account)
         throw invalid_account_build("Attempt made to update prematurely", errors);
     }
     
-    account.name() = Name(fields.first.value_or(account.name.first(),
-                );
-    account.address() = address.value();
+    account.name() = Name(fields.first.value_or(account.name().first())
+                         ,fields.last.value_or(account.name().last()));
+
+    account.address() = Address(fields.street.value_or(account.address().street())
+                               ,fields.city.value_or(account.address().city())
+                               ,fields.state.value_or(account.address().state())
+                               ,fields.zip.value_or(account.address().zip()));
 }
 
 void Account_Builder::initiate_new_build_process()

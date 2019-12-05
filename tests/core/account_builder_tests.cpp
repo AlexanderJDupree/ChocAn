@@ -127,26 +127,47 @@ TEST_CASE("Account builder can build new accounts", "[account_builder]")
     
     }
     
-    SECTION("Builds an account despite persitantly bad user input", "[account_builder][use_case][user_errors]")
+    SECTION("Builds an account despite persitantly bad user input", "[account_builder][user_errors]")
     {
         mock_dependencies mocks;
         Account_Builder account_builder;
-        std::stack<std::string> good_input("90808",
-                                           "OR",
-                                           "Portland",
-                                           "1123 cool street",
-                                           "last name", 
-                                           "first name", 
-                                           "provider");
-        std::vector<std::string> bad_inputs("not an account",
-                                            "134053480598350",
-                                            "////***/*//*/*/*/++6+66+21jj464``",
-                                            "!@#$%^&*()_+/*/*/",
-                                            std::string(1000,'*'),
-                                            "some more nonsense");
-    
+
         
 
+        const std::vector<std::string> good_inputs({
+                                           "provider",
+                                           "first name", 
+                                           "last name", 
+                                           "1123 cool street",
+                                           "Portland",
+                                           "OR",
+                                           "90808"});
+        const std::vector<std::string> bad_inputs({"not an account",
+                                            "134053480598350",
+                                            "809348590/*/*/++6+66+21jj464``",
+                                            "!@#$%^&*()_+/*/*/",
+                                            std::string(1000,'*'),
+                                            "mEmber",
+                                            "ManAger",
+                                            "ProViDer"});
+    
+
+        SECTION("Account builder will not transition state until given valid input","[account_builder][user_errors]")
+        {
+            account_builder.initiate_new_build_process();
+
+            for (const std::string &good_input : good_inputs)
+            {
+                for (const std::string &bad_input : bad_inputs)
+                {
+                    account_builder.set_field(bad_input);
+
+
+                }
+                account_builder.set_field(good_input);
+            }
+
+        }
 
     }
 }
