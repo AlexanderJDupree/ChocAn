@@ -236,7 +236,7 @@ void Account_Builder::deriveType(const std::string &input)
     
     else if(temp == "PROVIDER") fields.type = "Provider";
 
-    else errors["Account Type"] = Invalid_Value {input, "Manager,Provder,Member"};
+    else errors["Account Type"] = Invalid_Value {input, "Manager, Provider, Member"};
 
 }
 

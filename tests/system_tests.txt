@@ -55,4 +55,7 @@ yes
 4
 all
 Cool
+3
+123123123
+yes
 exit
