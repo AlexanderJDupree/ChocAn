@@ -38,7 +38,6 @@ Name::Name(const std::string& first, const std::string& last)
     else if (!Validators::length(first + " " + last, 1, 25))
     {
         errors["Full Name"] = Invalid_Length {first + " " + last,2,25};
-        name_errors.specific_errors.clear();
         name_errors.specific_errors.push_back(invalid_name::Bad_Full());
     }
 
