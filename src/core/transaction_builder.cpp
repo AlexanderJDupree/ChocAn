@@ -103,7 +103,7 @@ void Transaction_Builder::set_member_acct_field(const std::string& input)
     }
     catch(const std::bad_optional_access&)
     {
-        error.emplace(chocan_user_exception("Invalid ID" , { {"Member Account", Invalid_Value { input, "does not belong to a member account" }}}));
+        error.emplace(chocan_user_exception("Invalid ID" , { {"Member Account", Invalid_Value { input, "A 9-digit valid Member ID" }}}));
         return;
     }
     if (std::get<Member>(member_acct.value().type()).status() == Account_Status::Suspended)

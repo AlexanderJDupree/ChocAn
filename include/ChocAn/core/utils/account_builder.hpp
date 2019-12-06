@@ -18,10 +18,9 @@ https://github.com/AlexanderJDupree/ChocAn
 #ifndef CHOCAN_ACCOUNT_BUILDER_HPP
 #define CHOCAN_ACCOUNT_BUILDER_HPP
 
-#include <ChocAn/core/data_gateway.hpp>
-#include <ChocAn/core/entities/account.hpp>
-#include <optional>
 #include <stack>
+#include <optional>
+#include <ChocAn/core/entities/account.hpp>
 
 struct Fields
 {
@@ -49,16 +48,15 @@ public:
     struct Zip{};
     struct Idle{};
     
-    using Database_Ptr = Data_Gateway::Database_Ptr;
     using Build_State = std::variant<Type,First,Last,Street,City,State,Zip,Idle>;
     using Build_Stack = std::stack<Build_State>;
     using Errors_With_Name = std::vector<invalid_name::Name_Errors>;
     using Errors_With_Address = std::vector<invalid_address::Address_Errors>;
     Account_Builder(){reset();}
 
+    Account_Builder& initiate_new_build_process();
     
     const Account build_new_account(const ID_Generator& id_generator);
-    void initiate_new_build_process();
     void request_update_to_account(Build_State update_needed); 
     void apply_updates_to_account(Account& account); 
     void set_field(const std::string &input);

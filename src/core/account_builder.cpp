@@ -21,6 +21,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 bool Account_Builder::buildable() const
 {
+    //@Dan Maybe this should check if the fields are populated, not just that the stack is empty
     return build_state.empty();
 }
 
@@ -67,11 +68,13 @@ void Account_Builder::apply_updates_to_account(Account& account)
                                ,fields.zip.value_or(account.address().zip()));
 }
 
-void Account_Builder::initiate_new_build_process()
+Account_Builder& Account_Builder::initiate_new_build_process()
 {
     reset();
 
     build_state = Build_Stack({Zip(),State(),City(),Street(),Last(),First(),Type()});
+
+    return *this;
 }
 
 const Account Account_Builder::build_new_account(const ID_Generator& id_generator)
@@ -85,9 +88,11 @@ const Account Account_Builder::build_new_account(const ID_Generator& id_generato
 
     try
     {
-        return  Account(Name(name.value()),Address(address.value()),yield_account_type(),id_generator);
+        return  Account( name.value() ,address.value(), yield_account_type(), id_generator);
+        // @Dan What errors are you expecting? If it is buildable then no errors should occur, 
+        // Otherwise the result of buildable() is a lie. 
     }
-    catch(...)
+    catch(std::exception& e)
     {
         errors["Builder State at Exception"] = Invalid_Value{get_status(),""};
 

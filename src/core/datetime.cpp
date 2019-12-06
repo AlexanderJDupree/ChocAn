@@ -44,7 +44,7 @@ DateTime::DateTime(Day day, Month month, Year year, Hours hour, Minutes min, Sec
     }
     if( !Validators::range(year.count(), 1970, Year::max().count()) )
     {
-        errors["Year"] = Invalid_Value { "", "Must be greater than greater than 1970" };
+        errors["Year"] = Failed_With { std::to_string(year.count()), "Must be greater than greater than 1970" };
     }
     if( !Validators::range(month.count(), 1, 12) )
     {
