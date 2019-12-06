@@ -118,6 +118,7 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return View_Account {chocan->login_manager.session_owner() }; } },
+        { "2"   , [&](){ return Update_Account { chocan->login_manager.session_owner() }; } },
         { "4"   , [&](){ return Find_Account(); } },
         { "5"   , [&](){ 
             chocan->transaction_builder.reset();
@@ -280,7 +281,8 @@ Application_State State_Controller::operator()(Find_Account& state)
         switch (state.next)
         {
         case Find_Account::Next::Delete_Account : void();
-        case Find_Account::Next::Update_Account : void();
+       // case Find_Account::Next::Update_Account : void();
+        case Find_Account::Next::Update_Account : return Update_Account{ maybe_account.value() };
         default: return View_Account { maybe_account.value() };
         }
     }
@@ -332,45 +334,134 @@ Application_State State_Controller::operator()(View_Summary_Report& state)
     }) ;
     return pop_runtime();
 }
-Application_State State_Controller::operator()(Update_Record& state)
+
+Application_State State_Controller::operator()(Update_Account& state)
 {
-    int keepUpdating = 1;
+    std::string input;
+    if(state.status != Update_Account::Status::Confirm)
+    {
+        state_viewer->render_state(state, [&]()
+                {
+                input = input_controller->read_input();
+                }        
+                );
+    }
+
+    if(input == "exit") { return Exit(); }
+    if(input == "cancel") {return pop_runtime();}
+
+    std::map<Update_Account::Status, std::function<Application_State()>> transition_table
+    {
+        {Update_Account::Status::choose, [&]() -> Application_State
+            {
+                if(input == "name")
+                {
+                    state.msg.clear();
+                    state.builder = Account_Builder( Builder_Mode::Update, Account_Builder::set_name_sequence );
+                    state.status = Update_Account::Status::Update_Field;
+                }
+                else if(input == "address")
+                {
+                    state.msg.clear();
+                    state.builder = Account_Builder( Builder_Mode::Update, Account_Builder::set_address_sequence );
+                    state.status = Update_account::Status::Update_Field;
+                }
+            }
+        }
+    },
+
+    { Update_Account::Status::Update_Field, [&]() -> Application_State
+        {
+            state.builder.set_current_field(input);
+
+            if(state.builder.can_update())
+            {
+                state.builder.update(state.account);
+                state.status = Update_Account::Status::Confirm;
+            }
+            return state;
+        }
+    },
+    { Update_Account::Confirm, [&]() -> Application_State
+        {
+            View_Account view_state { state.account, View_Account::Status::Confirm_Update };
+
+            std::optional<bool> confirmed;
+            while(!confirmed)
+            {
+                state_viewer->render_state(view_state, [&]()
+                {
+                    confirmed = input_controller->confirminput();
+                });
+            }
+            if(confirmed.value())
+            {
+                state.msg.clear();
+                state.status = Update_Account::Status::Choose;
+                return state;
+            }
+            else
+            {
+                chocan->db->update_account(state.account);
+                return Provider_Menu {{"Account Updated!"}};
+            }
+        }
+    },
+    return transition_table.at(state.status)();
+}
+
+
+   /* int keepUpdating = 1;
     int updater = 0;
-  /* 1 for first, 2 for last, 3 for street, 4 for city, 5 for state, 6 for zip*/
-    do{
+   1 for first, 2 for last, 3 for street, 4 for city, 5 for state, 6 for zip
+    while(keepUpdating == 1)
+    {
 
     state_viewer->render_state(Update_Account_Fields);
     updater = input_controller->read_input();
     while(updater != 1 or updater != 2 or updater != 3 or updater != 4 or updater !=5 or updater != 6)
-    {
+     {
         state_viewer->render_state(Incorrect_Update_Choice);
         updater = input_controller->read_input();
-    }
-    //insert Dan function calls
+     }
+    
+    insert Dan function calls
     switch(updater)
     {
-        case 1: 
-            Account_Builder::request_updates_to_account((First()));
+        case 1:
+            if(Account_Builder::buildable()){            
+                 Account_Builder::request_updates_to_account((First()));
+            }
             break;
 
         case 2:  
+            if(Account_Builder::buildable()){
             Account_Builder::request_updates_to_account((Last()));
+            }
             break;
 
         case 3:
+            if(Account_Builder::buildable()){
             Account_Builder::request_updates_to_account((street()));
+            }
             break;
 
         case 4: 
+            if(Account_Builder::buildable()){
             Account_Builder::request_updates_to_account((city()));
+            }
             break;
 
         case 5:
+            if(Account_Builder::buildable()){
             Account_Builder::request_updates_to_account((state()));
+            }
             break;
 
         case 6: 
+            if(Account_Builder::buildable()){
             Account_Builder::request_updates_to_account((zip()));
+            }
             break;
     }
 
@@ -382,65 +473,8 @@ Application_State State_Controller::operator()(Update_Record& state)
         state_viewer->render_state(Invalid_Update_Continuation);
         nameChange = input_controller->read_input();
      }
-    }while(keepUpdating = 1);
-    
-   /* if(nameChange == "Y")
-    {
-        ++changeFlag;
-
-        std::fname;
-        std::lname;
-
-        state_viewer->render_state(Get_First);
-        fname = input_controller->read_input();
-
-        state_viewer->render_state(Get_Last);
-        lname = input_controller->read_input();
-
-        try
-        {
-            account.name() = Name{fname, lname};
-        }
-        catch(const std::invalid_name)
-        {
-            return (Update_Record {{"Invalid name detected."}})
-        }
-    }
-
-    state_viewer->render_state(Change_Address);
-    std::addressChange;
-    addressChange = input_controller->read_input();
-    while(addressChange != "Y" or addressChange != "N")
-    {
-        state_viewer->render_state(Edit_Address);
-        addressChange = input_controller->read_input();
-    }
-
-    if(addressChange == "Y")
-    {
-        ++changeFlag;
-        std::street;
-        std::city;
-        std::state;
-        std::zip;
-
-        state_viewer->render_state(Get_Address);
-        street = input_controller->read_input();
-        city = input_controller->read_input();
-        state = input_controller->read_input();
-        zip = input_controller->read_input();
-
-        try
-        {
-            account.address() = Address{street, city, state, zip};
-        }
-        catch(const std::invalid_address)
-        {
-            return (Update_Record {{"Invalid address detected."}});
-        }
-
-    }*/
-    
-    return pop_runtime();
-
 }
+    
+    return pop_runtime();*/
+
+

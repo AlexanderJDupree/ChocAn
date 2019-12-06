@@ -95,8 +95,13 @@ public:
 class Update_Account
 {
 public: 
+    enum class Status {Choose, Update_Field, Confirm};
+
     Account account;
-}
+    std::string msg = {};
+    Account_Builder builder = {};
+    Status status = Status::Choose;
+};
 
 using Application_State = std::variant< Login
                                       , Exit
