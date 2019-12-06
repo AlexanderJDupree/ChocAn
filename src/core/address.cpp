@@ -54,6 +54,7 @@ Address::Address( const std::string& street
 
         error_msg.specific_errors.push_back(invalid_address::Bad_City());
     }
+    /*
     else if(!Validators::is_alphabetic(city))
     {
 
@@ -62,6 +63,7 @@ Address::Address( const std::string& street
         error_msg.specific_errors.push_back(invalid_address::Bad_City());
 
     }
+    */
     
     if( !Validators::length(_state, 2, 2) ) {
 

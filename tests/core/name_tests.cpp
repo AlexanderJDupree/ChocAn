@@ -41,11 +41,11 @@ TEST_CASE("Constructing Name objects", "[constructors], [name]")
     }
     SECTION("First name is not alphabetic")
     {
-        REQUIRE_THROWS_AS( Name( "not &lphabeti(", "valid"), invalid_name);
+        REQUIRE_THROWS_AS( Name( "not 4lphabetic", "valid"), invalid_name);
     }
     SECTION("Last name is not alphabetic")
     {
-        REQUIRE_THROWS_AS( Name("valid", "not &lphabeti("), invalid_name);
+        REQUIRE_THROWS_AS( Name("valid", "not 4lphabetic"), invalid_name);
     }
 }
 
