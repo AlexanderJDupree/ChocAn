@@ -117,8 +117,13 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
     {
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
-        { "1"   , [&](){ return View_Account {chocan->login_manager.session_owner() }; } },
-        { "2"   , [&](){ return Update_Account { chocan->login_manager.session_owner() }; } },
+        { "1"   , [&](){ 
+            return View_Account { chocan->db->get_account(chocan->login_manager.session_owner().id()).value() }; } },
+        { "2"   , [&](){ 
+            return Update_Account { chocan->login_manager.session_owner() 
+                                  , &chocan->account_builder.reset() }; } 
+        },
+        { "3"   , [&](){ return Find_Account{ Find_Account::Next::Update_Account }; } },
         { "4"   , [&](){ return Find_Account(); } },
         { "5"   , [&](){ 
             chocan->transaction_builder.reset();
@@ -315,8 +320,11 @@ Application_State State_Controller::operator()(Find_Account& state)
     {
         switch (state.next)
         {
-        case Find_Account::Next::Update_Account : return Update_Account{ maybe_account.value() };
-        case Find_Account::Next::Delete_Account : return Delete_Account { maybe_account.value() };
+        case Find_Account::Next::Update_Account : 
+            return Update_Account{ maybe_account.value()        
+                                 , &chocan->account_builder.reset() };
+        case Find_Account::Next::Delete_Account : 
+            return Delete_Account { maybe_account.value() };
         default: return View_Account { maybe_account.value() };
         }
     }
@@ -369,7 +377,77 @@ Application_State State_Controller::operator()(View_Summary_Report& state)
     return pop_runtime();
 }
 
-Application_State State_Controller::operator()(Update_Account&)
+Application_State State_Controller::operator()(Update_Account& state)
 {
-    return pop_runtime();
+    std::string input;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return pop_runtime(); }
+
+    if(state.status == Update_Account::Status::Choose)
+    {
+        state.msg.clear();
+        if(input == "name")
+        {
+            state.builder->request_update_to_account( { Account_Builder::Last()
+                                                      , Account_Builder::First() } );
+
+            state.status = Update_Account::Status::Update_Field;
+        }
+        else if(input == "address")
+        {
+            state.builder->request_update_to_account( { Account_Builder::Zip()
+                                                      , Account_Builder::State()
+                                                      , Account_Builder::City()
+                                                      , Account_Builder::Street() } );
+
+            state.status = Update_Account::Status::Update_Field;
+        }
+        else
+        {
+            state.msg = "Unrecognized input";
+        }
+        return state;
+    }
+    if(state.status == Update_Account::Status::Update_Field)
+    {
+        state.builder->set_field(input);
+
+        if(state.builder->buildable())
+        {
+            state.builder->apply_updates_to_account(state.account);
+            state.status = Update_Account::Status::Confirm;
+        }
+    }
+    if(state.status == Update_Account::Status::Confirm)
+    {
+        std::optional<bool> confirmed;
+        while(!confirmed)
+        {
+            View_Account view { state.account, View_Account::Status::Confirm_Update };
+            state_viewer->render_state(view, [&]()
+            {
+                confirmed = input_controller->confirm_input();
+            } ) ;
+        }
+
+        if(confirmed.value())
+        {
+            state.builder->reset();
+            state.status = Update_Account::Status::Choose;
+        }
+        else
+        {
+            if(chocan->db->update_account(state.account))
+            {
+                return Provider_Menu {{ "Account Updated!" }};
+            }
+            return Provider_Menu {{ "Account Failed to update." }};
+        }
+    }
+    return state;
 }

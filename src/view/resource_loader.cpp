@@ -103,6 +103,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
         {
             case View_Account::Status::Confirm_Creation : return "Is this correct? (Y/N):";
             case View_Account::Status::Confirm_Deletion : return "Delete account? (Y/N):";
+            case View_Account::Status::Confirm_Update   : return "Update another field? (Y/N):";
             default : return "Press 'Enter' to continue:";
         };
     }() });
@@ -118,46 +119,41 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account
     
         {"builder.status", state.builder->get_status()},
    
-        {"builder.errors", [&]() {
-             if (std::optional<const chocan_user_exception> errors = state.builder->get_errors())
-             {
-                return render_user_error(errors.value());
+        { "builder.errors", render_user_error(state.builder->get_errors()) },
 
-             }
-             return std::string("");
-         }()
-        },
-        { "builder.current_field", [&]() -> std::string
-        {
-            return std::visit( overloaded {
-                [&](const Account_Builder::Type)  { return "Enter Account Type: "; },
-                [&](const Account_Builder::First) { return "Enter First Name: "; },
-                [&](const Account_Builder::Last)  { return "Enter Last Name: "; },
-                [&](const Account_Builder::Street){ return "Enter Street: "; },
-                [&](const Account_Builder::City)  { return "Enter City: "; },
-                [&](const Account_Builder::State) { return "Enter State: "; },
-                [&](const Account_Builder::Zip)   { return "Enter Zip: "; },
-                [&](const Account_Builder::Idle)  { return " "; }
-            }, state.builder->builder_state() );
-        }() }
+        { "builder.current_field", render_builder_prompt(state.builder->builder_state()) }
     };
 }
-Resource_Loader::Resource_Table Resource_Loader::operator()(const Update_Account&)
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Update_Account& state)
 {
     return
     {
         {"state_name", "Update Account" },
         
-        { "state_prompt", "" }
+        { "state_msg", [&]() -> std::string {
+            switch (state.status)
+            {
+            case Update_Account::Status::Update_Field : 
+                return render_user_error(state.builder->get_errors());
+            default: return state.msg;
+            }
+        }() },
+        { "state_prompt", [&]() -> std::string {
+            switch (state.status)
+            {
+            case Update_Account::Status::Choose : 
+                return "Enter 'name' or 'address' to update the corresponding field:";
+            case Update_Account::Status::Update_Field : 
+                return render_builder_prompt(state.builder->builder_state());
+            default: return {};
+            }
+        }() }
     };
 }
 
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Delete_Account&)
 {
-    return
-    {
-
-    };
+    return { };
 }
 
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Generate_Report& state)
@@ -193,7 +189,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Service_D
     };
 }
 
-std::string Resource_Loader::render_directory(const Data_Gateway::Service_Directory& directory)
+std::string Resource_Loader::render_directory(const Data_Gateway::Service_Directory& directory) const
 {
     std::string stream;
     for (const auto& service : directory)
@@ -204,6 +200,20 @@ std::string Resource_Loader::render_directory(const Data_Gateway::Service_Direct
                     '|' + row_bar(3));
     }
     return stream;
+}
+
+std::string Resource_Loader::render_builder_prompt(Account_Builder::Build_State state) const
+{
+            return std::visit( overloaded {
+                [&](const Account_Builder::Type)  { return "Enter Account Type: "; },
+                [&](const Account_Builder::First) { return "Enter First Name: "; },
+                [&](const Account_Builder::Last)  { return "Enter Last Name: "; },
+                [&](const Account_Builder::Street){ return "Enter Street: "; },
+                [&](const Account_Builder::City)  { return "Enter City: "; },
+                [&](const Account_Builder::State) { return "Enter State: "; },
+                [&](const Account_Builder::Zip)   { return "Enter Zip: "; },
+                [&](const Account_Builder::Idle)  { return " "; }
+            }, state );
 }
 
 std::string Resource_Loader::render_user_error(const std::optional<chocan_user_exception>& maybe_err) const

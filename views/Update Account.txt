@@ -1,0 +1,8 @@
+<clear_screen>
+<header>
+
+<footer>
+( Entering 'cancel' will cancel the transaction )
+
+<@state_msg>
+<@state_prompt> <prompt>

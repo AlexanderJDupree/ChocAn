@@ -68,7 +68,7 @@ public:
 class View_Account
 {
 public:
-    enum class Status { Wait, Confirm_Creation, Confirm_Deletion };
+    enum class Status { Wait, Confirm_Creation, Confirm_Deletion, Confirm_Update };
     Account account;
     Status status = Status::Wait;
 };
@@ -96,11 +96,11 @@ public:
 class Update_Account
 {
 public: 
-    enum class Status {Choose, Update_Field, Confirm};
+    enum class Status { Choose, Update_Field, Confirm };
 
     Account account;
+    Account_Builder* builder;
     std::string msg = {};
-    Account_Builder builder = {};
     Status status = Status::Choose;
 };
 

@@ -55,10 +55,11 @@ struct Resource_Loader
 
     /* Special Rendering Methods */
     std::string render_user_error(const std::optional<chocan_user_exception>& maybe_err) const;
+    std::string render_builder_prompt(Account_Builder::Build_State state) const;
 
     std::string render_provider_activity(const Provider_Activity& activity) const;
 
-    std::string render_directory(const Data_Gateway::Service_Directory& directory);
+    std::string render_directory(const Data_Gateway::Service_Directory& directory) const;
 
     std::string render_summary(const Summary_Report& summary) const;
 

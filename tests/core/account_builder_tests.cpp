@@ -230,6 +230,7 @@ TEST_CASE("Account builder can build new accounts", "[account_builder]")
 
     }
 }
+/*
 TEST_CASE("Account builder updates accounts as needed", "[account_builder],[update_account]")
 {
     Account account_to_update(good_input.name,good_input.address,good_input.account_type,mocks.chocan->id_generator);
@@ -319,6 +320,8 @@ TEST_CASE("Account builder updates accounts as needed", "[account_builder],[upda
     }
 
 }
+*/
+
 TEST_CASE("Account builder throws exceptions when needed", "[account_builder],[exceptions]")
 {
     Account temp(good_input.name,good_input.address,good_input.account_type,mocks.chocan->id_generator);

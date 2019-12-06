@@ -24,7 +24,7 @@ bool Account_Builder::buildable() const
     return build_state.empty();
 }
 
-void Account_Builder::reset()
+Account_Builder& Account_Builder::reset()
 {
     fields.type.reset();
     fields.first.reset();
@@ -36,17 +36,22 @@ void Account_Builder::reset()
 
     name.reset();
     address.reset();
+
+    // Reset build state
+    build_state = {};
+    return *this;
 }
 
 
-void Account_Builder::request_update_to_account(Build_State update_needed)
+void Account_Builder::request_update_to_account(std::vector<Build_State> updates_needed)
 {
-    //TODO maybe throw an exception to gaurd against attemts to change account
-    if(std::holds_alternative<Type>(update_needed)) return;
-
     reset();
-    
-    build_state.push(update_needed);
+    for(const auto& update : updates_needed)
+    {
+        if(std::holds_alternative<Type>(update)) return;
+
+        build_state.push(update);
+    }
 }
 
 void Account_Builder::apply_updates_to_account(Account& account)
