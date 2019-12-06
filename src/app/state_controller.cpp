@@ -147,14 +147,10 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-<<<<<<< HEAD
         { "2"   , [&](){ return Create_Account{ &chocan->account_builder.reset()}; } },
-        { "5"   , [&](){ return Generate_Report(); } }
-=======
         { "4"   , [&](){ return Find_Account { Find_Account::Next::Delete_Account }; }},
         { "5"   , [&](){ return Generate_Report(); } },
         { "exit", [&](){ return Exit();  } }
->>>>>>> master
     };
 
     try
@@ -218,7 +214,7 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
     }
 }
 
-Application_State State_Controller::operator()(const Create_Account& state)
+Application_State State_Controller::operator()(Create_Account& state)
 {
     std::string input;
     std::shared_ptr<Account> temp_account;
@@ -319,14 +315,8 @@ Application_State State_Controller::operator()(Find_Account& state)
     {
         switch (state.next)
         {
-<<<<<<< HEAD
-        case Find_Account::Next::Delete_Account : void();
-       // case Find_Account::Next::Update_Account : void();
         case Find_Account::Next::Update_Account : return Update_Account{ maybe_account.value() };
-=======
         case Find_Account::Next::Delete_Account : return Delete_Account { maybe_account.value() };
-        case Find_Account::Next::Update_Account : void();
->>>>>>> master
         default: return View_Account { maybe_account.value() };
         }
     }
@@ -379,146 +369,7 @@ Application_State State_Controller::operator()(View_Summary_Report& state)
     return pop_runtime();
 }
 
-Application_State State_Controller::operator()(Update_Account& state)
+Application_State State_Controller::operator()(Update_Account&)
 {
-    std::string input;
-    if(state.status != Update_Account::Status::Confirm)
-    {
-        state_viewer->render_state(state, [&]()
-                {
-                input = input_controller->read_input();
-                }        
-                );
-    }
-
-    if(input == "exit") { return Exit(); }
-    if(input == "cancel") {return pop_runtime();}
-
-    std::map<Update_Account::Status, std::function<Application_State()>> transition_table
-    {
-        {Update_Account::Status::choose, [&]() -> Application_State
-            {
-                if(input == "name")
-                {
-                    state.msg.clear();
-                    state.builder = Account_Builder( Builder_Mode::Update, Account_Builder::set_name_sequence );
-                    state.status = Update_Account::Status::Update_Field;
-                }
-                else if(input == "address")
-                {
-                    state.msg.clear();
-                    state.builder = Account_Builder( Builder_Mode::Update, Account_Builder::set_address_sequence );
-                    state.status = Update_account::Status::Update_Field;
-                }
-            }
-        }
-    },
-
-    { Update_Account::Status::Update_Field, [&]() -> Application_State
-        {
-            state.builder.set_current_field(input);
-
-            if(state.builder.can_update())
-            {
-                state.builder.update(state.account);
-                state.status = Update_Account::Status::Confirm;
-            }
-            return state;
-        }
-    },
-    { Update_Account::Confirm, [&]() -> Application_State
-        {
-            View_Account view_state { state.account, View_Account::Status::Confirm_Update };
-
-            std::optional<bool> confirmed;
-            while(!confirmed)
-            {
-                state_viewer->render_state(view_state, [&]()
-                {
-                    confirmed = input_controller->confirminput();
-                });
-            }
-            if(confirmed.value())
-            {
-                state.msg.clear();
-                state.status = Update_Account::Status::Choose;
-                return state;
-            }
-            else
-            {
-                chocan->db->update_account(state.account);
-                return Provider_Menu {{"Account Updated!"}};
-            }
-        }
-    },
-    return transition_table.at(state.status)();
+    return pop_runtime();
 }
-
-
-   /* int keepUpdating = 1;
-    int updater = 0;
-   1 for first, 2 for last, 3 for street, 4 for city, 5 for state, 6 for zip
-    while(keepUpdating == 1)
-    {
-
-    state_viewer->render_state(Update_Account_Fields);
-    updater = input_controller->read_input();
-    while(updater != 1 or updater != 2 or updater != 3 or updater != 4 or updater !=5 or updater != 6)
-     {
-        state_viewer->render_state(Incorrect_Update_Choice);
-        updater = input_controller->read_input();
-     }
-    
-    insert Dan function calls
-    switch(updater)
-    {
-        case 1:
-            if(Account_Builder::buildable()){            
-                 Account_Builder::request_updates_to_account((First()));
-            }
-            break;
-
-        case 2:  
-            if(Account_Builder::buildable()){
-            Account_Builder::request_updates_to_account((Last()));
-            }
-            break;
-
-        case 3:
-            if(Account_Builder::buildable()){
-            Account_Builder::request_updates_to_account((street()));
-            }
-            break;
-
-        case 4: 
-            if(Account_Builder::buildable()){
-            Account_Builder::request_updates_to_account((city()));
-            }
-            break;
-
-        case 5:
-            if(Account_Builder::buildable()){
-            Account_Builder::request_updates_to_account((state()));
-            }
-            break;
-
-        case 6: 
-            if(Account_Builder::buildable()){
-            Account_Builder::request_updates_to_account((zip()));
-            }
-            break;
-    }
-
-    
-    state_viewer->render_state(Continue_Updating);
-    keepUpdating = input_controller->read_input();
-    while(keepUpdating != 0 or keepUpdating != 1)
-      {
-        state_viewer->render_state(Invalid_Update_Continuation);
-        nameChange = input_controller->read_input();
-     }
-}
-    
-    return pop_runtime();*/
-
-

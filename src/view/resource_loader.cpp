@@ -103,14 +103,12 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
         {
             case View_Account::Status::Confirm_Creation : return "Is this correct? (Y/N):";
             case View_Account::Status::Confirm_Deletion : return "Delete account? (Y/N):";
-            case View_Account::Status::Confirm_Update : return "Update another field? (Y/N)"
             default : return "Press 'Enter' to continue:";
         };
     }() });
     return table;
 }
 
-<<<<<<< HEAD
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account& state)
 {
 
@@ -143,40 +141,21 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account
         }() }
     };
 }
-Resource_Loader::Resource_table Resource_Loader::operator()(const Update_Account& state)
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Update_Account&)
 {
     return
     {
-        {"state_name", "Update Account},"     
+        {"state_name", "Update Account" },
         
-        if(state.status == Update_Account::Status::Choose)
-        {
-        {
-            return state.msg;
-        }
-        else
-        {
-            return render_user_error(state.builder.get_last_error());
-        }
-        }() },
-        { "state_prompt", [&]() -> std::string
-        {
-            switch(state.status)
-            {
-                case Update_Account::Status::Choose :
-                    return "Enter 'name' or 'address' to update the corresponding field:";
-                case Update_Account::Status::Update_Field :
-                    return render_builder_prompt(state.builder.status());
-                default: return "";
-            }
-        }() }
-=======
+        { "state_prompt", "" }
+    };
+}
+
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Delete_Account&)
 {
     return
     {
 
->>>>>>> master
     };
 }
 

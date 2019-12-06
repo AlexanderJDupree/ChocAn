@@ -176,10 +176,10 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
     }
     SECTION("Provider menu transitions to Update Account on input '2'")
     {
-        mocks.chocan->login_manager.login(1234)
+        mocks.chocan->login_manager.login(1234);
         mocks.in_stream << "2\n";
 
-        REQUIRE(std::holde_alternative<Update_Account>(controller.interact().current_state()));
+        REQUIRE(std::holds_alternative<Update_Account>(controller.interact().current_state()));
     }
     SECTION("Provider menu transitions to View Account on input '1'")
     {
@@ -220,7 +220,6 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
-<<<<<<< HEAD
     SECTION("Manager menu transitions to create account on input '2'")
     {
 
@@ -228,7 +227,7 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(std::holds_alternative<Create_Account>(controller.interact().current_state()));
 
-=======
+    }
     SECTION("Manager menu transitions to Delete Account on input '4'")
     {
         mocks.in_stream << "4\n";
@@ -241,7 +240,6 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
             REQUIRE(std::holds_alternative<Delete_Account>(controller.interact().current_state()));
         }
->>>>>>> master
     }
     SECTION("Manager menu transitions to Generate Report input '5'")
     {

@@ -93,7 +93,6 @@ public:
     Summary_Report report;
 };
 
-<<<<<<< HEAD
 class Update_Account
 {
 public: 
@@ -103,7 +102,8 @@ public:
     std::string msg = {};
     Account_Builder builder = {};
     Status status = Status::Choose;
-=======
+};
+
 class Delete_Account
 {
 public:
@@ -114,7 +114,6 @@ class View_Service_Directory
 {
 public:
     Data_Gateway::Database_Ptr db;
->>>>>>> master
 };
 
 using Application_State = std::variant< Login
@@ -128,12 +127,9 @@ using Application_State = std::variant< Login
                                       , View_Account
                                       , Generate_Report
                                       , View_Summary_Report
-<<<<<<< HEAD
                                       , Update_Account
-=======
                                       , Delete_Account
                                       , View_Service_Directory
->>>>>>> master
                                       >;
 
 using State_Ptr = std::shared_ptr<Application_State>;
