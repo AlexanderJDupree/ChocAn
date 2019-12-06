@@ -147,10 +147,11 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
         { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-        { "2"   , [&](){ return Create_Account{ &chocan->account_builder.reset()}; } },
-        { "4"   , [&](){ return Find_Account { Find_Account::Next::Delete_Account }; }},
-        { "5"   , [&](){ return Generate_Report(); } },
-        { "exit", [&](){ return Exit();  } }
+        { "2"   , [&](){ return Create_Account{ 
+            &chocan->account_builder.initiate_new_build_process() }; } 
+        },
+        { "3"   , [&](){ return Find_Account { Find_Account::Next::Delete_Account }; }},
+        { "4"   , [&](){ return Generate_Report(); } },
     };
 
     try
@@ -217,43 +218,42 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
 Application_State State_Controller::operator()(Create_Account& state)
 {
     std::string input;
-    std::shared_ptr<Account> temp_account;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return Manager_Menu {{ "Account Not Created" }}; }
+
+    state.builder->set_field(input);
     
-    do{
-        state.builder->initiate_new_build_process();
-        
-        do{
-            
-            state_viewer->render_state(state);
+    state_viewer->render_state(state);
 
-            input = input_controller->read_input();
+    if(!state.builder->buildable()) { return state; }
 
-            if(input == "exit")   { return Exit(); }
-            if(input == "cancel") { return Manager_Menu{ {"Account Not Created"} }; }
+    Account temp_account = chocan->account_builder.build_new_account(chocan->db);
 
-            state.builder->set_field(input);
+    std::optional<bool> confirmed;
+    while(!confirmed)
+    {
+        View_Account view { temp_account, View_Account::Status::Confirm_Creation };
+        state_viewer->render_state(view, [&]()
+        {
+            confirmed = input_controller->confirm_input();
+        } ) ;
+    }
 
-        }while(!state.builder->buildable());
+    // User said yes
+    if(confirmed.value())
+    {
+        chocan->db->create_account(temp_account);
+        return Manager_Menu{{ "Account created! ID: " + std::to_string(temp_account.id()) }};
+    }
 
-        try{
-    
-            temp_account = std::make_unique<Account>(chocan->account_builder.build_new_account(chocan->db));
-
-            state_viewer->render_state(View_Account{*temp_account,View_Account::Status::Confirm_Creation});
-
-            input = input_controller->read_input();
-
-        }catch(const chocan_user_exception& err){
-
-            //TODO literally anything would be better than this as far as error reporting goes.
-            return Manager_Menu{{"Somthing went wrong when creating your account" }};
-        }
-    
-    }while(input == "N" || input == "n");
-    
-    chocan->db->create_account(*temp_account);
-
-    return Manager_Menu{{"Account Successfully Created"}};
+    // User said no, restart account build
+    state.builder->initiate_new_build_process();
+    return state;
 }
 
 Application_State State_Controller::operator()(View_Account& state)

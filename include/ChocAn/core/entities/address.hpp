@@ -19,6 +19,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_ADDRESS_HPP
 
 #include <set>
+#include <vector>
 #include <ChocAn/core/utils/exception.hpp>
 
 class Address
@@ -38,11 +39,6 @@ public:
     const std::string& state()  const { return _state;  }
     unsigned zip() const { return _zip;    }
 
-    void update_street(const std::string& new_street) {_street = new_street;}
-    void update_city(const std::string& new_city)     {_city = new_city;}
-    void update_state(const std::string& new_state)   {_state = new_state;}
-    void update_zip(unsigned new_zip)                 {_zip = new_zip;}
-
 private:
 
     std::string _street;
@@ -56,9 +52,19 @@ private:
 struct invalid_address : public chocan_user_exception
 {
     
+    
     explicit invalid_address(const char* err, Info info) 
         : chocan_user_exception(err, info)
         { }
+
+    struct Bad_Street{};
+    struct Bad_City{};
+    struct Bad_State{};
+    struct Bad_Zip{};
+    
+    using Address_Errors = std::variant<Bad_Street,Bad_City,Bad_State,Bad_Zip>;
+
+    std::vector<Address_Errors> specific_errors;
 };
 
 #endif // CHOCAN_ADDRESS_HPP

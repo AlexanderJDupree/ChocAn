@@ -136,7 +136,8 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account
                 [&](const Account_Builder::Street){ return "Enter Street: "; },
                 [&](const Account_Builder::City)  { return "Enter City: "; },
                 [&](const Account_Builder::State) { return "Enter State: "; },
-                [&](const Account_Builder::Zip)   { return "Enter Zip: "; }
+                [&](const Account_Builder::Zip)   { return "Enter Zip: "; },
+                [&](const Account_Builder::Idle)  { return " "; }
             }, state.builder->builder_state() );
         }() }
     };
@@ -228,7 +229,11 @@ std::string Resource_Loader::render_user_error(const std::optional<chocan_user_e
             },
             [](const Invalid_Value& err)
             {
-                return err.value + ' ' + err.expected;
+                return "Got [" + err.value + "], Expected [" + err.expected + ']';
+            },
+            [](const Failed_With& err)
+            {
+                return  err.value + ", " + err.reason;
             },
             [](const Incompatible_Values& err)
             {
