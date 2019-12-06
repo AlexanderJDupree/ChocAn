@@ -230,11 +230,8 @@ Application_State State_Controller::operator()(const Create_Account& state)
     
     state_viewer->render_state(state);
 
-    // loop 
     if(!state.builder->buildable()) { return state; }
 
-    // @Dan Got rid of the try/catch because if it is buildable() then there shall not be an exception.
-    // Otherwise, buildable() is a lie, and should be refactored.
     Account temp_account = chocan->account_builder.build_new_account(chocan->db);
 
     std::optional<bool> confirmed;

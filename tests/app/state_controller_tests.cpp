@@ -369,9 +369,6 @@ TEST_CASE("Create_Account State Behavior", "[create_account], [state_controller]
     // This input sequence will change if we make changes to the account builder
     mocks.in_stream << "member\nfirstname\nlastname\nstreet\ncity\nOR\n97888\n";
 
-    // @Dan, because the confirmation loops we can't give it the final input. Because
-    // Once the account builder is buildable we loop until the new account is confirmed
-    // It's weird but it works for now.
     for (int i = 0; i < 6; ++i)
     {
             controller.interact();

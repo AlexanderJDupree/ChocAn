@@ -21,7 +21,6 @@ https://github.com/AlexanderJDupree/ChocAn
 
 bool Account_Builder::buildable() const
 {
-    //@Dan Maybe this should check if the fields are populated, not just that the stack is empty
     return build_state.empty();
 }
 
@@ -85,19 +84,8 @@ const Account Account_Builder::build_new_account(const ID_Generator& id_generato
         
         throw invalid_account_build("Attempt made to build prematurely", errors);
     }
-
-    try
-    {
-        return  Account( name.value() ,address.value(), yield_account_type(), id_generator);
-        // @Dan What errors are you expecting? If it is buildable then no errors should occur, 
-        // Otherwise the result of buildable() is a lie. 
-    }
-    catch(std::exception& e)
-    {
-        errors["Builder State at Exception"] = Invalid_Value{get_status(),""};
-
-        throw invalid_account_build("Failed to build account",errors);
-    }
+    
+    return  Account( name.value() ,address.value(), yield_account_type(), id_generator);
 }
 
 const std::string Account_Builder::get_status()
