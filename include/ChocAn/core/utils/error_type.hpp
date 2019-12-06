@@ -48,10 +48,17 @@ struct Invalid_Value
     std::string expected;
 };
 
+struct Failed_With
+{
+    std::string value;
+    std::string reason;
+};
+
 using Error_Type = std::variant< Invalid_Length
                                , Invalid_Range
                                , Invalid_Value
                                , Incompatible_Values
+                               , Failed_With
                                >;
 
 #endif // CHOCAN_ERROR_TYPE_HPP

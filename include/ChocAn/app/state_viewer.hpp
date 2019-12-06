@@ -36,6 +36,7 @@ public:
     virtual void update() = 0;
     // Store callback handler, render current state
     virtual void render_state(const Application_State& state, Callback event = [](){}) = 0;
+
 };
 
 #endif // CHOCAN_STATE_VIEWER_H

@@ -37,29 +37,41 @@ Address::Address( const std::string& street
 {
     chocan_user_exception::Info errors;
 
-    // Capitalize state
+    //Grants access to class specific errors messages
+    invalid_address error_msg("",{});
+    
     for(char& c : _state) { c = std::toupper(c); }
 
-    if( !Validators::length(street, 1, 25) )
+    if( !Validators::length(street, 1, 25) ) 
     {
-        errors["Street Address"] = Invalid_Length { street, 1, 25 };
+        errors["Street"] = Invalid_Length {street,1,25};
+        error_msg.specific_errors.push_back(invalid_address::Bad_Street());
     }
-    if( !Validators::length(city, 1, 14) )
+
+    if( !Validators::length(city, 1, 14) ) 
     {
-        errors["City"] = Invalid_Length { city, 1, 14 };
+        errors["City"] = Invalid_Length {city,1,14};
+
+        error_msg.specific_errors.push_back(invalid_address::Bad_City());
     }
-    if( !Validators::length(state, 2, 2) )
+    
+    if( !Validators::length(_state, 2, 2) ) {
+
+        errors["State"] = Invalid_Length {_state,2,2};
+        error_msg.specific_errors.push_back(invalid_address::Bad_State());
+    }
+    else if(US_states.find(_state) == US_states.end() )
     {
-        errors["State Length"] =  Invalid_Value { state, "must be in abbreviated 2 character format" };
-    }
-    if( US_states.find(_state) == US_states.end() )
-    {
-        errors["State"] = Invalid_Value { state, "is not a U.S. State (2 character format)"};
-    }
+        errors["State"] = Invalid_Value {_state,"Us state"};
+        error_msg.specific_errors.push_back(invalid_address::Bad_State());
+    }    
+
     if( !Validators::length(std::to_string(zip), 5, 5) ) 
     {
-        errors["Zip"] = Invalid_Value { std::to_string(zip), "must be 5 digits" };
+        errors["Zip"] = Invalid_Value {std::to_string(zip),"Cannot be empty"};
+        error_msg.specific_errors.push_back(invalid_address::Bad_Zip());
     }
+
     ( !errors.empty() ) 
         ? throw invalid_address("Invalid address values", errors)
         : void();

@@ -36,6 +36,7 @@ Terminal_State_Viewer::Terminal_State_Viewer( bool compact_output
     , compact_output( compact_output )
     {}
 
+
 void Terminal_State_Viewer::render_state(const Application_State& state, Callback handler)
 {
     resources = Resource_Loader(state);

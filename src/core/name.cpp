@@ -1,6 +1,6 @@
 /* 
  
-File: name.hpp
+File: name.cpp
 
 Brief: Implementation for Name utility class
 
@@ -23,21 +23,26 @@ Name::Name(const std::string& first, const std::string& last)
 {
     chocan_user_exception::Info errors;
 
-    if(!Validators::length(first, 1, 25)) 
-    { 
-        errors["First Name"] = Invalid_Length { first, 1, 25 }; 
+    invalid_name name_errors("", {});
+
+    if (!Validators::length(first, 1, 24)){
+        
+        errors["First Name"] = Invalid_Length {first,1,24};
+        name_errors.specific_errors.push_back(invalid_name::Bad_First());
     }
-    if(!Validators::length(last, 1, 25)) 
-    { 
-        errors["Last Name"] = Invalid_Length { first, 1, 25 }; 
-    }
-    if(!Validators::length(first + last, 1, 25))
+    else if (!Validators::length(last, 1, 24))
     {
-        errors["Full Name"] = Invalid_Length { first + last, 1, 25 };
+        errors["Last Name"] = Invalid_Length {last,1,24};
+        name_errors.specific_errors.push_back(invalid_name::Bad_Last());
     }
-    ( !errors.empty() ) 
-        ? throw invalid_name("Invalid name length", errors)
-        : void();
+    else if (!Validators::length(first + " " + last, 1, 25))
+    {
+        errors["Full Name"] = Invalid_Length {first + " " + last,2,25};
+        name_errors.specific_errors.push_back(invalid_name::Bad_Full());
+    }
+
+    if (!errors.empty())
+        throw invalid_name("Invalid name length", errors);
 }
 
 bool Name::operator==(const Name& rhs) const

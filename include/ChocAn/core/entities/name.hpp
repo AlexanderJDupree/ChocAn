@@ -20,6 +20,7 @@ https://github.com/AlexanderJDupree/ChocAn
 
 #include <string>
 #include <ChocAn/core/utils/exception.hpp>
+#include <vector>
 
 class Name
 {
@@ -44,6 +45,13 @@ struct invalid_name : public chocan_user_exception
     explicit invalid_name(const char* err, Info info) 
         : chocan_user_exception(err, info)
         { }
+    struct Bad_First{};
+    struct Bad_Last{};
+    struct Bad_Full{};
+
+    using Name_Errors = std::variant<Bad_First,Bad_Last,Bad_Full>;
+    std::vector<Name_Errors> specific_errors;
 };
+
 
 #endif // CHOCAN_NAME_HPP

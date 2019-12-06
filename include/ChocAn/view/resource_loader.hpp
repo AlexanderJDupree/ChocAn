@@ -43,8 +43,10 @@ struct Resource_Loader
     Resource_Table operator()(const Generate_Report& state);
     Resource_Table operator()(const View_Summary_Report& state);
     Resource_Table operator()(const Confirm_Transaction& state);
+    Resource_Table operator()(const Create_Account& state);
     Resource_Table operator()(const Add_Transaction& transaction);
     Resource_Table operator()(const View_Service_Directory& state);
+
 
     /* String Formatting Methods */
     std::string row_bar(unsigned num_fields) const;

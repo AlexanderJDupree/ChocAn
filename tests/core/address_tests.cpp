@@ -139,7 +139,7 @@ TEST_CASE("Invalid Address Exception", "[address], [exceptions]")
             info = err.info();
             REQUIRE(std::string(err.what()) == "Invalid address values");
         }
-        REQUIRE(info.size() == 5);
+        REQUIRE(info.size() == 4);
     }
 
 }

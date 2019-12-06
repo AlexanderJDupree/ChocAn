@@ -19,6 +19,7 @@ https://github.com/AlexanderJDupree/ChocAn
 #define CHOCAN_ADDRESS_HPP
 
 #include <set>
+#include <vector>
 #include <ChocAn/core/utils/exception.hpp>
 
 class Address
@@ -50,9 +51,20 @@ private:
 
 struct invalid_address : public chocan_user_exception
 {
+    
+    
     explicit invalid_address(const char* err, Info info) 
         : chocan_user_exception(err, info)
         { }
+
+    struct Bad_Street{};
+    struct Bad_City{};
+    struct Bad_State{};
+    struct Bad_Zip{};
+    
+    using Address_Errors = std::variant<Bad_Street,Bad_City,Bad_State,Bad_Zip>;
+
+    std::vector<Address_Errors> specific_errors;
 };
 
 #endif // CHOCAN_ADDRESS_HPP

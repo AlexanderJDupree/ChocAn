@@ -17,6 +17,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <functional>
+#include <ChocAn/app/application_state.hpp>
 #include <ChocAn/core/utils/parsers.hpp>
 #include <ChocAn/app/state_controller.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
@@ -142,10 +143,14 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
 
     const Transition_Table manager_menu
     {
+        { "exit", [&](){ return Exit();  } },
         { "0"   , [&](){ chocan->login_manager.logout(); return Login(); } },
         { "1"   , [&](){ return Find_Account(); } },
-        { "4"   , [&](){ return Find_Account { Find_Account::Next::Delete_Account }; }},
-        { "5"   , [&](){ return Generate_Report(); } },
+        { "2"   , [&](){ return Create_Account{ 
+            &chocan->account_builder.initiate_new_build_process() }; } 
+        },
+        { "3"   , [&](){ return Find_Account { Find_Account::Next::Delete_Account }; }},
+        { "4"   , [&](){ return Generate_Report(); } },
         { "exit", [&](){ return Exit();  } }
     };
 
@@ -210,11 +215,55 @@ Application_State State_Controller::operator()(Confirm_Transaction& state)
     }
 }
 
+Application_State State_Controller::operator()(const Create_Account& state)
+{
+    std::string input;
+    state_viewer->render_state(state, [&]()
+    {
+        input = input_controller->read_input();
+    } ) ;
+
+    if(input == "exit")   { return Exit(); }
+    if(input == "cancel") { return Manager_Menu {{ "Account Not Created" }}; }
+
+    state.builder->set_field(input);
+    
+    state_viewer->render_state(state);
+
+    if(!state.builder->buildable()) { return state; }
+
+    Account temp_account = chocan->account_builder.build_new_account(chocan->db);
+
+    std::optional<bool> confirmed;
+    while(!confirmed)
+    {
+        View_Account view { temp_account, View_Account::Status::Confirm_Creation };
+        state_viewer->render_state(view, [&]()
+        {
+            confirmed = input_controller->confirm_input();
+        } ) ;
+    }
+
+    // User said yes
+    if(confirmed.value())
+    {
+        chocan->db->create_account(temp_account);
+        return Manager_Menu{{ "Account created! ID: " + std::to_string(temp_account.id()) }};
+    }
+
+    // User said no, restart account build
+    state.builder->initiate_new_build_process();
+    return state;
+}
+
 Application_State State_Controller::operator()(View_Account& state)
 {
+    std::string input;
+
     state_viewer->render_state(state, [&](){
-        input_controller->read_input();
+        input = input_controller->read_input();
     }) ;
+    
     return pop_runtime();
 }
 

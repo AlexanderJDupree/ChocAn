@@ -109,6 +109,40 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
     return table;
 }
 
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account& state)
+{
+
+    return 
+    {
+        {"state_name", "Create Account"},
+    
+        {"builder.status", state.builder->get_status()},
+   
+        {"builder.errors", [&]() {
+             if (std::optional<const chocan_user_exception> errors = state.builder->get_errors())
+             {
+                return render_user_error(errors.value());
+
+             }
+             return std::string("");
+         }()
+        },
+        { "builder.current_field", [&]() -> std::string
+        {
+            return std::visit( overloaded {
+                [&](const Account_Builder::Type)  { return "Enter Account Type: "; },
+                [&](const Account_Builder::First) { return "Enter First Name: "; },
+                [&](const Account_Builder::Last)  { return "Enter Last Name: "; },
+                [&](const Account_Builder::Street){ return "Enter Street: "; },
+                [&](const Account_Builder::City)  { return "Enter City: "; },
+                [&](const Account_Builder::State) { return "Enter State: "; },
+                [&](const Account_Builder::Zip)   { return "Enter Zip: "; },
+                [&](const Account_Builder::Idle)  { return " "; }
+            }, state.builder->builder_state() );
+        }() }
+    };
+}
+
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Delete_Account&)
 {
     return
@@ -186,7 +220,11 @@ std::string Resource_Loader::render_user_error(const std::optional<chocan_user_e
             },
             [](const Invalid_Value& err)
             {
-                return err.value + ' ' + err.expected;
+                return "Got [" + err.value + "], Expected [" + err.expected + ']';
+            },
+            [](const Failed_With& err)
+            {
+                return  err.value + ", " + err.reason;
             },
             [](const Incompatible_Values& err)
             {
