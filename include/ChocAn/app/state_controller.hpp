@@ -54,6 +54,7 @@ public:
     Application_State operator()(Login&);
     Application_State operator()(Find_Account&);
     Application_State operator()(View_Account&);
+    Application_State operator()(Delete_Account&);
     Application_State operator()(Manager_Menu&);
     Application_State operator()(Provider_Menu&);
     Application_State operator()(Add_Transaction&);
@@ -61,7 +62,11 @@ public:
     Application_State operator()(Generate_Report&);
     Application_State operator()(View_Summary_Report&);
     Application_State operator()(Confirm_Transaction&);
+<<<<<<< HEAD
     Application_State operator()(Update_Account&);
+=======
+    Application_State operator()(View_Service_Directory&);
+>>>>>>> master
 
 private:
 

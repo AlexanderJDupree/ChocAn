@@ -196,6 +196,8 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
     State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Manager_Menu());
 
+    mocks.chocan->login_manager.login(5678);
+
     SECTION("Manager menu transitions to login on input '0'")
     {
         Application_State expected_state{Login()};
@@ -218,6 +220,7 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
     }
+<<<<<<< HEAD
     SECTION("Manager menu transitions to create account on input '2'")
     {
 
@@ -225,6 +228,20 @@ TEST_CASE("Manager Menu State behavior", "[manager_menu], [state_controller]")
 
         REQUIRE(std::holds_alternative<Create_Account>(controller.interact().current_state()));
 
+=======
+    SECTION("Manager menu transitions to Delete Account on input '4'")
+    {
+        mocks.in_stream << "4\n";
+
+        REQUIRE(std::holds_alternative<Find_Account>(controller.interact().current_state()));
+
+        SECTION("Find_Account transitions to Delete_Account on entry of valid id")
+        {
+            mocks.in_stream << "1234\n";
+
+            REQUIRE(std::holds_alternative<Delete_Account>(controller.interact().current_state()));
+        }
+>>>>>>> master
     }
     SECTION("Manager menu transitions to Generate Report input '5'")
     {
@@ -267,6 +284,19 @@ TEST_CASE("Add_Transaction State Behavior", "[add_transaction], [state_controlle
 
         REQUIRE(std::holds_alternative<Exit>(controller.interact().current_state()));
     }
+    SECTION("Add transaction transitions to View Service Directory on input 'help'")
+    {
+        mocks.in_stream << "help\n";
+
+        REQUIRE(std::holds_alternative<View_Service_Directory>(controller.interact().current_state()));
+
+        SECTION("View Service Directory transitions back to add transaction after pressing enter")
+        {
+            mocks.in_stream << "\n";
+
+            REQUIRE(std::holds_alternative<Add_Transaction>(controller.interact().current_state()));
+        }
+    }
 }
 
 TEST_CASE("Confirm Transaction State Behavior", "[confirm_transaction], [state_controller]")
@@ -294,13 +324,6 @@ TEST_CASE("Confirm Transaction State Behavior", "[confirm_transaction], [state_c
         mocks.in_stream << "no\n";
 
         REQUIRE(std::holds_alternative<Add_Transaction>(controller.interact().current_state()));
-    }
-    SECTION("Confirm transaction does not transition if input cannot be confirmed")
-    {
-        // This input sequence will change if we make changes to the transaction builder
-        mocks.in_stream << "unintelligible\n";
-
-        REQUIRE(std::holds_alternative<Confirm_Transaction>(controller.interact().current_state()));
     }
 }
 
@@ -399,5 +422,35 @@ TEST_CASE("Generate Report state behavior", "[generate_report], [state_controlle
         mocks.in_stream << "cancel\n";
 
         REQUIRE(std::holds_alternative<Manager_Menu>(controller.interact().current_state()));
+    }
+}
+
+TEST_CASE("Delete account state behavior", "[delete_account], [state_controller]")
+{
+    mock_dependencies mocks;
+
+    Account account = mocks.db->get_account(1234).value();
+
+    State_Controller controller( mocks.chocan
+                               , mocks.state_viewer
+                               , mocks.input_controller
+                               , Delete_Account{ account } );
+
+    SECTION("Delete account was given 'yes' and account was actually removed from db")
+    {
+        mocks.in_stream << "yes\n";
+
+        controller.interact();
+
+        REQUIRE_FALSE(mocks.db->get_account(1234));
+    }
+
+    SECTION("Delete account was given 'no' and account was not removed from db")
+    {
+        mocks.in_stream << "no\n";
+
+        controller.interact();
+
+        REQUIRE(mocks.db->get_account(1234));
     }
 }

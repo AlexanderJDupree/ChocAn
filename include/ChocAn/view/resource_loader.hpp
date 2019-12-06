@@ -36,6 +36,7 @@ struct Resource_Loader
     Resource_Table operator()(const Exit&);
     Resource_Table operator()(const Login& login);
     Resource_Table operator()(const View_Account&);
+    Resource_Table operator()(const Delete_Account& state);
     Resource_Table operator()(const Find_Account& state);
     Resource_Table operator()(const Provider_Menu& menu);
     Resource_Table operator()(const Manager_Menu& menu);
@@ -44,7 +45,11 @@ struct Resource_Loader
     Resource_Table operator()(const Confirm_Transaction& state);
     Resource_Table operator()(const Create_Account& state);
     Resource_Table operator()(const Add_Transaction& transaction);
+<<<<<<< HEAD
     Resource_Table operator()(const Update_Account& state);
+=======
+    Resource_Table operator()(const View_Service_Directory& state);
+>>>>>>> master
 
     /* String Formatting Methods */
     std::string row_bar(unsigned num_fields) const;
@@ -55,6 +60,8 @@ struct Resource_Loader
     std::string render_user_error(const std::optional<chocan_user_exception>& maybe_err) const;
 
     std::string render_provider_activity(const Provider_Activity& activity) const;
+
+    std::string render_directory(const Data_Gateway::Service_Directory& directory);
 
     std::string render_summary(const Summary_Report& summary) const;
 

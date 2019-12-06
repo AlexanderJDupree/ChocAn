@@ -29,8 +29,13 @@ Terminal_State_Viewer::Terminal_State_Viewer( bool compact_output
     , command_table  ( {
           { "header",       [&](){ return render_view("header");  } }
         , { "footer",       [&](){ return render_view("footer");  } }
+<<<<<<< HEAD
         , { "clear_screen", [&](){ return clear_screen();  } }
         , { "prompt",       [&](){ event_callback(); } }
+=======
+        , { "clear_screen", [&](){ return clear_screen();         } }
+        , { "prompt",       [&](){ return event_callback();       } }
+>>>>>>> master
     } )
     , resources ({})
     , compact_output( compact_output )
@@ -49,7 +54,6 @@ void Terminal_State_Viewer::render_state(const Application_State& state, Callbac
 void Terminal_State_Viewer::update()
 {
     resources.update();
-    if(!compact_output) { clear_screen(); }
     try
     {
         render_view(resources.table.at("state_name"));
@@ -135,5 +139,14 @@ void Terminal_State_Viewer::execute_command(const std::string& command)
 
 std::string Terminal_State_Viewer::clear_screen() const
 {
+<<<<<<< HEAD
     return std::string(100, '\n');
+=======
+    if(!compact_output)
+    {
+        out_stream << std::string(100, '\n');
+    }
+
+    return;
+>>>>>>> master
 }

@@ -10,11 +10,11 @@
 
 Chocoholics Anonymous is an organization commited to treating those afflicted with addictions to chocolate in all of its glorious forms. The software contained in this repository assists in the delivery and accountability of ChocAn services to Members of the ChocAn network. 
 
-( It's a group software project for CS300 - Elements of Software Engineer, at Portland State University )
+( It's a group software project for CS300 - Elements of Software Engineering, at Portland State University )
 
 ## Project Goals
 
-For detailed analysis of the ChocAn project please see the following documents. 
+For a detailed analysis of the ChocAn project please see the following documents. 
 
 * [Requirements](docs/ChocAn-Requirements.pdf)
 * [Design](docs/ChocAn-Design.pdf)
@@ -22,7 +22,7 @@ For detailed analysis of the ChocAn project please see the following documents.
 
 ## Prerequisites
 
-This project uses C++17 language features and requires a compiler that supports those features. The ChocAn project is built and tested with GCC version 7.0 and Clang version 4.0. For a list of C++17 supported compilers see [here](https://en.cppreference.com/w/cpp/compiler_support). 
+This project uses C++17 language features and requires a compiler that supports those features. The ChocAn project is built and tested with GCC 7.0 and Clang 4.0. For a list of C++17 supported compilers see [here](https://en.cppreference.com/w/cpp/compiler_support). 
 
 This project also utilizes the [Catch2](https://github.com/catchorg/Catch2) unit test library and the [Clara](https://github.com/catchorg/Clara) command line parser. You do not need to download these libraries, they are included in the `third_party` folder of the project repository. 
 
@@ -46,7 +46,7 @@ That's it!
 
 The provided build script will build the project in debug and release configurations and runs their respective unit tests. The build script uses the provided GNU Makefiles in the `gmake/` folder and will store the compiled binaries in the `bin/` folder. If you need specific project files (Visual Studio, Xcode) or need to change the compiler, I have provided a premake5 script that can generate this files for you. If you don't have premake5 you can download it [here](https://premake.github.io/download.html).
 
-The build script will also attempt to download the [Lib-bash](https://github.com/pioneerworks/lib-bash) utility to prettify the output. Currently, if this download fails the build scrip aborts, we are working on making the process never fail in [issue #13](https://github.com/AlexanderJDupree/ChocAn/issues/13). If the process fails you can still build the project manually like this:
+The build script will also attempt to download the [Lib-bash](https://github.com/pioneerworks/lib-bash) utility to prettify the output. ~~Currently, if this download fails the build scrip aborts, we are working on making the process never fail in [issue #13](https://github.com/AlexanderJDupree/ChocAn/issues/13)~~. Fixed in [PR #44](https://github.com/AlexanderJDupree/ChocAn/pull/44). If the process fails you can still build the project manually like this:
 
 To build using Make. 
 ```bash

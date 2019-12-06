@@ -110,6 +110,7 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Account& 
     return table;
 }
 
+<<<<<<< HEAD
 Resource_Loader::Resource_Table Resource_Loader::operator()(const Create_Account& state)
 {
 
@@ -169,6 +170,13 @@ Resource_Loader::Resource_table Resource_Loader::operator()(const Update_Account
                 default: return "";
             }
         }() }
+=======
+Resource_Loader::Resource_Table Resource_Loader::operator()(const Delete_Account&)
+{
+    return
+    {
+
+>>>>>>> master
     };
 }
 
@@ -194,6 +202,28 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Summary_R
         { "start_date"       , start["month"] + '/' + start["day"] + '/' + start["year"] },
         { "end_date"         , end["month"] + '/' + end["day"] + '/' + end["year"] }
     };
+}
+
+Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Service_Directory& state)
+{
+    return
+    {
+        { "state_name", "Service Directory" },
+        { "directory", render_directory(state.db->service_directory()) }
+    };
+}
+
+std::string Resource_Loader::render_directory(const Data_Gateway::Service_Directory& directory)
+{
+    std::string stream;
+    for (const auto& service : directory)
+    {
+        stream += ( '|' + center(service.second.name()) +
+                    '|' + center(service.second.code()) + 
+                    '|' + center('$' + service.second.cost().to_string()) + 
+                    '|' + row_bar(3));
+    }
+    return stream;
 }
 
 std::string Resource_Loader::render_user_error(const std::optional<chocan_user_exception>& maybe_err) const

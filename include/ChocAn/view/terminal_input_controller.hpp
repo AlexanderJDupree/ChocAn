@@ -48,6 +48,21 @@ public:
         return input;
     }
 
+    std::optional<bool> confirm_input() const override
+    {
+        std::string input = read_input();
+
+        std::for_each(input.begin(), input.end(), [](char& c)
+        {
+            c = std::tolower(c);
+        } );
+
+        if(input == "y" || input == "yes") { return true;  }
+        if(input == "n" || input == "no")  { return false;  }
+
+        return { };
+    }
+
     Form_Data read_form(const Fields& fields, Field_Callback prompt) const override
     {
         Form_Data form;
