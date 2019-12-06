@@ -330,18 +330,16 @@ TEST_CASE("Create_Account State Behavior", "[create_account], [state_controller]
     State_Controller controller(mocks.chocan, mocks.state_viewer, mocks.input_controller, Create_Account{&mocks.chocan->account_builder});
     
     // This input sequence will change if we make changes to the account builder
-    mocks.in_stream << "member\nfirstname\nlastname\nstreet\ncity\nOR\n97888\n";
+    mocks.in_stream << "member\nfirstname\nlastname\nstreet\ncity\nOR\n97888\nyes\n";
 
     for (int i = 0; i < 7; ++i)
     {
             controller.interact();
     }
+    REQUIRE(std::holds_alternative<Manager_Menu>(controller.interact().current_state()));
     
     SECTION("Create account transitions to manager menu if account is accepted by user")
     {
-        mocks.in_stream << "Yes\n";
-
-        REQUIRE(std::holds_alternative<Manager_Menu>(controller.interact().current_state()));
     }
 
     SECTION("Create account does not transition if account it rejected by user")
