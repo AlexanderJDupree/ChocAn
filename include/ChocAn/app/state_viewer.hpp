@@ -22,7 +22,6 @@ https://github.com/AlexanderJDupree/ChocAn
 #include <memory>
 #include <functional>
 #include <ChocAn/app/application_state.hpp>
-#include <ChocAn/core/utils/account_builder.hpp>
 
 class State_Viewer
 {
