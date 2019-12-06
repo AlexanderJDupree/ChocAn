@@ -7,6 +7,7 @@
 5
 987654321
 123123123
+not a date
 11-23-2019
 123456
 Add first transaction
