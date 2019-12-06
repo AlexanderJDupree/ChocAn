@@ -220,15 +220,11 @@ std::string Resource_Loader::render_user_error(const std::optional<chocan_user_e
             },
             [](const Invalid_Value& err)
             {
-<<<<<<< HEAD
-                return "Got[" + err.value + "], Expected[" + err.expected + "]";
-=======
                 return "Got [" + err.value + "], Expected [" + err.expected + ']';
             },
             [](const Failed_With& err)
             {
                 return  err.value + ", " + err.reason;
->>>>>>> a3853ddeff38310cb82dadaf476e7357b693838c
             },
             [](const Incompatible_Values& err)
             {
