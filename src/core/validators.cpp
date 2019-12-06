@@ -27,3 +27,9 @@ bool Validators::range(int value, int min, int max)
     return min <= value && value <= max;
 }
 
+bool Validators::is_alphabetic(const std::string& word)
+{
+    for(const char c : word) {if(!std::isalpha(c)) return false;}
+
+    return true;
+}

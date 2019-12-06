@@ -39,6 +39,14 @@ TEST_CASE("Constructing Name objects", "[constructors], [name]")
     {
         REQUIRE_THROWS_AS( Name( "Really really ", "really long name"), invalid_name);
     }
+    SECTION("First name is not alphabetic")
+    {
+        REQUIRE_THROWS_AS( Name( "not &lphabeti(", "valid"), invalid_name);
+    }
+    SECTION("Last name is not alphabetic")
+    {
+        REQUIRE_THROWS_AS( Name("valid", "not &lphabeti("), invalid_name);
+    }
 }
 
 TEST_CASE("Name equality operators", "[operators], [name]")
