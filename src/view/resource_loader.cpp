@@ -15,6 +15,7 @@ https://github.com/AlexanderJDupree/ChocAn
 */
 
 #include <sstream>
+#include <algorithm>
 #include <ChocAn/view/resource_loader.hpp>
 #include <ChocAn/core/utils/overloaded.hpp>
 
@@ -211,12 +212,26 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Service_D
 
 std::string Resource_Loader::render_directory(const Data_Gateway::Service_Directory& directory) const
 {
-    std::string stream;
-    for (const auto& service : directory)
+    struct alphabetical_ordering
     {
-        stream += ( '|' + center(service.second.name()) +
-                    '|' + center(service.second.code()) + 
-                    '|' + center('$' + service.second.cost().to_string()) + 
+        bool operator()(const Service& lhs, const Service& rhs) const
+        {
+            return lhs.name() < rhs.name();
+        }
+    };
+
+    std::set<Service, alphabetical_ordering> services;
+    std::for_each(directory.begin(), directory.end(), [&](const auto& entry)
+    {
+        services.insert(entry.second);
+    } );
+
+    std::string stream;
+    for (const auto& service : services)
+    {
+        stream += ( '|' + center(service.name()) +
+                    '|' + center(service.code()) + 
+                    '|' + center('$' + service.cost().to_string()) + 
                     '|' + row_bar(3));
     }
     return stream;

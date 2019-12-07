@@ -129,7 +129,8 @@ Application_State State_Controller::operator()(Provider_Menu& menu)
             chocan->transaction_builder.reset();
             chocan->transaction_builder.set_provider_acct_field(chocan->login_manager.session_owner());
             return Add_Transaction{ &chocan->transaction_builder }; } 
-        }
+        },
+        { "6"   , [&](){ return View_Service_Directory { chocan->db }; } }
     };
 
     try
