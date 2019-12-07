@@ -157,6 +157,8 @@ Application_State State_Controller::operator()(Manager_Menu& menu)
         },
         { "3"   , [&](){ return Find_Account { Find_Account::Next::Delete_Account }; }},
         { "4"   , [&](){ return Generate_Report(); } },
+        { "5"   , [&](){ return Find_Account { Find_Account::Next::Gen_Provider_Report }; }},
+        { "6"   , [&](){ return Find_Account { Find_Account::Next::Gen_Member_Report }; }},
     };
 
     try
@@ -299,12 +301,24 @@ Application_State State_Controller::operator()(Find_Account& state)
 {
     using Get_Account_Function = std::function<std::optional<Account>(const std::string&)>;
 
+    std::string err_msg;
     auto get_account = [&]() -> Get_Account_Function {
-        if(std::holds_alternative<Manager>(chocan->login_manager.session_owner().type()))
+
+        if(state.next == Find_Account::Next::Gen_Member_Report || std::holds_alternative<Provider>(chocan->login_manager.session_owner().type()))
         {
+            err_msg = "Error, not a ChocAn Member ID: ";
+            return [&](const std::string& id) { return chocan->db->get_member_account(id); };
+        }
+        else if(state.next == Find_Account::Next::Gen_Provider_Report)
+        {
+            err_msg = "Error, not a ChocAn Provider ID: ";
+            return [&](const std::string& id) { return chocan->db->get_provider_account(id); };
+        }
+        else
+        {
+            err_msg = "Error, not a ChocAn ID: ";
             return [&](const std::string& id) { return chocan->db->get_account(id);};
         }
-        return [&](const std::string& id) { return chocan->db->get_member_account(id);};
     }();
 
     std::string input;
@@ -325,10 +339,14 @@ Application_State State_Controller::operator()(Find_Account& state)
                                  , &chocan->account_builder.reset() };
         case Find_Account::Next::Delete_Account : 
             return Delete_Account { maybe_account.value() };
+        case Find_Account::Next::Gen_Member_Report : 
+            return Generate_Report { Generate_Report::Report_Type::Member, maybe_account };
+        case Find_Account::Next::Gen_Provider_Report : 
+            return Generate_Report { Generate_Report::Report_Type::Provider, maybe_account };
         default: return View_Account { maybe_account.value() };
         }
     }
-    state.status = "Invalid ID: " + input;
+    state.status = err_msg + input;
     return state;
 }
 
@@ -337,7 +355,22 @@ Application_State State_Controller::operator()(Generate_Report& state)
     // We have enough dates to generate a report
     if(state.date_range.size() == 2) 
     { 
-        return View_Summary_Report { 
+        switch (state.type)
+        {
+        case Generate_Report::Report_Type::Member :
+            return View_Report { 
+                chocan->reporter.gen_member_report(state.date_range[0], state.date_range[1], state.account.value()) 
+            }; 
+        case Generate_Report::Report_Type::Provider :
+            return View_Report { 
+                chocan->reporter.gen_provider_report(state.date_range[0], state.date_range[1], state.account.value()) 
+            }; 
+        default: // Summary Report
+            return View_Report { 
+                chocan->reporter.gen_summary_report(state.date_range[0], state.date_range[1]) 
+            }; 
+        }
+        return View_Report { 
             chocan->reporter.gen_summary_report(state.date_range[0], state.date_range[1]) 
         }; 
     }
@@ -369,7 +402,7 @@ Application_State State_Controller::operator()(Generate_Report& state)
     return state;
 }
 
-Application_State State_Controller::operator()(View_Summary_Report& state)
+Application_State State_Controller::operator()(View_Report& state)
 {
     state_viewer->render_state(state, [&](){
         input_controller->read_input();

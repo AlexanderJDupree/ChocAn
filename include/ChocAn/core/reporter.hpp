@@ -35,6 +35,8 @@ public:
 
     Provider_Report gen_provider_report(const DateTime& start, const DateTime& end, const Account& provider) const;
 
+    Member_Report gen_member_report(const DateTime& start, const DateTime& end, const Account& member) const;
+
 private:
 
     Database_Ptr db;

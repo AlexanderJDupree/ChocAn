@@ -60,7 +60,12 @@ class Find_Account
 {
 public:
     // Represents the next state find account will proceed to
-    enum class Next { View_Account, Delete_Account, Update_Account };
+    enum class Next { View_Account
+                    , Delete_Account
+                    , Update_Account
+                    , Gen_Member_Report
+                    , Gen_Provider_Report };
+
     Next next = Next::View_Account;
     std::string status = "";
 };
@@ -82,15 +87,20 @@ public:
 class Generate_Report 
 { 
 public:
-    std::vector<DateTime> date_range;
+
+    enum class Report_Type { Member, Provider, Summary };
+
+    Report_Type type = Report_Type::Summary;
+    std::optional<Account> account = {};
+    std::vector<DateTime> date_range = {};
     const std::string date_structure = "MM-DD-YYYY";
-    std::optional<chocan_user_exception> error;
+    std::optional<chocan_user_exception> error = {};
 };
 
-class View_Summary_Report
+class View_Report
 {
 public:
-    Summary_Report report;
+    ChocAn_Report report;
 };
 
 class Update_Account
@@ -116,19 +126,19 @@ public:
     Data_Gateway::Database_Ptr db;
 };
 
-using Application_State = std::variant< Login
-                                      , Exit
-                                      , Provider_Menu
+using Application_State = std::variant< Exit
+                                      , Login
+                                      , View_Report
                                       , Manager_Menu
-                                      , Add_Transaction
-                                      , Confirm_Transaction
-                                      , Create_Account
                                       , Find_Account
                                       , View_Account
-                                      , Generate_Report
-                                      , View_Summary_Report
+                                      , Provider_Menu
+                                      , Create_Account
                                       , Update_Account
                                       , Delete_Account
+                                      , Generate_Report
+                                      , Add_Transaction
+                                      , Confirm_Transaction
                                       , View_Service_Directory
                                       >;
 
