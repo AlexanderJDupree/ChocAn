@@ -13,6 +13,8 @@
 
 5) Add Transaction
 
+6) View Service Directory
+
 <footer>
 
 <@menu.status>

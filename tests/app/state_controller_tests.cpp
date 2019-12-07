@@ -161,6 +161,12 @@ TEST_CASE("Provider Menu State behavior", "[provider_menu], [state_controller]")
 
         REQUIRE(controller.interact().current_state().index() == expected_state.index());
     }
+    SECTION("Provider menu transtions to View Service directory on input '6'")
+    {
+        mocks.in_stream << "6\n";
+
+        REQUIRE(std::holds_alternative<View_Service_Directory>(controller.interact().current_state()));
+    }
     SECTION("Provider menu transitions to Add Transaction on input '5'")
     {
         Application_State expected_state{Add_Transaction{&mocks.chocan->transaction_builder}};
