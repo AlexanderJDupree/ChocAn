@@ -54,13 +54,13 @@ public:
     using Errors_With_Address = std::vector<invalid_address::Address_Errors>;
     Account_Builder(){reset();}
 
+    Account_Builder& reset();
     Account_Builder& initiate_new_build_process();
     
     const Account build_new_account(const ID_Generator& id_generator);
-    void request_update_to_account(Build_State update_needed); 
+    void request_update_to_account(std::vector<Build_State> updates_needed); 
     void apply_updates_to_account(Account& account); 
     void set_field(const std::string &input);
-    void reset();
 
     bool buildable()const;
     const std::string get_status();

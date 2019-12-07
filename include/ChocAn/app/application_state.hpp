@@ -68,7 +68,7 @@ public:
 class View_Account
 {
 public:
-    enum class Status { Wait, Confirm_Creation, Confirm_Deletion };
+    enum class Status { Wait, Confirm_Creation, Confirm_Deletion, Confirm_Update };
     Account account;
     Status status = Status::Wait;
 };
@@ -91,6 +91,17 @@ class View_Summary_Report
 {
 public:
     Summary_Report report;
+};
+
+class Update_Account
+{
+public: 
+    enum class Status { Choose, Update_Field, Confirm };
+
+    Account account;
+    Account_Builder* builder;
+    std::string msg = {};
+    Status status = Status::Choose;
 };
 
 class Delete_Account
@@ -116,6 +127,7 @@ using Application_State = std::variant< Login
                                       , View_Account
                                       , Generate_Report
                                       , View_Summary_Report
+                                      , Update_Account
                                       , Delete_Account
                                       , View_Service_Directory
                                       >;

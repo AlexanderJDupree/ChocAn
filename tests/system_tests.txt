@@ -1,6 +1,19 @@
 987654321
 1
   
+3
+123123123
+name
+Abe
+Lincoln
+yes
+address
+1864 Emancipation St.
+Salem
+what
+CA
+12345
+no
 4
 123123123
   
@@ -55,4 +68,7 @@ yes
 4
 all
 Cool
+3
+123123123
+yes
 exit
