@@ -32,7 +32,7 @@ bool Validators::range(int value, int min, int max)
 
 bool Validators::is_alphabetic(const std::string& word)
 {
-    for(const char c : word) 
+    for(const char& c : word) 
     {
         if((c < 'A' || c > 'Z') && (c < 'a' || c > 'z'))  return false;
     }

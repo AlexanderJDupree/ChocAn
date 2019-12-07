@@ -43,12 +43,12 @@ Name::Name(const std::string& first, const std::string& last)
     }
     else if(!Validators::is_alphabetic(first))
     {
-        errors["First Name"] = Invalid_Value {first,"Only english letter"};
+        errors["First Name"] = Invalid_Value {first,"Alphabetic characters only"};
         name_errors.specific_errors.push_back(invalid_name::Bad_First());
     }
     else if(!Validators::is_alphabetic(last))
     {
-        errors["Last Name"] = Invalid_Value {first,"Only english letter"};
+        errors["Last Name"] = Invalid_Value {first,"Alphabetic characters only"};
         name_errors.specific_errors.push_back(invalid_name::Bad_Last());
     }
 
