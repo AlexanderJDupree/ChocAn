@@ -159,6 +159,8 @@ main() {
   header
   build
   tests
+
+  echo "IMPORTANT: To run the application use: './bin/debug/ChocAn_debug' or './bin/debug/ChocAn_release'."
 }
 
 while [ "$1" != "" ]; do
