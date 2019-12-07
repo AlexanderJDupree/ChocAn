@@ -28,6 +28,8 @@ bool length(const std::string& field, unsigned min, unsigned max);
 
 bool range(int value, int min, int max);
 
+bool is_alphabetic(const std::string& word);
+
 }; // namespace Validators
 
 #endif // CHOCAN_VALIDATORS_HPP

@@ -54,7 +54,6 @@ Address::Address( const std::string& street
 
         error_msg.specific_errors.push_back(invalid_address::Bad_City());
     }
-    
     if( !Validators::length(_state, 2, 2) ) {
 
         errors["State"] = Invalid_Length {_state,2,2};

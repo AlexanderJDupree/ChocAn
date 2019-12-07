@@ -39,6 +39,17 @@ Name::Name(const std::string& first, const std::string& last)
     {
         errors["Full Name"] = Invalid_Length {first + " " + last,2,25};
         name_errors.specific_errors.push_back(invalid_name::Bad_Full());
+
+    }
+    else if(!Validators::is_alphabetic(first))
+    {
+        errors["First Name"] = Invalid_Value {first,"Alphabetic characters only"};
+        name_errors.specific_errors.push_back(invalid_name::Bad_First());
+    }
+    else if(!Validators::is_alphabetic(last))
+    {
+        errors["Last Name"] = Invalid_Value {first,"Alphabetic characters only"};
+        name_errors.specific_errors.push_back(invalid_name::Bad_Last());
     }
 
     if (!errors.empty())

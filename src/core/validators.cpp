@@ -15,7 +15,10 @@ https://github.com/AlexanderJDupree/ChocAn
  
 */
 
+
 #include <ChocAn/core/utils/validators.hpp>
+#include <set>
+
 
 bool Validators::length(const std::string& field, unsigned min, unsigned max)
 {
@@ -27,3 +30,12 @@ bool Validators::range(int value, int min, int max)
     return min <= value && value <= max;
 }
 
+bool Validators::is_alphabetic(const std::string& word)
+{
+    for(const char& c : word) 
+    {
+        if((c < 'A' || c > 'Z') && (c < 'a' || c > 'z'))  return false;
+    }
+
+    return true;
+}
