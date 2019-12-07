@@ -2,7 +2,7 @@
 
 <footer>
 ( Entering 'cancel' will cancel the return to the previous menu )
-( Entering 'all' will generate a summary report for all transactions since 1970 )
+( Entering 'all' will generate a report for all transactions since 1970 )
 
 <@errors>
 <@status> <prompt>

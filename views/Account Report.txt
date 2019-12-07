@@ -1,0 +1,13 @@
+<clear_screen>
+<header>
+
+ChocAn ID: <@chocan_id> | <@type> | <@status>
+
+Name: <@l_name>, <@f_name>
+
+Address: <@street>
+         <@city> <@state>, <@zip>
+
+<@account_activity>
+
+Press 'Enter' to continue: <prompt>

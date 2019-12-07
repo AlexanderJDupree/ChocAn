@@ -52,6 +52,7 @@ public:
     /** Visitor Methods **/
     Application_State operator()(Exit&);
     Application_State operator()(Login&);
+    Application_State operator()(View_Report&);
     Application_State operator()(Find_Account&);
     Application_State operator()(View_Account&);
     Application_State operator()(Manager_Menu&);
@@ -61,7 +62,6 @@ public:
     Application_State operator()(Update_Account&);
     Application_State operator()(Add_Transaction&);
     Application_State operator()(Generate_Report&);
-    Application_State operator()(View_Summary_Report&);
     Application_State operator()(Confirm_Transaction&);
     Application_State operator()(View_Service_Directory&);
 

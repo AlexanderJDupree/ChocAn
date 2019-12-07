@@ -30,9 +30,16 @@ Reporter::Reporter(Database_Ptr db)
 
 Provider_Report Reporter::gen_provider_report( const DateTime& start
                                              , const DateTime& end
-                                             , const Account& provider) const
+                                             , const Account&  provider ) const
 {
     return Provider_Report( provider, db->get_transactions(start, end, provider));
+}
+
+Member_Report Reporter::gen_member_report( const DateTime&   start
+                                           , const DateTime& end
+                                           , const Account&  member ) const
+{
+    return Member_Report( member, db->get_transactions(start, end, member));
 }
 
 Summary_Report Reporter::gen_summary_report(const DateTime& start, const DateTime& end) const

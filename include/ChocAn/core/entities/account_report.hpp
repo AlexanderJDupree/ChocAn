@@ -42,6 +42,13 @@ protected:
     Transactions _transactions;
 };
 
+class Member_Report : public Account_Report
+{
+public:
+    Member_Report(const Account& account, const Transactions& transactions)
+        : Account_Report(account, transactions) {}
+};
+
 class Provider_Report : public Account_Report
 {
 public:
@@ -83,5 +90,10 @@ private:
     DateTime _start;
     Provider_Activity _activity;
 };
+
+using ChocAn_Report = std::variant< Member_Report
+                                  , Provider_Report
+                                  , Summary_Report
+                                  >;
 
 #endif // CHOCAN_ACCOUNT_REPORT_HPP

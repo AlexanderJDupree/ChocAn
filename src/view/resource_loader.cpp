@@ -166,18 +166,38 @@ Resource_Loader::Resource_Table Resource_Loader::operator()(const Generate_Repor
                                                : "Enter report end date (" + state.date_structure + "):" }
     };
 }
-Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Summary_Report& state)
+Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Report& state)
 {
-    DateTime::Data_Table start = state.report.start_date().serialize();
-    DateTime::Data_Table end   = state.report.end_date().serialize();
-    return
-    {
-        { "state_name", "Summary Report" },
-        { "summary_totals"   , render_summary(state.report) },
-        { "provider_activity", render_provider_activity(state.report.activity()) },
-        { "start_date"       , start["month"] + '/' + start["day"] + '/' + start["year"] },
-        { "end_date"         , end["month"] + '/' + end["day"] + '/' + end["year"] }
-    };
+    return std::visit( overloaded {
+        [&](const Summary_Report& report) -> Resource_Table
+        {
+            DateTime::Data_Table start = report.start_date().serialize();
+            DateTime::Data_Table end   = report.end_date().serialize();
+            return
+            {
+                { "state_name", "Summary Report" },
+                { "summary_totals"   , render_summary(report) },
+                { "provider_activity", render_provider_activity(report.activity()) },
+                { "start_date"       , start["month"] + '/' + start["day"] + '/' + start["year"] },
+                { "end_date"         , end["month"] + '/' + end["day"] + '/' + end["year"] }
+            };
+        },
+        [&](const Provider_Report& report) -> Resource_Table
+        {
+            Resource_Table table = report.account().serialize();
+            table.insert({ "state_name", "Account Report" });
+            table.insert({ "account_activity", render_account_activity(report) });
+            return table;
+        },
+        [&](const Member_Report& report) -> Resource_Table
+        {
+
+            Resource_Table table = report.account().serialize();
+            table.insert({ "state_name", "Account Report" });
+            table.insert({ "account_activity", render_account_activity(report) });
+            return table;
+        }
+    }, state.report );
 }
 
 Resource_Loader::Resource_Table Resource_Loader::operator()(const View_Service_Directory& state)
@@ -253,6 +273,41 @@ std::string Resource_Loader::render_user_error(const std::optional<chocan_user_e
     }
     return stream += '\n';
 }
+
+std::string Resource_Loader::render_account_activity(const Provider_Report& report) const
+{
+    std::string activity = "Activity for this period:\n";
+    
+    for ( const auto& transaction : report.transactions())
+    {
+        Transaction::Data_Table data = transaction.serialize();
+        activity += ( "\n\nService Date: " + data["service_date_alt"] +
+                      "\nFiled Date: " + data["filed_date_alt"] + 
+                      "\n\tMember ID: " + data["member_id"] + 
+                      "\n\tMember Name: " + data["member_name"] + 
+                      "\n\tCost: " + data["service_cost"] + 
+                      "\n\tService: " + data["service_name"] + " | " + data["service_code"]);
+    }
+
+    activity += "\n\nTotal Number of Consultations: " + std::to_string(report.services_rendered());
+    activity += "\nTotal Fee: " + report.total_fee().to_string();
+    return activity;
+};
+
+std::string Resource_Loader::render_account_activity(const Member_Report& report) const
+{
+    std::string activity = "Activity for this period:\n";
+    
+    for ( const auto& transaction : report.transactions())
+    {
+        Transaction::Data_Table data = transaction.serialize();
+        activity += ( "\n\nService Date: " + data["service_date_alt"] +
+                      "\n\tProvider ID: " + data["provider_id"] + 
+                      "\n\tProvider Name: " + data["provider_name"] + 
+                      "\n\tService: " + data["service_name"] + " | " + data["service_code"]);
+    }
+    return activity;
+};
 
 std::string Resource_Loader::render_provider_activity(const Provider_Activity& activity) const
 {

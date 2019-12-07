@@ -11,6 +11,10 @@
 
 4) Generate Summary Reports
 
+5) Generate Provider Report
+
+6) Generate Member Report
+
 <footer>
 
 <@menu.status>
