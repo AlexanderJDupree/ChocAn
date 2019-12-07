@@ -15,6 +15,10 @@ https://github.com/AlexanderJDupree/LinkedListsCPP
  
 */
 
+#define CHOCAN_VERSION_MAJOR 1
+#define CHOCAN_VERSION_MINOR 1
+#define CHOCAN_VERSION_PATCH 0
+
 #include <fstream>
 #include <clara.hpp>
 #include <ChocAn/data/mock_db.hpp>
